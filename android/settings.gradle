@@ -1,0 +1,3 @@
+rootProject.name = 'humaniq_mobile'
+
+include ':app'
