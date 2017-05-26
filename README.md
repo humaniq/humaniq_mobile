@@ -9,3 +9,9 @@ LITE version of the mobile app (without text), is specially designed for nonread
 ## Getting started
 This app is based on React Native framework.
 To run this app on your device or simulator please follow [official documentation instructions](https://facebook.github.io/react-native/docs/getting-started.html).
+
+### Tools:
+#### Code inspection:
+* ESlint (Aribnb, babel-parser)
+
+To lint run ```node_modules/.bin/eslint ./src```
