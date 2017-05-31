@@ -1,8 +1,12 @@
+import React from 'react';
 import { AppRegistry } from 'react-native';
 import {
   StackNavigator,
   // TabNavigator,
 } from 'react-navigation';
+
+import { Provider } from 'react-redux';
+import store from './utils/store';
 
 import Login from './components/Login';
 
@@ -21,7 +25,7 @@ const Dashboard = TabNavigator(
 );
 */
 
-const App = StackNavigator(
+const LoginStack = StackNavigator(
   {
     Login: { screen: Login },
     // Dashboard: { screen: Dashboard },
@@ -29,6 +33,12 @@ const App = StackNavigator(
   {
     headerMode: 'none',
   },
+);
+
+let App = () => (
+  <Provider store={store}>
+    <LoginStack />
+  </Provider>
 );
 
 AppRegistry.registerComponent('humaniq_mobile', () => App);

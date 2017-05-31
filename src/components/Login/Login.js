@@ -5,9 +5,20 @@ import {
   TouchableOpacity,
   StyleSheet,
 } from 'react-native';
+import { bindActionCreators } from 'redux';
 import { NavigationActions } from 'react-navigation';
+import { connect } from 'react-redux';
+import { ActionCreators } from '../../actions';
 
-export default class Login extends Component {
+class Login extends Component {
+  componentDidMount() {
+    this.props.initApp();
+  }
+
+  componentWillReceiveProps(newProps) {
+    console.log('new props Login', newProps.init)
+  }
+
   static navigationOptions = {
     // header: null,
   };
@@ -38,6 +49,13 @@ export default class Login extends Component {
     );
   }
 }
+
+const mapDispatchToProps = dispatch => (bindActionCreators(ActionCreators, dispatch));
+const mapStateToProps = state => ({
+  init: state.init,
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(Login);
 
 const styles = StyleSheet.create({
   container: {
