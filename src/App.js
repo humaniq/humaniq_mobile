@@ -8,6 +8,7 @@ import { Provider } from 'react-redux';
 import store from './utils/store';
 
 import Login from './components/Login';
+import Tutorial from './components/Shared/Components/Tutorial';
 
 /*
 const Dashboard = TabNavigator(
@@ -26,8 +27,8 @@ const Dashboard = TabNavigator(
 
 const LoginStack = StackNavigator(
   {
-    Login: { screen: Login },
-    // Dashboard: { screen: Dashboard },
+    // Login: { screen: Login },
+    Tutorial: { screen: Tutorial },
   },
   {
     headerMode: 'none',

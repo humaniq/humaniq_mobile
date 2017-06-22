@@ -3,7 +3,9 @@ import * as _ from 'underscore';
 import { vh, vw, pixelRatio } from './units';
 
 EStyleSheet.build({
-  $cGray: 'tomato',
+  $colorPrimary: 'tomato',
+  $cGray: '#9B9B9B',
+  $cGrayLight: '#D8D8D8',
 });
 
 const adjustableProperties = {
