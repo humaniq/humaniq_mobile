@@ -3,6 +3,7 @@ import {
   View,
   Text,
   TouchableOpacity,
+  StyleSheet,
 } from 'react-native';
 import { bindActionCreators } from 'redux';
 import { NavigationActions } from 'react-navigation';
@@ -16,7 +17,7 @@ class Login extends Component {
   }
 
   componentWillReceiveProps(newProps) {
-    console.log('new props Login', newProps.init);
+    console.log('new props Login', newProps.init)
   }
 
   static navigationOptions = {
@@ -73,11 +74,9 @@ const styles = CustomStyleSheet({
     fontSize: 50,
   },
   btn: {
-    round: 100,
-    // width: 100,
-    // height: 100,
+    width: 250,
+    height: 50,
     margin: 10,
-    borderRadius: 500,
     backgroundColor: '$cGray',
     justifyContent: 'center',
     alignItems: 'center',
