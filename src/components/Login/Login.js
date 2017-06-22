@@ -3,12 +3,12 @@ import {
   View,
   Text,
   TouchableOpacity,
-  StyleSheet,
 } from 'react-native';
 import { bindActionCreators } from 'redux';
 import { NavigationActions } from 'react-navigation';
 import { connect } from 'react-redux';
 import { ActionCreators } from '../../actions';
+import CustomStyleSheet from '../../utils/customStylesheet';
 
 class Login extends Component {
   componentDidMount() {
@@ -16,7 +16,7 @@ class Login extends Component {
   }
 
   componentWillReceiveProps(newProps) {
-    console.log('new props Login', newProps.init)
+    console.log('new props Login', newProps.init);
   }
 
   static navigationOptions = {
@@ -57,7 +57,11 @@ const mapStateToProps = state => ({
 
 export default connect(mapStateToProps, mapDispatchToProps)(Login);
 
-const styles = StyleSheet.create({
+const styles = CustomStyleSheet({
+  test: {
+    width: 100,
+    height: 100,
+  },
   container: {
     flex: 1,
     paddingTop: 300,
@@ -69,10 +73,12 @@ const styles = StyleSheet.create({
     fontSize: 50,
   },
   btn: {
-    width: 250,
-    height: 50,
+    round: 100,
+    // width: 100,
+    // height: 100,
     margin: 10,
-    backgroundColor: '#fff',
+    borderRadius: 500,
+    backgroundColor: '$cGray',
     justifyContent: 'center',
     alignItems: 'center',
   },

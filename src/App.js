@@ -4,7 +4,6 @@ import {
   StackNavigator,
   // TabNavigator,
 } from 'react-navigation';
-
 import { Provider } from 'react-redux';
 import store from './utils/store';
 
@@ -35,7 +34,7 @@ const LoginStack = StackNavigator(
   },
 );
 
-let App = () => (
+const App = () => (
   <Provider store={store}>
     <LoginStack />
   </Provider>
