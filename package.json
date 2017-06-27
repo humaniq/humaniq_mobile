@@ -10,14 +10,17 @@
     "firebase": "^4.1.0",
     "react": "16.0.0-alpha.6",
     "react-native": "0.44.0",
+    "react-native-asset-library-to-base64": "^1.0.1",
     "react-native-camera": "git+https://github.com/lwansbrough/react-native-camera.git",
     "react-native-extended-stylesheet": "^0.5.0",
+    "react-native-fetch-blob": "^0.10.5",
     "react-navigation": "^1.0.0-beta.11",
     "react-redux": "^5.0.5",
     "redux": "^3.6.0",
     "redux-logger": "^3.0.6",
     "redux-thunk": "^2.2.0",
-    "underscore": "^1.8.3"
+    "underscore": "^1.8.3",
+    "vanilla-masker": "^1.2.0"
   },
   "devDependencies": {
     "babel-eslint": "^6.1.2",

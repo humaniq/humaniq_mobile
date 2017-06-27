@@ -29,7 +29,7 @@ export default class Tutorial extends Component {
   componentWillMount() {
     const navState = this.props.navigation.state;
     if (navState.params && navState.params.nextScene) {
-      const nextScene  = this.props.navigation.state.params.nextScene;
+      const nextScene = this.props.navigation.state.params.nextScene;
       this.setState({ nextScene });
     }
   }
@@ -39,13 +39,14 @@ export default class Tutorial extends Component {
   };
 
   handleNavigate = () => {
-    this.props.navigation.navigate(this.state.nextScene);
+    const navState = this.props.navigation.state;
+    this.props.navigation.navigate(this.state.nextScene, { ...navState.params });
   };
 
   render() {
     return (
       <View style={styles.container}>
-        <Text style={{alignSelf: 'center', fontSize: 30}}>
+        <Text style={{ alignSelf: 'center', fontSize: 30 }}>
           {`tutorial for ${this.state.nextScene}`}
         </Text>
 

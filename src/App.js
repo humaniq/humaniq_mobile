@@ -7,7 +7,13 @@ import {
 import { Provider } from 'react-redux';
 import store from './utils/store';
 
-import Login from './components/Login';
+import Camera from './components/Camera';
+import {
+  Password,
+  TelInput,
+  // CodeInput
+} from './components/Login';
+import Dashboard from './components/Dashboard';
 import Tutorial from './components/Shared/Components/Tutorial';
 
 /*
@@ -27,8 +33,11 @@ const Dashboard = TabNavigator(
 
 const LoginStack = StackNavigator(
   {
-    // Login: { screen: Login },
     Tutorial: { screen: Tutorial },
+    Camera: { screen: Camera },
+    Password: { screen: Password },
+    TelInput: { screen: TelInput },
+    Dashboard: { screen: Dashboard },
   },
   {
     headerMode: 'none',
