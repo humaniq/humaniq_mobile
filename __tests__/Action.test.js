@@ -15,7 +15,7 @@ import {
     SAVE_USER_PHONE,
     SAVE_USER_TOKEN
 } from '../src/actions/types';
-import initApp from '../src/actions/init'
+import {initApp} from '../src/actions/init'
 import {
     saveUserId,
     saveUserImei,

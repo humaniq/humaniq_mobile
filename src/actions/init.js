@@ -1,6 +1,6 @@
 import * as types from './types';
 
-export default function initApp() {
+export function initApp() {
   return {
     type: types.INIT_APP,
   };
