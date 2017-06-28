@@ -3,15 +3,16 @@
  */
 import {shallow} from 'enzyme'
 import React, { Component } from 'react';
-import Dashboard from '../src/components/Dashboard/Dashboard'
+import Keyboard from '../src/components/Login/Keyboard'
+import CodeInput from '../src/components/Login/CodeInput'
+import TelInput from '../src/components/Login/TelInput'
 import configureMockStore from 'redux-mock-store'
 const mockStore = configureMockStore()
 
-
-describe('<Dashboard />', () => {
+describe('<Login />', () => {
     const store = mockStore({})
-    it('should render correcly', () => {
-        const wrapper = shallow(<Dashboard store={store}/>)
+    it('should render Keyboard correcly', () => {
+        const wrapper = shallow(<Keyboard/>)
         expect(wrapper).toMatchSnapshot()
         expect(wrapper.length).toBe(1)
     })
