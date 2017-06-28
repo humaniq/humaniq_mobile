@@ -3,7 +3,6 @@
  */
 import {shallow, render, mount} from 'enzyme'
 import React, { Component } from 'react';
-import mockStore from 'redux-mock-store'
 import fetch from 'isomorphic-fetch'
 
 describe('API test', () => {
