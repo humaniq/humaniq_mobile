@@ -33,7 +33,7 @@ export default class VirtualKeyboard extends Component {
       <TouchableOpacity
         style={[
           styles.cell,
-          middleCellValues.includes(number) && styles.middleCell
+          styles.middleCell
         ]}
         key={number}
         accessibilityLabel={number.toString()}

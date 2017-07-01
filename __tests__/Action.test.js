@@ -26,9 +26,9 @@ import {
     updateUserRegStatus
 } from '../src/actions/user'
 
-/***
- * Testing actions
- ***/
+    /***
+     * Testing actions
+     ***/
 
 describe('init Action', () => {
     it('should return INIT action', () => {
