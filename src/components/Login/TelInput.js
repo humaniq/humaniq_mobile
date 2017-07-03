@@ -17,7 +17,7 @@ import Keyboard from './Keyboard';
 
 const ic_user = require('../../assets/icons/ic_user.png');
 
-class TelInput extends Component {
+export class TelInput extends Component {
   static navigationOptions = {
     // header: null,
   };

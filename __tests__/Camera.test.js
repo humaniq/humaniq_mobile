@@ -68,7 +68,7 @@ describe('<Camera />', () => {
         expect(wrapper.state().imageB64).toEqual('')
     })
 
-    it('should would', () => {
+    it('should return type Function', () => {
         const wrapper = shallow(<Cam user={user} store={mockedStore} />)
         expect(typeof wrapper.instance().handleCameraClose).toEqual('function')
     })
