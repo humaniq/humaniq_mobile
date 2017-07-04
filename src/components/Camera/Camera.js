@@ -24,6 +24,8 @@ const close = require('../../assets/icons/ic_close.png');
 // eslint-disable-next-line import/no-unresolved
 const confirm = require('../../assets/icons/ic_confirm_dark.png');
 
+const photo = 'file:///storage/emulated/0/DCIM/Camera/IMG_20170629_161313.jpg';
+
 /*
   on second run check permissions http://facebook.github.io/react-native/docs/permissionsandroid.html
   before: https://github.com/lwansbrough/react-native-camera/issues/224
@@ -108,12 +110,15 @@ export class Cam extends Component {
   };
 
   handleImageCapture = () => {
-    this.camera.capture()
+    this.camera
+      .capture()
       .then((data) => {
         this.setState({ path: data.path });
         this.convertToBase64(data.path);
       })
-      .catch((err) => { console.error('error during image capture', err); });
+      .catch((err) => {
+        console.error('error during image capture', err);
+      });
   };
 
   handleImageDelete = () => {

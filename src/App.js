@@ -14,6 +14,7 @@ import {
   CodeInput
 } from './components/Login';
 import Dashboard from './components/Dashboard';
+import Chat from './components/Chat';
 import Tutorial from './components/Shared/Components/Tutorial';
 import Instructions from './components/Instructions/Instructions'
 import Profile from './components/Profile/Profile'
@@ -41,6 +42,7 @@ const LoginStack = StackNavigator(
       ProfileSettings: {screen: ProfileSettings},
       ProfileEdit: {screen: ProfileEdit},
       Tutorial: { screen: Tutorial },
+      Chat: { screen: Chat },
     Camera: { screen: Camera },
     Password: { screen: Password },
     TelInput: { screen: TelInput },
@@ -53,10 +55,9 @@ const LoginStack = StackNavigator(
   },
 );
 
-const App = () => (
-  <Provider store={store}>
+const App = () =>
+  (<Provider store={store}>
     <LoginStack />
-  </Provider>
-);
+  </Provider>);
 
 AppRegistry.registerComponent('humaniq_mobile', () => App);
