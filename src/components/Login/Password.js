@@ -197,7 +197,7 @@ class Password extends Component {
     return (
       <View style={styles.container}>
         <View style={styles.header}>
-          <Image style={styles.userPhoto} source={{ uri: this.props.user.avatar.localPath }} />
+          <Image style={styles.userPhoto} source={{ uri: "data:image/jpeg;base64," + this.props.user.avatar.b64 }} />
           {this.renderInputStep()}
           <Text>{this.state.password}</Text>
           <View style={styles.passContainer}>
