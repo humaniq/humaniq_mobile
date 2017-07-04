@@ -1,10 +1,5 @@
 import React, { Component } from 'react';
-import {
-  View,
-  TouchableOpacity,
-  Image,
-  Text,
-} from 'react-native';
+import { View, TouchableOpacity, Image, Text } from 'react-native';
 import Camera from 'react-native-camera';
 import { NavigationActions } from 'react-navigation';
 import RNFetchBlob from 'react-native-fetch-blob';
@@ -17,6 +12,8 @@ import CustomStyleSheet from '../../utils/customStylesheet';
 // assets
 const close = require('../../assets/icons/ic_close.png');
 const confirm = require('../../assets/icons/ic_confirm_dark.png');
+
+const photo = 'file:///storage/emulated/0/DCIM/Camera/IMG_20170629_161313.jpg';
 
 /*
   on second run check permissions http://facebook.github.io/react-native/docs/permissionsandroid.html
@@ -42,11 +39,14 @@ class Cam extends Component {
   };
 
   handleImageCapture = () => {
-    this.camera.capture()
+    this.camera
+      .capture()
       .then((data) => {
         this.setState({ imagePath: data.path });
       })
-      .catch((err) => { console.error('error during image capture', err); });
+      .catch((err) => {
+        console.error('error during image capture', err);
+      });
   };
 
   handleImageDelete = () => {
@@ -56,7 +56,8 @@ class Cam extends Component {
   handleImageUpload = () => {
     this.setState({ uploading: true });
     // TODO: reset navigation stack to prevent back action on android!!
-    RNFetchBlob.fs.readFile(this.state.imagePath, 'base64')
+    RNFetchBlob.fs
+      .readFile(photo, 'base64')
       .then((data) => {
         this.setState({ imageB64: data });
         this.handleIsRegisteredCheck(data);
@@ -158,23 +159,21 @@ class Cam extends Component {
           {this.state.imagePath ? this.renderImage() : this.renderCamera()}
         </View>
         <View style={styles.captureContainer}>
-          {this.state.uploading ? <Text>Uploading</Text> :
-          <TouchableOpacity
-            style={[styles.captureBtn, this.state.imagePath && styles.uploadBtn]}
-            onPress={this.state.imagePath ? this.handleImageUpload : this.handleImageCapture}
-          >
-            {this.state.imagePath ? <Image source={confirm} /> : null}
-          </TouchableOpacity>
-          }
+          {this.state.uploading
+            ? <Text>Uploading</Text>
+            : <TouchableOpacity
+              style={[styles.captureBtn, this.state.imagePath && styles.uploadBtn]}
+              onPress={this.state.imagePath ? this.handleImageUpload : this.handleImageCapture}
+            >
+              {this.state.imagePath ? <Image source={confirm} /> : null}
+            </TouchableOpacity>}
         </View>
       </View>
     );
   }
 }
 
-const mapDispatchToProps = dispatch => (
-  bindActionCreators(ActionCreators, dispatch)
-);
+const mapDispatchToProps = dispatch => bindActionCreators(ActionCreators, dispatch);
 
 const mapStateToProps = state => ({
   user: state.user,
