@@ -15,6 +15,7 @@ import {
 } from './components/Login';
 import Dashboard from './components/Dashboard';
 import Tutorial from './components/Shared/Components/Tutorial';
+import Instructions from './components/Instructions/Instructions'
 
 /*
 const Dashboard = TabNavigator(
@@ -38,6 +39,7 @@ const LoginStack = StackNavigator(
     Password: { screen: Password },
     TelInput: { screen: TelInput },
     Dashboard: { screen: Dashboard },
+      Instructions: { screen: Instructions },
   },
   {
     headerMode: 'none',
