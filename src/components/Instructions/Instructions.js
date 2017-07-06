@@ -67,7 +67,7 @@ export class Instructions extends Component {
     }
 
     onPressStart = () => {
-        // on long click pauses video
+        // on click pauses video
         this.setState({paused: true})
     }
 
@@ -84,7 +84,6 @@ export class Instructions extends Component {
 
     onLoad = (data) => {
         this.setState({duration: data.duration});
-        this.video.presentFullscreenPlayer()
     };
 
 
