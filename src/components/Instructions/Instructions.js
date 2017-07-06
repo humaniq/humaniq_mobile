@@ -7,7 +7,10 @@ import {
     Image,
     Text,
     StatusBar,
-    Animated
+    Animated,
+    ActivityIndicator,
+    WebView,
+    Dimensions
 } from 'react-native';
 
 import {NavigationActions} from 'react-navigation';
@@ -16,6 +19,7 @@ import CustomStyleSheet from '../../utils/customStylesheet';
 import Video from 'react-native-video';
 import LinearGradient from 'react-native-linear-gradient';
 import {Bar} from 'react-native-progress';
+import {downloadVideo} from '../../utils/videoCache'
 
 const closeIcon = require('../../assets/icons/ic_close.png');
 const botIcon = require('../../assets/icons/ic_help.png');
@@ -34,11 +38,20 @@ export class Instructions extends Component {
             currentTime: 0.0,
             paused: false,
             progress: 0,
+            source: '',
+            loading: true,
+            downloaded: true
         }
     }
 
-    componentDidMount() {
-        console.warn(JSON.stringify(this.props.user))
+    async componentDidMount() {
+        downloadVideo('http://clips.vorwaerts-gmbh.de/VfE_html5.mp4', 'intro')
+        .then(res => {
+            this.setState({source: res, loading: false})
+        })
+        .catch(err => {
+            this.setState({loading: false})
+        })
     }
 
     componentWillUnmount() {
@@ -71,7 +84,9 @@ export class Instructions extends Component {
 
     onLoad = (data) => {
         this.setState({duration: data.duration});
+        this.video.presentFullscreenPlayer()
     };
+
 
     onEnd = () => {
         this.setState({paused: true, progress: 1})
@@ -84,23 +99,25 @@ export class Instructions extends Component {
     };
 
     render() {
+        var {height, width} = Dimensions.get('window')
+
         return (
             <View style={styles.container}>
                 <TouchableWithoutFeedback
                     onPressOut={() => this.onPressEnd()}
                     onPressIn={() => this.onPressStart()}>
-                        <Video
-                            ref={(ref: Video) => {this.video = ref}}
-                            source={require('../../../intro.mp4')}
-                            style={styles.fullScreen}
-                            paused={this.state.paused}
-                            volume={this.state.volume}
-                            muted={this.state.muted}
-                            onProgress={this.onProgress}
-                            onLoad={this.onLoad}
-                            resizeMode="cover"
-                            onEnd={this.onEnd}
-                        />
+                    <Video
+                        ref={(ref: Video) => {this.video = ref}}
+                        source={{uri: this.state.source}}
+                        style={[styles.fullScreen, {height, width}]}
+                        paused={this.state.paused}
+                        volume={this.state.volume}
+                        muted={this.state.muted}
+                        onProgress={this.onProgress}
+                        onLoad={this.onLoad}
+                        resizeMode="cover"
+                        onEnd={this.onEnd}
+                    />
                 </TouchableWithoutFeedback>
 
                 <LinearGradient
@@ -141,6 +158,14 @@ export class Instructions extends Component {
                         </View>
                     </View>
                 </LinearGradient>
+
+
+                <ActivityIndicator
+                    animating={this.state.loading}
+                    color={'#000'}
+                    size={100}
+                    style={styles.indicator}/>
+
             </View>
         );
     }
@@ -176,6 +201,14 @@ const styles = CustomStyleSheet({
         marginLeft: 10,
         marginRight: 10,
         marginTop: 8,
+    },
+    indicator: {
+        flex:1,
+        position: 'absolute',
+        top: 0,
+        bottom: 0,
+        left: 0,
+        right: 0
     }
 });
 
