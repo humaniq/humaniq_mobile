@@ -24,7 +24,7 @@ const confirm = require('../../assets/icons/ic_confirm_dark.png');
   cache user image
  */
 
-class Cam extends Component {
+export class Cam extends Component {
   constructor(props) {
     super(props);
 

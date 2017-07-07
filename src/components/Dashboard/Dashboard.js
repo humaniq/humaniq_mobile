@@ -11,7 +11,8 @@ import { NavigationActions } from 'react-navigation';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 
-class Dashboard extends Component {
+export class Dashboard extends Component {
+
   render() {
     return (
       <View style={{ justifyContent: 'center', alignItems: 'center'}}>

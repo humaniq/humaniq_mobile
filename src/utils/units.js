@@ -5,13 +5,13 @@ const SCREEN_WIDTH = Dimensions.get('window').width;
 const DESIGN_WIDTH = 320;
 const DESIGN_HEIGHT = 568;
 
-function fontScale(sWidth, dWidth) {
+export function fontScale(sWidth, dWidth) {
   return sWidth / dWidth;
 }
 
 const pixelRatio = fontScale(SCREEN_WIDTH, DESIGN_WIDTH);
 
-function viewPortCalc(px, design, screen) {
+export function viewPortCalc(px, design, screen) {
   if (typeof px === 'string' && /^[\d.]+%$/.test(px)) {
     px = parseInt(px, 10) * design / 100;
   }

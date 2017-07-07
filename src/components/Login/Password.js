@@ -15,7 +15,7 @@ import Keyboard from './Keyboard';
 import CustomStyleSheet from '../../utils/customStylesheet';
 import Confirm from '../Shared/Buttons/Confirm';
 
-class Password extends Component {
+export class Password extends Component {
   static navigationOptions = {
     // header: null,
   };
