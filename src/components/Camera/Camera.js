@@ -30,6 +30,7 @@ class Cam extends Component {
     this.state = {
       imagePath: '',
       imageB64: '',
+      count: 0,
     };
   }
 
@@ -41,7 +42,12 @@ class Cam extends Component {
   };
 
   handleImageCapture = () => {
-    this.setState({ imagePath: 'faces/S1/1.jpg' });
+    if (this.state.count == 0) {
+      this.setState({ imagePath: 'faces/S1/1.jpg', count: 1 });
+    } else {
+      this.setState({ imagePath: 'faces/S1/1.jpg' });
+    }
+    
     /*this.camera
       .capture()
       .then((data) => {
