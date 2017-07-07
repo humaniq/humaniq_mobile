@@ -3,6 +3,7 @@ package com.humaniq_mobile;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import codes.simen.IMEI.IMEI;
 import com.learnium.RNDeviceInfo.RNDeviceInfo;
 import com.BV.LinearGradient.LinearGradientPackage;
 import com.brentvatne.react.ReactVideoPackage;
@@ -28,6 +29,7 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
+            new IMEI(),
             new RNDeviceInfo(),
             new LinearGradientPackage(),
             new ReactVideoPackage(),

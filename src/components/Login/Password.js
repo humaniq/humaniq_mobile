@@ -25,7 +25,12 @@ export class Password extends Component {
     match: null,
   };
 
-  componentWillMount() {
+  componentDidMount() {
+    // DEV
+    const imei = DeviceInfo.isEmulator() ? Math.floor((10000000 + Math.random()) * 90000000) : IMEI.getImei();
+    this.setState({
+      imei: imei.toString(),
+    });
   }
 
   componentWillReceiveProps(nextProps) {
