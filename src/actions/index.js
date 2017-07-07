@@ -14,6 +14,7 @@ export const LOGIN = createRequestTypes('LOGIN');
 export const SIGNUP = createRequestTypes('SIGNUP');
 
 export const SET_AVATAR_LOCAL_PATH = 'SET_AVATAR_LOCAL_PATH';
+export const SET_PASSWORD = 'SET_PASSWORD';
 
 function action(type, payload = {}) {
   return { type, ...payload };
@@ -39,4 +40,4 @@ export const signup = {
 };
 
 export const setAvatarLocalPath = path => action(SET_AVATAR_LOCAL_PATH, { path });
-export const setPassword = password => action(SET_AVATAR_LOCAL_PATH, { password });
+export const setPassword = password => action(SET_PASSWORD, { password });
