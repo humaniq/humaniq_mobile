@@ -12,6 +12,7 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import DeviceInfo from 'react-native-device-info';
 import IMEI from 'react-native-imei';
+import { NetworkInfo } from 'react-native-network-info'
 
 export class Dashboard extends Component {
 
@@ -58,8 +59,12 @@ export class Dashboard extends Component {
         <Text>{`-------------------------------------------------`}</Text>
 
         <Text>{`-------------------------------------------------`}</Text>
-        <Text>{`IMEI`}</Text>
+        <Text>{`NETWORK INFO / not working? :|`}</Text>
         <Text>{`-------------------------------------------------`}</Text>
+        <Text>{`IP ${NetworkInfo.getIPAddress(ip => ip)}`}</Text>
+        <Text>{`IPV4 ${NetworkInfo.getIPV4Address(ipv4 => ipv4)}`}</Text>
+        <Text>{`SSID ${NetworkInfo.getSSID(ssid => ssid)}`}</Text>
+        <Text>{`BSSID ${NetworkInfo.getBSSID(bssid => bssid)}`}</Text>
       </ScrollView>
     );
   }
