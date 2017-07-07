@@ -38,6 +38,7 @@ const LoginStack = StackNavigator(
     Camera: { screen: Camera },
     Password: { screen: Password },
     TelInput: { screen: TelInput },
+    // CodeInput: { screen: CodeInput },
     Dashboard: { screen: Dashboard },
       Instructions: { screen: Instructions },
   },

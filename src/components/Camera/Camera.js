@@ -6,17 +6,22 @@ import {
   Text,
 } from 'react-native';
 import Camera from 'react-native-camera';
+import _ from 'underscore';
 import { NavigationActions } from 'react-navigation';
 import RNFetchBlob from 'react-native-fetch-blob';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import { ActionCreators } from '../../actions';
+import { validate, setAvatarLocalPath } from '../../actions';
+
+// console.log('action types🔑', ActionTypes.setAvatarLocalPath());
 
 import CustomStyleSheet from '../../utils/customStylesheet';
 
 // assets
 const close = require('../../assets/icons/ic_close.png');
 const confirm = require('../../assets/icons/ic_confirm_dark.png');
+
+console.log('validate', validate);
 
 /*
   on second run check permissions http://facebook.github.io/react-native/docs/permissionsandroid.html
@@ -29,9 +34,35 @@ export class Cam extends Component {
     super(props);
 
     this.state = {
-      imagePath: '',
-      imageB64: '',
+      path: '',
+      base64: '',
+      count: 1,
     };
+  }
+
+  componentWillMount() {
+    // console.log('props camera', this.props);
+  }
+
+  componentWillReceiveProps(nextProps) {
+    // TODO: MOVE TO SAGA TO PREVENT LAG
+    if (nextProps.user.validate.payload) {
+      const code = nextProps.user.validate.payload.code;
+      const photo = nextProps.user.photo;
+      if (code === 3002 && !photo) {
+        // registered user
+        this.props.setAvatarLocalPath(this.state.path);
+        this.props.navigation.navigate('Password');
+      } else if (code === 3003 && !photo) {
+        // new user
+        this.props.setAvatarLocalPath(this.state.path);
+        this.props.navigation.navigate('Tutorial', { nextScene: 'Password' });
+      } else if (code === 3001) {
+        this.setState({ path: '' });
+        alert('Бред какой-то');
+        // reset payload?
+      }
+    }
   }
 
   handleCameraClose = () => {
@@ -44,77 +75,29 @@ export class Cam extends Component {
   handleImageCapture = () => {
     this.camera.capture()
       .then((data) => {
-        this.setState({ imagePath: data.path });
+        this.setState({ path: data.path });
+        this.convertToBase64(data.path);
       })
       .catch((err) => { console.error('error during image capture', err); });
   };
 
   handleImageDelete = () => {
-    this.setState({ imagePath: '' });
+    this.setState({ path: '' });
+  };
+
+  // TODO: вынести
+  convertToBase64 = (path) => {
+    RNFetchBlob.fs.readFile(path, 'base64')
+      .then((data) => {
+        this.setState({ base64: data });
+      })
+      .catch((err) => { console.log(err.message); });
   };
 
   handleImageUpload = () => {
-    this.setState({ uploading: true });
-    // TODO: reset navigation stack to prevent back action on android!!
-    RNFetchBlob.fs.readFile(this.state.imagePath, 'base64')
-      .then((data) => {
-        this.setState({ imageB64: data });
-        this.handleIsRegisteredCheck(data);
-      })
-      .catch(err => console.log('error converting image to base64', err));
-  };
-
-  handleIsRegisteredCheck = (image) => {
-    RNFetchBlob.fetch(
-      'POST',
-      'https://beta-api.humaniq.co/tapatybe/api/v1/registered',
-      {
-        'Content-Type': 'application/json',
-      },
-      JSON.stringify({
-        facial_image: image,
-      }),
-    )
-      .then(resp => resp.json())
-      .then((resp) => {
-        this.setState({ uploading: false });
-        // update codes after registration will be uploaded
-        if (resp.code === 40000) {
-          this.handleUploadError();
-        } else if (resp.code === 40400) {
-          this.createRegistration();
-        } else {
-          this.authenticate();
-        }
-      })
-      .catch((err) => {
-        this.setState({ uploading: false });
-        alert('network error');
-        // console.log('err');
-      });
-  };
-
-  createRegistration = () => {
-    this.props.updateUserRegStatus(false);
-    this.props.setAvatarPath({
-      localPath: this.state.imagePath,
-      b64: this.state.imageB64,
-    });
-    this.props.navigation.navigate('Tutorial', { nextScene: 'Password' });
-  };
-
-  authenticate = () => {
-    this.props.updateUserRegStatus(true);
-    this.props.setAvatarPath({
-      localPath: this.state.imagePath,
-      b64: this.state.imageB64,
-    });
-    this.props.navigation.navigate('Password');
-  };
-
-  handleUploadError = () => {
-    this.setState({ imagePath: null });
-    alert('Face not found');
+    this.props.validate(this.state.base64);
+    // this.props.checkUserRegStatus(this.state.base64);
+    // console.log('this.props.validate', this.props);
   };
 
   renderCamera() {
@@ -137,7 +120,7 @@ export class Cam extends Component {
     return (
       <Image
         // resizeMode={'center'}
-        source={{ uri: this.state.imagePath }}
+        source={{ uri: this.state.path }}
         style={styles.previewImage}
       />
     );
@@ -149,21 +132,21 @@ export class Cam extends Component {
         <View style={styles.navbar}>
           <TouchableOpacity
             style={styles.closeBtn}
-            onPress={this.state.imagePath ? this.handleImageDelete : this.handleCameraClose}
+            onPress={this.state.path ? this.handleImageDelete : this.handleCameraClose}
           >
             <Image source={close} />
           </TouchableOpacity>
         </View>
         <View style={{ borderWidth: 5, flex: 1, borderColor: 'tomato' }}>
-          {this.state.imagePath ? this.renderImage() : this.renderCamera()}
+          {this.state.path ? this.renderImage() : this.renderCamera()}
         </View>
         <View style={styles.captureContainer}>
-          {this.state.uploading ? <Text>Uploading</Text> :
+          {this.props.user.validate.isFetching ? <Text>Uploading</Text> :
           <TouchableOpacity
-            style={[styles.captureBtn, this.state.imagePath && styles.uploadBtn]}
-            onPress={this.state.imagePath ? this.handleImageUpload : this.handleImageCapture}
+            style={[styles.captureBtn, this.state.path && styles.uploadBtn]}
+            onPress={this.state.path ? this.handleImageUpload : this.handleImageCapture}
           >
-            {this.state.imagePath ? <Image source={confirm} /> : null}
+            {this.state.path ? <Image source={confirm} /> : null}
           </TouchableOpacity>
           }
         </View>
@@ -172,15 +155,14 @@ export class Cam extends Component {
   }
 }
 
-const mapDispatchToProps = dispatch => (
-  bindActionCreators(ActionCreators, dispatch)
-);
-
 const mapStateToProps = state => ({
   user: state.user,
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(Cam);
+export default connect(mapStateToProps, {
+  validate: validate.request,
+  setAvatarLocalPath,
+})(Cam);
 
 const styles = CustomStyleSheet({
   container: {

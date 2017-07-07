@@ -12,6 +12,8 @@ function createRequestTypes(base) {
 export const VALIDATE = createRequestTypes('VALIDATE');
 export const LOGIN = createRequestTypes('LOGIN');
 export const SIGNUP = createRequestTypes('SIGNUP');
+export const PHONE_NUMBER_CREATE = createRequestTypes('PHONE_NUMBER_CREATE');
+export const PHONE_NUMBER_VALIDATE = createRequestTypes('PHONE_NUMBER_VALIDATE');
 
 export const SET_AVATAR_LOCAL_PATH = 'SET_AVATAR_LOCAL_PATH';
 export const SET_PASSWORD = 'SET_PASSWORD';
@@ -37,6 +39,18 @@ export const signup = {
   request: request => action(SIGNUP[REQUEST], request),
   success: response => action(SIGNUP[SUCCESS], { response }),
   failure: error => action(SIGNUP[FAILURE], { error }),
+};
+
+export const phoneNumberCreate = {
+  request: request => action(PHONE_NUMBER_CREATE[REQUEST], request),
+  success: response => action(PHONE_NUMBER_CREATE[SUCCESS], { response }),
+  failure: error => action(PHONE_NUMBER_CREATE[FAILURE], { error }),
+};
+
+export const phoneNumberValidate = {
+  request: request => action(PHONE_NUMBER_VALIDATE[REQUEST], request),
+  success: response => action(PHONE_NUMBER_VALIDATE[SUCCESS], { response }),
+  failure: error => action(PHONE_NUMBER_VALIDATE[FAILURE], { error }),
 };
 
 export const setAvatarLocalPath = path => action(SET_AVATAR_LOCAL_PATH, { path });

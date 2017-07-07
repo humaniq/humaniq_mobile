@@ -38,14 +38,78 @@ function password(state = '', action) {
   }
 }
 
+function account(state = {
+  isFetching: false,
+  payload: null,
+}, action) {
+  switch (action.type) {
+    case ActionTypes.LOGIN.REQUEST:
+    case ActionTypes.SIGNUP.REQUEST:
+      return {
+        ...state,
+        isFetching: true,
+        payload: null,
+      };
+    case ActionTypes.LOGIN.SUCCESS:
+    case ActionTypes.SIGNUP.SUCCESS:
+      return {
+        ...state,
+        isFetching: false,
+        payload: action.response,
+      };
+    case ActionTypes.LOGIN.FAILURE:
+    case ActionTypes.SIGNUP.FAILURE:
+      return {
+        ...state,
+        isFetching: false,
+        payload: action.error,
+      };
+    default:
+      return state;
+  }
+}
+
+function phone(state = {
+  isFetching: false,
+  payload: null,
+}, action) {
+  switch (action.type) {
+    case ActionTypes.PHONE_NUMBER_CREATE.REQUEST:
+    case ActionTypes.PHONE_NUMBER_VALIDATE.REQUEST:
+      return {
+        ...state,
+        isFetching: true,
+        payload: null,
+      };
+    case ActionTypes.PHONE_NUMBER_CREATE.SUCCESS:
+    case ActionTypes.PHONE_NUMBER_VALIDATE.SUCCESS:
+      return {
+        ...state,
+        isFetching: false,
+        payload: action.response,
+      };
+    case ActionTypes.PHONE_NUMBER_CREATE.FAILURE:
+    case ActionTypes.PHONE_NUMBER_VALIDATE.FAILURE:
+      return {
+        ...state,
+        isFetching: false,
+        payload: action.error,
+      };
+    default:
+      return state;
+  }
+}
+
 export const user = combineReducers({
   validate: subroutineReducerCreator({
     types: [
       ActionTypes.VALIDATE.REQUEST,
       ActionTypes.VALIDATE.SUCCESS,
       ActionTypes.VALIDATE.FAILURE,
-    ]
+    ],
   }),
-  photo: photo,
-  password: password,
+  phone,
+  account,
+  photo,
+  password,
 });

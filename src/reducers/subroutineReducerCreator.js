@@ -10,6 +10,7 @@ export function subroutineReducerCreator({ types }) {
         return {
           ...state,
           isFetching: true,
+          payload: null,
         };
       case successType:
         return {

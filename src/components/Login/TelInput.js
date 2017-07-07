@@ -6,14 +6,12 @@ import {
 } from 'react-native';
 import { NavigationActions } from 'react-navigation';
 import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
-import RNFetchBlob from 'react-native-fetch-blob';
 import VMasker from 'vanilla-masker';
 
 import CustomStyleSheet from '../../utils/customStylesheet';
 import Confirm from '../Shared/Buttons/Confirm';
-import { ActionCreators } from '../../actions';
 import Keyboard from './Keyboard';
+import { phoneNumberCreate } from '../../actions';
 
 const ic_user = require('../../assets/icons/ic_user.png');
 
@@ -25,6 +23,12 @@ export class TelInput extends Component {
     maxPhoneLength: 19,
     phone: '',
   };
+
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.user.phone.payload) {
+      this.props.navigation.navigate('Dashboard');
+    }
+  }
 
   handleNumberPress = (number) => {
     if (this.state.phone.length < this.state.maxPhoneLength) {
@@ -46,35 +50,11 @@ export class TelInput extends Component {
   };
 
   handlePhoneConfirm = () => {
-    this.setState({ uploading: true });
-    let phone = VMasker.toNumber(this.state.phone);
-
-    RNFetchBlob.fetch(
-      'POST',
-      'https://beta-api.humaniq.co/tapatybe/api/v1/account/phone_number',
-      {
-        'Content-Type': 'application/json',
-      },
-      JSON.stringify({
-        account_id: this.props.user.id,
-        phone_number: {
-          country_code: phone.slice(0, 1),
-          phone_number: phone.slice(1),
-        },
-      }),
-    )
-      .then(resp => resp.json())
-      .then((resp) => {
-        this.setState({ uploading: false });
-        if (resp.code === 20100) {
-          this.props.saveUserPhone(this.state.phone);
-          this.props.navigation.navigate('Dashboard');
-        }
-      })
-      .catch((err) => {
-        this.setState({ uploading: false });
-        alert('something happened during upload, try one more time');
-      });
+    const phone_number = VMasker.toNumber(this.state.phone);
+    this.props.phoneNumberCreate({
+      account_id: this.props.user.account.payload.payload.account_id,
+      phone_number,
+    });
   };
 
   renderInput = () => {
@@ -95,7 +75,7 @@ export class TelInput extends Component {
             {this.renderInput()}
           </View>
         </View>
-        {!this.state.uploading ?
+        {!this.props.user.phone.isFetching ?
           <Confirm
             active={this.state.phone.length === this.state.maxPhoneLength}
             onPress={this.handlePhoneConfirm}
@@ -111,15 +91,13 @@ export class TelInput extends Component {
   }
 }
 
-const mapDispatchToProps = dispatch => (
-  bindActionCreators(ActionCreators, dispatch)
-);
-
 const mapStateToProps = state => ({
   user: state.user,
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(TelInput);
+export default connect(mapStateToProps, {
+  phoneNumberCreate: phoneNumberCreate.request,
+})(TelInput);
 
 const styles = CustomStyleSheet({
   container: {

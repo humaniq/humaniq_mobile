@@ -6,14 +6,13 @@ import {
 } from 'react-native';
 
 import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
-import RNFetchBlob from 'react-native-fetch-blob';
 import { NavigationActions } from 'react-navigation';
 
-import { ActionCreators } from '../../actions';
 import Keyboard from './Keyboard';
 import CustomStyleSheet from '../../utils/customStylesheet';
 import Confirm from '../Shared/Buttons/Confirm';
+import { login, signup, setPassword } from '../../actions';
+
 
 export class Password extends Component {
   static navigationOptions = {
@@ -22,13 +21,35 @@ export class Password extends Component {
   state = {
     maxPasswordLength: 4,
     password: '',
-    imei: Math.floor((100000 + Math.random()) * 900000).toString(),
+    imei: Math.floor((10000000 + Math.random()) * 90000000).toString(),
     match: null,
   };
 
   componentWillMount() {
-    // TODO: закешировать картинку на этом экране
-    // TODO: Получить тут IMEI;
+  }
+
+  componentWillReceiveProps(nextProps) {
+    // TODO: MOVE TO SAGA TO PREVENT LAG
+    if (nextProps.user.account.payload) {
+      const code = nextProps.user.account.payload.code;
+      const password = nextProps.user.password;
+      if (code === 3002 && !password) {
+        // registered user
+        // this.props.setAvatarLocalPath(this.state.path);
+        // this.props.navigation.navigate('Password');
+      } else if (code === 1001 && !password) {
+        // auth
+        // password good (save password & token?)
+        this.props.setPassword(this.state.password);
+        this.props.navigation.navigate('TelInput');
+      } else if (code === 2001 && !password) {
+      // password good (save password & token?)
+        this.props.setPassword(this.state.password);
+        this.props.navigation.navigate('Dashboard');
+      } else if (code === 900000000000000) {
+        alert('Бред какой-то, попробуй еще раз');
+      }
+    }
   }
 
   handleNumberPress = (number) => {
@@ -60,7 +81,10 @@ export class Password extends Component {
   };
 
   handlePasswordConfirm = () => {
-    const { registered } = this.props.user;
+    // TODO: CHANGE
+    // 3002 - registered
+    // 3003 - new user
+    const registered = this.props.user.validate.payload.code === 3002;
 
     if (registered) {
       this.authenticate();
@@ -75,75 +99,21 @@ export class Password extends Component {
   };
 
   authenticate = () => {
-    this.setState({ uploading: true });
-    RNFetchBlob.fetch(
-      'POST',
-      'https://beta-api.humaniq.co/tapatybe/api/v1/authenticate/user',
-      {
-        'Content-Type': 'application/json',
-      },
-      JSON.stringify({
-        facial_image: this.props.user.avatar.b64,
-        password: this.state.password,
-        metadata: {
-          react_native_imei: {
-            device_imei: this.state.imei,
-          },
-        },
-      }),
-    )
-      .then(resp => resp.json())
-      .then((resp) => {
-        this.setState({ uploading: false });
-        if (resp.code === 20000) {
-          this.props.saveUserId(resp.payload.account_id);
-          this.props.saveUserToken(resp.payload.token);
-          this.props.navigation.navigate('Dashboard');
-        } else {
-          alert('something wrong with existing user auth or password is incorrect, call Karim :)');
-        }
-        // TODO: REDIRECT
-      })
-      .catch((err) => {
-        alert('network fail');
-        this.setState({ uploading: false });
-      });
+    // image_id, password, imei
+    this.props.login({
+      facial_image_id: this.props.user.validate.payload.payload.facial_image_id,
+      device_imei: this.state.imei,
+      password: this.state.password,
+    });
   };
 
   createRegistration = () => {
-    this.setState({ uploading: true });
-    RNFetchBlob.fetch(
-      'POST',
-      'https://beta-api.humaniq.co/tapatybe/api/v1/registration',
-      {
-        'Content-Type': 'application/json',
-      },
-      JSON.stringify({
-        facial_image: this.props.user.avatar.b64,
-        password: this.state.password,
-        metadata: {
-          react_native_imei: {
-            device_imei: this.state.imei,
-          },
-        },
-      }),
-    )
-      .then(resp => resp.json())
-      .then((resp) => {
-        this.setState({ uploading: false });
-        if (resp.code === 20100) {
-          this.props.saveUserPassword(this.state.password);
-          this.props.saveUserImei(this.state.imei);
-          this.props.saveUserId(resp.payload.account_id);
-          this.props.navigation.navigate('Tutorial', { nextScene: 'TelInput' });
-        } else {
-          alert('reg fail');
-        }
-      })
-      .catch((err) => {
-        this.setState({ uploading: false });
-        alert('something happened during upload, try one more time');
-      });
+    console.log('image id', this.props.user.validate.payload);
+    this.props.signup({
+      facial_image_id: this.props.user.validate.payload.payload.facial_image_id,
+      device_imei: this.state.imei,
+      password: this.state.password,
+    });
   };
 
   passwordConfirmAvailability = () => {
@@ -174,37 +144,33 @@ export class Password extends Component {
   };
 
   renderInputStep = () => {
+    // 3002 - registered
+    // 3003 - new user
     const params = this.props.navigation.state.params;
-    if (!this.props.user.registered && !params.password) {
-      return (<Text style={styles.stage}>{'1 / 2'}</Text>);
-    } else if (!this.props.user.registered && params.password) {
-      return (<Text style={styles.stage}>{'2 / 2'}</Text>);
+    const code = this.props.user.validate.payload.code;
+    if (params) {
+      if (code === 3003 && !params.password) {
+        return (<Text style={styles.stage}>{'1 / 2'}</Text>);
+      } else if (params.password) {
+        return (<Text style={styles.stage}>{'2 / 2'}</Text>);
+      }
     }
 
     return null;
-    /*
-    const params = this.props.navigation.state.params;
-    if (!params.registered) {
-      if (params.password) {
-        return (<Text style={styles.stage}>{!params.registered && '2 / 2'}</Text>);
-      }
-      return (<Text style={styles.stage}>{!params.registered && '1 / 2'}</Text>);
-    }
-    */
   };
 
   render() {
     return (
       <View style={styles.container}>
         <View style={styles.header}>
-          <Image style={styles.userPhoto} source={{ uri: this.props.user.avatar.localPath }} />
+          <Image style={styles.userPhoto} source={{ uri: this.props.user.photo }} />
           {this.renderInputStep()}
           <Text>{this.state.password}</Text>
           <View style={styles.passContainer}>
             {this.renderPassMask()}
           </View>
         </View>
-        {!this.state.uploading ?
+        {!this.props.user.account.isFetching ?
           <Confirm
             active={this.passwordConfirmAvailability()}
             onPress={this.handlePasswordConfirm}
@@ -220,15 +186,15 @@ export class Password extends Component {
   }
 }
 
-const mapDispatchToProps = dispatch => (
-  bindActionCreators(ActionCreators, dispatch)
-);
-
 const mapStateToProps = state => ({
   user: state.user,
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(Password);
+export default connect(mapStateToProps, {
+  login: login.request,
+  signup: signup.request,
+  setPassword,
+})(Password);
 
 const styles = CustomStyleSheet({
   container: {

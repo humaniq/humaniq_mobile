@@ -27,3 +27,4 @@ function callApi(endpoint, body) {
 export const validate = body => callApi('registered', body);
 export const login = body => callApi('authenticate/user', body);
 export const signup = body => callApi('registration', body);
+export const phoneNumberCreate = body => callApi('account/phone_number', body);

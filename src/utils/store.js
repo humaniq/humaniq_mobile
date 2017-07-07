@@ -10,7 +10,7 @@ const sagaMiddleware = createSagaMiddleware();
 function configureStore(initialState) {
   const enhancer = compose(
     applyMiddleware(
-      logger,
+      // logger,
       sagaMiddleware,
       // thunkMiddleware,
     ),
