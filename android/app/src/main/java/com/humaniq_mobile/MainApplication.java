@@ -10,6 +10,8 @@ import codes.simen.IMEI.IMEI;
 import com.learnium.RNDeviceInfo.RNDeviceInfo;
 import com.BV.LinearGradient.LinearGradientPackage;
 import com.brentvatne.react.ReactVideoPackage;
+import com.zmxv.RNSound.RNSoundPackage;
+import com.rnim.rn.audio.ReactNativeAudioPackage;
 import com.humaniq.libsignals.SignalReactPackage;
 import com.RNFetchBlob.RNFetchBlobPackage;
 import com.lwansbrough.RCTCamera.RCTCameraPackage;
@@ -39,6 +41,8 @@ public class MainApplication extends MultiDexApplication implements ReactApplica
             new RNDeviceInfo(),
             new LinearGradientPackage(),
             new ReactVideoPackage(),
+            new RNSoundPackage(),
+            new ReactNativeAudioPackage(),
             new SignalReactPackage(),
             new RNFetchBlobPackage(),
             new RCTCameraPackage()

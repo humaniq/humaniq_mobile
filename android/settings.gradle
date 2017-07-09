@@ -1,4 +1,5 @@
 rootProject.name = 'humaniq_mobile'
+<<<<<<< HEAD
 include ':react-native-android-sms-listener'
 project(':react-native-android-sms-listener').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-android-sms-listener/android')
 include ':react-native-network-info'
@@ -11,6 +12,12 @@ include ':react-native-linear-gradient'
 project(':react-native-linear-gradient').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-linear-gradient/android')
 include ':react-native-video'
 project(':react-native-video').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-video/android')
+=======
+include ':react-native-sound'
+project(':react-native-sound').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-sound/android')
+include ':react-native-audio'
+project(':react-native-audio').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-audio/android')
+>>>>>>> add sound, rebounded chat, photos
 include ':humaniq-libsignals'
 project(':humaniq-libsignals').projectDir = new File(rootProject.projectDir, '../node_modules/humaniq-libsignals/android')
 include ':react-native-fetch-blob'

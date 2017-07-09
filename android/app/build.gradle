@@ -155,6 +155,8 @@ dependencies {
     compile project(':react-native-device-info')
     compile project(':react-native-linear-gradient')
     compile project(':react-native-video')
+    compile project(':react-native-sound')
+    compile project(':react-native-audio')
     compile project(':humaniq-libsignals')
     compile project(':react-native-fetch-blob')
     compile project(':react-native-camera')

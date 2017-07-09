@@ -1,28 +1,220 @@
-import React, { Component } from 'react';
-import { StyleSheet, Text, View, Button, TextInput, TouchableOpacity, Image } from 'react-native';
-import { GiftedChat } from 'react-native-gifted-chat';
+import React from 'react';
+import {
+  Platform,
+  StyleSheet,
+  Text,
+  View,
+  TouchableOpacity,
+  Image,
+} from 'react-native';
+import { connect } from 'react-redux';
+import {GiftedChat, Actions, Bubble} from './GiftedChat';
+import CameraRollPicker from 'react-native-camera-roll-picker';
+import Backend from './Backend';
+import CustomActions from './CustomActions';
+import CustomView from './CustomView';
+import CustomSend from './CustomSend';
+import CustomComposer from './CustomComposer';
+import PhotoSelect from './PhotoSelect';
+import SoundSelect from './SoundSelect';
 
-import CustomStyleSheet from '../../utils/customStylesheet';
+const deleteImg = require('./assets/delete.png');
+const playImg = require('./assets/play.png');
+const recImg = require('./assets/rec.png');
+const sendImg = require('./assets/send.png');
+const stopImg = require('./assets/stop.png');
 
-const styles = CustomStyleSheet({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'white',
-  },
-  welcome: {
-    fontSize: 20,
-    textAlign: 'center',
-    margin: 10,
-  },
-  instructions: {
-    textAlign: 'center',
-    color: '#333333',
-    marginBottom: 5,
+const combinedShape = require('./../../assets/icons/combined_shape.png');
+const icUser = require('./../../assets/icons/ic_user.png');
+const ovalCopy = require('./../../assets/icons/oval_copy_3.png');
+const voiceMessage = require('./../../assets/icons/voice_message.png');
+const newTransaction = require('./../../assets/icons/new_transaction.png');
+const emoji = require('./../../assets/icons/emoji.png');
+const attach = require('./../../assets/icons/attach.png');
+
+const time = Date.now();
+const name = Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5);
+const num = Math.round(Math.random() * 100)
+const user1 = {
+  _id: time,
+  name: `${name} ${num}`,
+  //avatar: 'http://findicons.com/files/icons/1072/face_avatars/300/a02.png',
+};
+
+class Chat extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      messages: [],
+      loadEarlier: true,
+      typingText: null,
+      isLoadingEarlier: false,
+      time: 0,
+    };
+
+    this._isMounted = false;
+    this.onSend = this.onSend.bind(this);
+    this.renderCustomActions = this.renderCustomActions.bind(this);
+    this.renderFooter = this.renderFooter.bind(this);
+    this.onLoadEarlier = this.onLoadEarlier.bind(this);
+
+    this._isAlright = null;
+
+    this.photoSelectRef = null;
+    this.soundSelectRef = null;
+  }
+
+  componentWillMount() {
+    this._isMounted = true;
+    Backend.loadMessages((message) => {
+      this.setState((previousState) => {
+        return {
+          messages: GiftedChat.append(previousState.messages, message),
+        };
+      });
+    });
+  }
+
+  componentWillUnmount() {
+    this._isMounted = false;
+  }
+
+  onLoadEarlier() {
+    this.setState((previousState) => {
+      return {
+        isLoadingEarlier: true,
+      };
+    });
+
+    setTimeout(() => {
+      if (this._isMounted === true) {
+        this.setState((previousState) => {
+          return {
+            messages: GiftedChat.prepend(previousState.messages, require('./data/old_messages.js')),
+            loadEarlier: false,
+            isLoadingEarlier: false,
+          };
+        });
+      }
+    }, 1000); // simulating network
+  }
+
+  onSend(message) {
+    // THIS IS APP FUNCTION
+    Backend.sendMessage(message.map((m) => { m.user = user1; return m; }));
+  }
+
+  renderCustomActions(props) {
+    return null;
+  }
+
+  renderCustomView(props) {
+    return (
+      <CustomView
+        {...props}
+      />
+    );
+  }
+
+  renderComposer(props) {
+    return (<CustomComposer {...props} />);
+  }
+
+  renderSend(props) {
+    return (
+      <CustomSend {...props} />
+    );
+  }
+  renderFooter(props) {
+    const handleAttach = () => {
+      this.photoSelectRef.setModalVisible(true);
+    };
+    const handleSound = () => {
+      this.soundSelectRef.setModalVisible(true);
+    };
+    const CustomBtn = props => (
+      <TouchableOpacity onPress={props.onPress} style={styles.btn}>
+        <Image source={props.src} style={styles.imgBtn} />
+      </TouchableOpacity>
+    );
+
+    return (
+      <View style={styles.panelContainer}>
+        <CustomBtn onPress={handleAttach} src={attach} />
+        <PhotoSelect onSend={this.onSend} ref={(r) => { this.photoSelectRef = r; }} />
+        <CustomBtn onPress={this.handleEmoji} src={emoji} />
+        <CustomBtn onPress={this.handleTransaction} src={newTransaction} />
+        <CustomBtn onPress={handleSound} src={voiceMessage} />
+        <SoundSelect onSend={this.onSend} ref={(r) => { this.soundSelectRef = r; }} />
+      </View>
+    );
+    /*
+    if (this.state.typingText) {
+      return (
+        <View style={styles.footerContainer}>
+          <Text style={styles.footerText}>
+            {this.state.typingText}
+          </Text>
+        </View>
+      );
+    }
+    return null;
+    */
+  }
+
+  render() {
+    console.log(this.props);
+
+    return (
+      <View style={{ backgroundColor: '#ffffff', flex: 1 }}>
+        <View style={styles.navbar}>
+          <View style={{ width: 60, flex: 0.5, alignItems: 'flex-start' }}>
+            <TouchableOpacity
+              onPress={() => alert('back')}
+              style={{ padding: 10 }}
+            >
+              <Image source={combinedShape} />
+            </TouchableOpacity>
+          </View>
+          <View style={{ flex: 1, alignItems: 'center' }}>
+            <Text style={{ fontSize: 20 }}>{'+375295738689'}</Text>
+          </View>
+          <View style={{ width: 60, flex: 0.5, alignItems: 'flex-end' }}>
+            <Image style={{ margin: 10 }} source={icUser} />
+          </View>
+        </View>
+        <View style={{ backgroundColor: '#ffffff', flex: 1 }}>
+          <GiftedChat
+            messages={this.state.messages}
+            onSend={this.onSend}
+            // loadEarlier={this.state.loadEarlier}
+            // onLoadEarlier={this.onLoadEarlier}
+            // isLoadingEarlier={this.state.isLoadingEarlier}
+
+            user={user1}
+
+            renderComposer={this.renderComposer}
+            renderActions={this.renderCustomActions}
+            renderBubble={this.renderBubble}
+            renderCustomView={this.renderCustomView}
+            renderChatFooter={this.renderFooter}
+            renderSend={this.renderSend}
+          />
+        </View>
+      </View>
+    );
+  }
+}
+
+const styles = StyleSheet.create({
+  footerContainer: {
+    marginTop: 5,
+    marginLeft: 10,
+    marginRight: 10,
+    marginBottom: 10,
   },
   navbar: {
-    height: 40,
+    height: 60,
     position: 'absolute',
     left: 0,
     right: 0,
@@ -34,259 +226,45 @@ const styles = CustomStyleSheet({
     borderColor: '#9b9b9b',
     borderBottomWidth: 1,
   },
-  userPhoto: {
-    alignSelf: 'flex-end',
-    padding: 10,
+  footerText: {
+    fontSize: 14,
+    color: '#aaa',
   },
-  phoneNumber: {
-    flex: 1,
+  panelContainer: {
     flexDirection: 'row',
-    justifyContent: 'center',
     alignItems: 'center',
-    alignSelf: 'center',
+    justifyContent: 'space-around',
+    borderColor: '#9b9b9b',
+    borderTopWidth: 1,
   },
-  closeBtn: {
-    padding: 10,
-    alignSelf: 'flex-start',
-  },
-  camera: {
-    flex: 1,
-  },
-  previewImage: {
-    flex: 1,
-  },
-  captureContainer: {
-    backgroundColor: 'white',
-    justifyContent: 'center',
+  recordingContainer: {
+    flexDirection: 'row',
     alignItems: 'center',
-    height: 70,
+    justifyContent: 'flex-end',
+    // padding: 20,
+    backgroundColor: 'gray',
+    borderWidth: 2,
   },
-  captureBtn: {
-    round: 50,
-    borderRadius: 55,
-    borderWidth: 5,
+  recordingTime: {
+    fontSize: 20,
+    color: 'red',
   },
-  uploadBtn: {
-    alignItems: 'center',
-    justifyContent: 'center',
+  btn: {
+    paddingLeft: 10,
+    paddingRight: 10,
+    paddingTop: 7,
+    paddingBottom: 7,
+  },
+  imgBtn: {
+    width: 40,
+    height: 40,
   },
 });
 
-import {
-  AccountManager,
-  SignalConnectionService,
-  SignalServiceMessagePipe,
-} from 'humaniq-libsignals';
-
-const combinedShape = require('../../assets/icons/combined_shape.png');
-const icUser = require('../../assets/icons/ic_user.png');
-
-const user1 = {
-  _id: 1,
-  name: 'User 1',
-  avatar: 'http://findicons.com/files/icons/1072/face_avatars/300/a02.png',
+const mapStateToProps = (state) => {
+  return {
+    user: state.user,
+  };
 };
 
-const user2 = {
-  _id: 2,
-  name: 'User 2',
-  avatar: 'http://icons.iconarchive.com/icons/hopstarter/face-avatars/256/Female-Face-FB-1-icon.png',
-};
-
-
-export default class Chat extends Component {
-
-  constructor(props) {
-    super(props);
-    this.state = { verifyValue: '', isChat: false, messages: [] };
-  }
-
-  verificationCode = '';
-  signalConnectionService = null;
-  accountManager = null;
-  signalPipe = null;
-  signalServiceMessagePipe = null;
-  onSend = o => console.log(o)
-
-  async handleMessages() {
-    this.signalServiceMessagePipe = await new SignalServiceMessagePipe(this.signalPipe.descriptor, this.signalConnectionService);
-    console.log('created pipe');
-    let listenMessages = true;
-
-    // SignalModuleAndroid.handleReceiveMessages();
-
-    while (listenMessages) {
-      try {
-
-        setTimeout(() => { this.signalConnectionService.sendMessage('+375295738689', 'Hello world!', []);console.log('--->') }, 3000);
-        const message = await this.signalServiceMessagePipe.readMessage(10);
-        console.log('read message');
-        if (message !== null) console.log(message);
-      } catch (e) {
-        console.log(e.message);
-        //await this.signalServiceMessagePipe.shutdownPipe();
-        listenMessages = false;
-        console.log('shutdown pipe');
-      }
-    }
-  }
-  // <View style={{ zIndex: 2, borderColor: '#9b9b9b', borderBottomWidth: 1,
-  // position: 'absolute', left: 0, right: 0, height: 80 }}><Text>OK</Text></View>
-
-  onSend = (messages = []) => {
-    this.setState((previousState) => {
-      return {
-        messages: GiftedChat.append(previousState.messages, messages),
-      };
-    });
-  }
-
-  renderChat = () => (
-    <View style={{ backgroundColor: '#ffffff', flex: 1 }}>
-      <View style={styles.navbar}>
-        <TouchableOpacity
-          style={styles.closeBtn}
-          onPress={() => this.setState({ isChat: false })}
-        >
-          <Image source={combinedShape} />
-        </TouchableOpacity>
-        <View style={styles.phoneNumber}>
-          <Text>{'+375295738689'}</Text>
-        </View>
-        <Image style={styles.userPhoto} source={icUser} />
-      </View>
-      <View style={{ backgroundColor: '#ffffff', flex: 1 }}>
-        <GiftedChat
-          renderAvatarOnTop
-          messages={this.state.messages}
-          onSend={this.onSend}
-          user={user1}
-        />
-      </View>
-    </View>
-  )
-  renderReg = () => (<View style={styles.container}>
-    <Text style={styles.welcome}>Welcome to Chat Testing!</Text>
-    <Button
-      title="Register"
-      style={{ marginTop: 10, marginBottom: 10 }}
-      onPress={async () => {
-        console.log('ok');
-        this.accountManager = await AccountManager.createInstance(
-            'https://beta-api.humaniq.co/signal',
-            //'https://textsecure-service-staging.whispersystems.org:80',
-            '+375295738689',
-            // '+79137698347',
-            // "+79639467632",
-            // "+79529262362",
-            '123456',
-            'OWF',
-          );
-        console.log('created account', this.accountManager);
-        await this.accountManager.requestSmsVerificationCode();
-        console.log('requested', this.accountManager);
-      }}
-    />
-
-    <TextInput
-      ref={(el) => {
-        this.verificationCode = el;
-      }}
-      style={{
-        height: 40,
-        width: 100,
-        borderColor: 'gray',
-        borderWidth: 1,
-        marginTop: 10,
-        marginBottom: 10,
-      }}
-      onChangeText={verifyValue => this.setState({ verifyValue })}
-      value={this.state.verifyValue}
-    />
-    <Button
-      title="Verify"
-      style={{ marginTop: 10, marginBottom: 10 }}
-      onPress={async () => {
-        console.log(this.state.verifyValue, this.accountManager);
-
-        await this.accountManager.verifyAccountWithCode(
-          this.state.verifyValue,
-        ).catch(e => console.log(e));
-
-        console.log('verified');
-
-          // await SignalModuleAndroid.initAccount();
-          // console.log("inited account");
-      }}
-    />
-
-    <Button
-      title="Init"
-      style={{ marginTop: 10, marginBottom: 10 }}
-      onPress={async () => {
-        await this.accountManager.initAccount();
-        this.signalConnectionService =
-        await SignalConnectionService.createInstance(this.accountManager);
-
-        this.signalPipe =
-        await this.signalConnectionService.createPipe();
-        console.log('inited account');
-      }}
-    />
-
-    <Button
-      title="Reveive messages"
-      onPress={async () => {
-        await this.handleMessages();
-      }}
-    />
-    <Button
-      title="Send message"
-      style={{ marginTop: 10, marginBottom: 10 }}
-      onPress={async () => {
-        // +79639467632
-        await this.signalConnectionService.sendMessage('+375295738689', 'Hello world!', []);
-        console.log('text message was sent');
-      }}
-    />
-    <Button title="Go to Chat" style={{ marginTop: 10, marginBottom: 10 }} onPress={() => {
-      this.setState({ isChat: true, messages: [
-        {
-          _id: 5,
-          text: 'Давай к нам',
-          createdAt: new Date(Date.UTC(2017, 5, 30, 5, 27, 31)),
-          user: user2,
-        },
-        {
-          _id: 4,
-          text: 'Фигасе!!!!',
-          createdAt: new Date(Date.UTC(2017, 5, 30, 5, 25, 16)),
-          user: user1,
-        },
-        {
-          _id: 3,
-          text: 'Глянь где я',
-          image: 'https://files1.adme.ru/files/news/part_79/793310/10095010-797ab841d30ecf2e893c6ff55e0e067a_970x-1000-224ec000e1-1484579184.jpg',
-          createdAt: new Date(Date.UTC(2017, 5, 30, 5, 22, 50)),
-          user: user2,
-        },
-        {
-          _id: 1,
-          text: 'Привет',
-          createdAt: new Date(Date.UTC(2017, 5, 30, 5, 20, 24)),
-          user: user1,
-        },
-        {
-          _id: 2,
-          text: 'Привет. Как у тебя дела?',
-          createdAt: new Date(Date.UTC(2017, 5, 30, 5, 19, 33)),
-          user: user2,
-        },
-      ] });
-    }} />
-  </View>)
-
-  render() {
-    return this.state.isChat ? this.renderChat() : this.renderReg();
-  }
-}
+export default connect(mapStateToProps)(Chat);
