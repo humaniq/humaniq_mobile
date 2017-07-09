@@ -1,4 +1,8 @@
 rootProject.name = 'humaniq_mobile'
+include ':react-native-sound'
+project(':react-native-sound').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-sound/android')
+include ':react-native-audio'
+project(':react-native-audio').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-audio/android')
 include ':humaniq-libsignals'
 project(':humaniq-libsignals').projectDir = new File(rootProject.projectDir, '../node_modules/humaniq-libsignals/android')
 include ':react-native-fetch-blob'

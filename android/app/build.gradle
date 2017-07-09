@@ -149,6 +149,8 @@ android {
 }
 
 dependencies {
+    compile project(':react-native-sound')
+    compile project(':react-native-audio')
     compile project(':humaniq-libsignals')
     compile project(':react-native-fetch-blob')
     compile project(':react-native-camera')
