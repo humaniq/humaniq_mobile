@@ -50,22 +50,33 @@ export class Cam extends Component {
       const code = nextProps.user.validate.payload.code;
       const photo = nextProps.user.photo;
 
-      if (code === 6000) {
-        alert(nextProps.user.validate.payload.message);
-      } else if (code === 3002 && !photo) {
-        // registered user
-        this.props.setAvatarLocalPath(this.state.path);
-        this.props.navigation.navigate('Password');
-      } else if (code === 3003 && !photo) {
-        // new user
-        this.props.setAvatarLocalPath(this.state.path);
-        this.props.navigation.navigate('Tutorial', { nextScene: 'Password' });
-      } else if (code === 3000) {
-        this.setState({ path: '' });
-        alert(nextProps.user.validate.payload.message);
-        // reset payload?
-      } else {
-        alert('Unknown code, no info in Postman');
+      if (!photo) {
+        switch (code) {
+          case 6000:
+            alert(nextProps.user.validate.payload.message);
+            break;
+
+          case 3002:
+            // registered user
+            this.props.setAvatarLocalPath(this.state.path);
+            this.props.navigation.navigate('Password');
+            break;
+
+          case 3003:
+            // new user
+            this.props.setAvatarLocalPath(this.state.path);
+            this.props.navigation.navigate('Tutorial', { nextScene: 'Password' });
+            break;
+
+          case 3000:
+            this.setState({ path: '' });
+            alert(nextProps.user.validate.payload.message);
+            // reset payload?
+            break;
+
+          default:
+            alert(`Unknown code ${nextProps.user.validate.payload.code}, no info in Postman`);
+        }
       }
     }
   }

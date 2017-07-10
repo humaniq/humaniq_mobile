@@ -8,10 +8,10 @@ function* fetchEntity(entity, apiFn, body) {
   // console.log('request ready', body);
   const { response, error } = yield call(apiFn, body);
   if (response) {
-    // console.log('response ok', response);
+    console.log('response ok', response);
     yield put(entity.success(response));
   } else {
-    // console.log('response fail', error);
+    console.log('response fail', error);
     yield put(entity.failure(error));
   }
 }

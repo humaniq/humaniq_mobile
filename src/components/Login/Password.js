@@ -40,22 +40,39 @@ export class Password extends Component {
     if (nextProps.user.account.payload) {
       const code = nextProps.user.account.payload.code;
       const password = nextProps.user.password;
-      if (code === 6000) {
-        alert(nextProps.user.account.payload.message);
-      } else if (code === 1001 && !password) {
-        // registration created (save password & token?)
-        this.props.setPassword(this.state.password);
-        this.props.navigation.navigate('TelInput');
-      } else if (code === 2001 && !password) {
-        // login, password ok (save password & token?)
-        this.props.setPassword(this.state.password);
-        this.props.navigation.navigate('Dashboard');
-      } else if (code === 2002) {
-        alert(nextProps.user.account.payload.message);
-      } else if (code === 3003) {
-        alert(nextProps.user.account.payload.message);
-      } else {
-        alert('Unknown code, no info in Postman');
+
+      if (!password) {
+        switch (code) {
+          case 6000:
+            alert(nextProps.user.account.payload.message);
+            break;
+
+          case 1001:
+            this.props.setPassword(this.state.password);
+            this.props.navigation.navigate('TelInput');
+            break;
+
+          case 2001:
+            // login, password ok (save password & token?)
+            this.props.setPassword(this.state.password);
+            this.props.navigation.navigate('Dashboard');
+            break;
+
+          case 2002:
+            // Authentication Failed
+            this.setState({ password: '' });
+            alert(nextProps.user.account.payload.message);
+            break;
+
+          case 3003:
+            // Facial Image Not Found
+            alert(nextProps.user.account.payload.message);
+            break;
+
+          default:
+            alert(`Unknown code ${nextProps.user.account.payload.code}, no info in Postman`);
+
+        }
       }
     }
   }
