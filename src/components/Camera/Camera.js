@@ -49,7 +49,10 @@ export class Cam extends Component {
     if (nextProps.user.validate.payload) {
       const code = nextProps.user.validate.payload.code;
       const photo = nextProps.user.photo;
-      if (code === 3002 && !photo) {
+
+      if (code === 6000) {
+        alert(nextProps.user.validate.payload.message);
+      } else if (code === 3002 && !photo) {
         // registered user
         this.props.setAvatarLocalPath(this.state.path);
         this.props.navigation.navigate('Password');
@@ -57,10 +60,12 @@ export class Cam extends Component {
         // new user
         this.props.setAvatarLocalPath(this.state.path);
         this.props.navigation.navigate('Tutorial', { nextScene: 'Password' });
-      } else if (code === 3001) {
+      } else if (code === 3000) {
         this.setState({ path: '' });
-        alert('Бред какой-то');
+        alert(nextProps.user.validate.payload.message);
         // reset payload?
+      } else {
+        alert('Unknown code, no info in Postman');
       }
     }
   }

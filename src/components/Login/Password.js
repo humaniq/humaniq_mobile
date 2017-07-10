@@ -40,21 +40,22 @@ export class Password extends Component {
     if (nextProps.user.account.payload) {
       const code = nextProps.user.account.payload.code;
       const password = nextProps.user.password;
-      if (code === 3002 && !password) {
-        // registered user
-        // this.props.setAvatarLocalPath(this.state.path);
-        // this.props.navigation.navigate('Password');
+      if (code === 6000) {
+        alert(nextProps.user.account.payload.message);
       } else if (code === 1001 && !password) {
-        // auth
-        // password good (save password & token?)
+        // registration created (save password & token?)
         this.props.setPassword(this.state.password);
         this.props.navigation.navigate('TelInput');
       } else if (code === 2001 && !password) {
-      // password good (save password & token?)
+        // login, password ok (save password & token?)
         this.props.setPassword(this.state.password);
         this.props.navigation.navigate('Dashboard');
-      } else if (code === 900000000000000) {
-        alert('Бред какой-то, попробуй еще раз');
+      } else if (code === 2002) {
+        alert(nextProps.user.account.payload.message);
+      } else if (code === 3003) {
+        alert(nextProps.user.account.payload.message);
+      } else {
+        alert('Unknown code, no info in Postman');
       }
     }
   }
