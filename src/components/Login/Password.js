@@ -7,6 +7,8 @@ import {
 
 import { connect } from 'react-redux';
 import { NavigationActions } from 'react-navigation';
+import DeviceInfo from 'react-native-device-info';
+import IMEI from 'react-native-imei';
 
 import Keyboard from './Keyboard';
 import CustomStyleSheet from '../../utils/customStylesheet';
