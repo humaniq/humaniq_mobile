@@ -17,12 +17,9 @@ import {
     Platform
 } from 'react-native';
 
-import {NavigationActions} from 'react-navigation';
-import CustomStyleSheet from '../../utils/customStylesheet';
 import {connect} from 'react-redux';
 import Item from './Item'
 import * as constants from '../../utils/constants'
-
 
 const HEADER_MAX_HEIGHT = 170;
 const DELTA = 20;
@@ -40,7 +37,6 @@ export class Profile extends Component {
     }
 
     componentWillMount() {
-        console.warn('axax' + StatusBar.currentHeight)
     }
 
     // render list
@@ -105,8 +101,7 @@ export class Profile extends Component {
                 <StatusBar
                     translucent
                     barStyle="light-content"
-                    backgroundColor="rgba(255,255,255,0.5)"
-                />
+                    backgroundColor="#598fba"/>
 
                 {/* render list */}
                 <Animated.ScrollView
@@ -115,22 +110,19 @@ export class Profile extends Component {
                     onScroll={
                         Animated.event([
                             { nativeEvent: { contentOffset: { y: this.state.scrollY } }
-                            }],{ useNativeDriver: true})
-                    }>
+                            }],{ useNativeDriver: true})}>
                     {this.renderScrollViewContent()}
                 </Animated.ScrollView>
 
-                {/* render toolbar layout */}
+                {/* render collapse layout */}
                 <Animated.View
                     style={[styles.collapseContainer, {
-                        transform: [{translateY: this.getAnimationType(constants.HEADER_TRANSLATE)}]}]
-                    }>
+                        transform: [{translateY: this.getAnimationType(constants.HEADER_TRANSLATE)}]}]}>
                     <Animated.View
                         style={[styles.bar, {
                             transform: [
                                 {scale: this.getAnimationType(constants.VIEW_TRANSLATE)},
-                                {translateY: this.getAnimationType(constants.VIEWY_TRANSLATE)}]}]
-                        }>
+                                {translateY: this.getAnimationType(constants.VIEWY_TRANSLATE)}]}]}>
                         <Animated.View
                             style={styles.avatarInfoContainer}>
                             <Animated.Image
@@ -144,16 +136,15 @@ export class Profile extends Component {
                         </Animated.View>
                     </Animated.View>
 
-                    {/* render toolbar items */}
+                    {/* render toolbar */}
                     <Animated.View style={[{
                         transform: [{translateY: this.getAnimationType(constants.HEADER_TRANSLATE2)}]}]}>
                         <ToolbarAndroid
-                            onActionSelected={(position) => this.onActionClick()}
+                            onActionSelected={(position) => this.onActionClick(position)}
                             style={styles.toolbar}
                             onIconClicked={() => this.backButtonHandle()}
                             navIcon={require('../../assets/back.png')}
                             actions={[{title: 'Settings', icon: require('../../assets/settings_white.png'), show: 'always'}]}/>
-
                     </Animated.View>
                 </Animated.View>
 
@@ -179,9 +170,7 @@ export class Profile extends Component {
     onActionClick = (position) => {
         switch (position) {
             case 0:
-                const navState = this.props.navigation.state;
-                this.props.navigation.navigate('ProfileSettings', { ...navState.params });
-                break
+                return this.settingsButtonHandle()
         }
     }
 }
@@ -209,13 +198,6 @@ const styles = StyleSheet.create({
         height: 60,
         width: 60,
         borderRadius: 60,
-    },
-    toolbarItemsContainer: {
-        justifyContent: 'space-between',
-        flexDirection: 'row',
-        alignItems: 'center',
-        top: StatusBar.currentHeight,
-        height: TOOLBAR_HEIGHT
     },
     infoContainer: {marginLeft: 13},
     bar: {
