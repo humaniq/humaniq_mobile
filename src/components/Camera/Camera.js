@@ -64,37 +64,34 @@ export class Cam extends Component {
 
   componentWillReceiveProps(nextProps) {
     // TODO: MOVE TO SAGA TO PREVENT LAG
-    if (nextProps.user.validate.payload) {
+    const photo = nextProps.user.photo;
+    if (!photo) {
       const code = nextProps.user.validate.payload.code;
-      const photo = nextProps.user.photo;
+      switch (code) {
+        case 6000:
+          Alert(nextProps.user.validate.payload.message);
+          break;
 
-      if (!photo) {
-        switch (code) {
-          case 6000:
-            Alert(nextProps.user.validate.payload.message);
-            break;
+        case 3002:
+          // registered user
+          this.props.setAvatarLocalPath(this.state.path);
+          this.props.navigation.navigate('Password');
+          break;
 
-          case 3002:
-            // registered user
-            this.props.setAvatarLocalPath(this.state.path);
-            this.props.navigation.navigate('Password');
-            break;
+        case 3003:
+          // new user
+          this.props.setAvatarLocalPath(this.state.path);
+          this.props.navigation.navigate('Tutorial', { nextScene: 'Password' });
+          break;
 
-          case 3003:
-            // new user
-            this.props.setAvatarLocalPath(this.state.path);
-            this.props.navigation.navigate('Tutorial', { nextScene: 'Password' });
-            break;
+        case 3000:
+          this.setState({ path: '' });
+          Alert(nextProps.user.validate.payload.message);
+          // reset payload?
+          break;
 
-          case 3000:
-            this.setState({ path: '' });
-            Alert(nextProps.user.validate.payload.message);
-            // reset payload?
-            break;
-
-          default:
-            Alert(`Unknown code ${nextProps.user.validate.payload.code}, no info in Postman`);
-        }
+        default:
+          Alert(`Unknown code ${nextProps.user.validate.payload.code}, no info in Postman`);
       }
     }
   }

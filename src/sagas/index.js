@@ -3,15 +3,30 @@ import { take, put, call, fork, select, all, takeLatest } from 'redux-saga/effec
 import { api } from '../utils/index';
 import * as actions from '../actions';
 
-function* fetchEntity(entity, apiFn, body) {
+function* fetchEntity(entity, apiFn, body, errorCodes) {
   // yield put(entity.request(...));
   // console.log('request ready', body);
-  const { response, error } = yield call(apiFn, body);
-  if (response) {
-    console.log('response ok', response);
+  // const { response, error } = yield call(apiFn, body);
+  console.log('body', body);
+  // console.log('error codes', errorCodes);
+  const { response } = yield call(apiFn, body);
+
+  if (response.code) {
+    const responseCode = parseInt(response.code);
+    const errorCode = errorCodes.find((errorCode) => errorCode === responseCode);
+    console.log('response', response);
     yield put(entity.success(response));
+
+    if (!errorCode) {
+      console.log('response ok', response);
+    } else {
+      const error = { ...response };
+      console.log('response fail', error);
+      yield put(entity.failure(error));
+    }
   } else {
-    console.log('response fail', error);
+    const error = { ...response };
+    console.log('unknown response fail', error);
     yield put(entity.failure(error));
   }
 }
@@ -26,12 +41,14 @@ export const fetchPhoneNumberCreate = fetchEntity.bind(
 );
 
 function* validate({ facial_image }) {
+  const errorCodes = [3000, 3001, 6000];
   // do we need cache? place it here and wrap with conditional statement below call
-  yield call(fetchValidate, { facial_image });
+  yield call(fetchValidate, { facial_image }, errorCodes);
 }
 
 function* login({ facial_image_id, password, device_imei }) {
   // console.log('inaction', action);
+  const errorCodes = [2002, 3003, 6000];
   const body = {
     facial_image_id,
     password,
@@ -45,6 +62,7 @@ function* login({ facial_image_id, password, device_imei }) {
 }
 
 function* signup({ facial_image_id, password, device_imei }) {
+  const errorCodes = [2002, 3003, 6000];
   const body = {
     facial_image_id,
     password,
