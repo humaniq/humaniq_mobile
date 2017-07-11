@@ -57,6 +57,7 @@ export class Password extends Component {
   componentWillReceiveProps(nextProps) {
     // TODO: MOVE TO SAGA TO PREVENT LAG
     if (nextProps.user.account.payload) {
+      console.log('☠', nextProps.user.account.payload.payload.errors);
       const code = nextProps.user.account.payload.code;
       const password = nextProps.user.password;
 
@@ -153,9 +154,11 @@ export class Password extends Component {
 
   createRegistration = () => {
     // DEV
+    // TODO: set real ID;
     const isEmulator = DeviceInfo.isEmulator();
     const randomImei = Math.floor((10000000 + Math.random()) * 90000000);
-    const imei = isEmulator ? randomImei : IMEI.getImei();
+    // const imei = isEmulator ? randomImei : IMEI.getImei();
+    const imei = randomImei.toString();
 
     this.props.signup({
       facial_image_id: this.props.user.validate.payload.payload.facial_image_id,

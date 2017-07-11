@@ -45,8 +45,35 @@ export class TelInput extends Component {
   };
 
   componentWillReceiveProps(nextProps) {
+    // TODO: MOVE TO SAGA TO PREVENT LAG
+    // console.log('📞 nextProps', nextProps.user.validate);
     if (nextProps.user.phone.payload) {
-      this.props.navigation.navigate('Dashboard');
+      const code = nextProps.user.phone.payload.code;
+
+      if (code) {
+        switch (code) {
+          case 6000:
+            alert(nextProps.user.validate.payload.message);
+            break;
+
+          case 4005:
+            // registered user
+            // Account Phone Number Created Successfully. Validation Code Sent
+            // this.props.navigation.navigate('CodeInput');
+            alert('Proceed to codeInput');
+            break;
+
+          case 4011:
+            // The Account Already Has A Phone Number
+            alert('The Account Already Has A Phone Number');
+            // this.props.setAvatarLocalPath(this.state.path);
+            // this.props.navigation.navigate('Tutorial', { nextScene: 'Password' });
+            break;
+
+          default:
+            alert(`Unknown code ${nextProps.user.validate.payload.code}, no info in Postman`);
+        }
+      }
     }
   }
 
@@ -70,9 +97,10 @@ export class TelInput extends Component {
   };
 
   handlePhoneConfirm = () => {
+    console.log(this.props.user.account);
     const phone_number = VMasker.toNumber(this.state.phone);
     this.props.phoneNumberCreate({
-      account_id: this.props.user.account.payload.payload.account_id,
+      account_id: this.props.user.account.payload.payload.account_information.account_id,
       phone_number,
     });
   };

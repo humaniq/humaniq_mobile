@@ -7,14 +7,11 @@ function* fetchEntity(entity, apiFn, body, errorCodes) {
   // yield put(entity.request(...));
   // console.log('request ready', body);
   // const { response, error } = yield call(apiFn, body);
-  console.log('body', body);
-  // console.log('error codes', errorCodes);
   const { response } = yield call(apiFn, body);
 
   if (response.code) {
     const responseCode = parseInt(response.code);
     const errorCode = errorCodes.find((errorCode) => errorCode === responseCode);
-    console.log('response', response);
     yield put(entity.success(response));
 
     if (!errorCode) {
@@ -77,6 +74,7 @@ function* signup({ facial_image_id, password, device_imei }) {
 }
 
 function* phoneNumberCreate({ phone_number, account_id }) {
+  const errorCodes = [4011, 6000];
   const code = phone_number.toString().slice(0, 1);
   const number = phone_number.toString().slice(1);
   const body = {
@@ -88,7 +86,7 @@ function* phoneNumberCreate({ phone_number, account_id }) {
       // phone_number: '5035863325',
     },
   };
-  yield call(fetchPhoneNumberCreate, body);
+  yield call(fetchPhoneNumberCreate, body, errorCodes);
 }
 
 // function* phoneNumberValidate(phoneNumber) {

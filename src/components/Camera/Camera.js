@@ -64,11 +64,10 @@ export class Cam extends Component {
 
   componentWillReceiveProps(nextProps) {
     // TODO: MOVE TO SAGA TO PREVENT LAG
-    console.log('📞 nextProps', nextProps.user.validate);
+    // console.log('📞 nextProps', nextProps.user.validate);
     if (nextProps.user.validate.payload) {
       const code = nextProps.user.validate.payload.code;
       const photo = nextProps.user.photo;
-      console.log('payload code', code, photo);
 
       if (!photo) {
         switch (code) {
