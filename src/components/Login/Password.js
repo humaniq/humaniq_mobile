@@ -63,7 +63,7 @@ export class Password extends Component {
       if (!password) {
         switch (code) {
           case 6000:
-            Alert(nextProps.user.account.payload.message);
+            alert(nextProps.user.account.payload.message);
             break;
 
           case 1001:
@@ -80,16 +80,16 @@ export class Password extends Component {
           case 2002:
             // Authentication Failed
             this.setState({ password: '' });
-            Alert(nextProps.user.account.payload.message);
+            alert(nextProps.user.account.payload.message);
             break;
 
           case 3003:
             // Facial Image Not Found
-            Alert(nextProps.user.account.payload.message);
+            alert(nextProps.user.account.payload.message);
             break;
 
           default:
-            Alert(`Unknown code ${nextProps.user.account.payload.code}, no info in Postman`);
+            alert(`Unknown code ${nextProps.user.account.payload.code}, no info in Postman`);
 
         }
       }
@@ -121,7 +121,7 @@ export class Password extends Component {
   };
 
   handleHelpPress = () => {
-    Alert('В шаббат у нас с мамой традиция — зажигать свечи и смотреть „Колесо фортуны“');
+    alert('В шаббат у нас с мамой традиция — зажигать свечи и смотреть „Колесо фортуны“');
   };
 
   handlePasswordConfirm = () => {

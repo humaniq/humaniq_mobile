@@ -66,7 +66,7 @@ export class TelInput extends Component {
   };
 
   handleHelpPress = () => {
-    Alert('В шаббат у нас с мамой традиция — зажигать свечи и смотреть „Колесо фортуны“');
+    alert('В шаббат у нас с мамой традиция — зажигать свечи и смотреть „Колесо фортуны“');
   };
 
   handlePhoneConfirm = () => {

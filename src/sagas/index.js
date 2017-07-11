@@ -58,7 +58,7 @@ function* login({ facial_image_id, password, device_imei }) {
       },
     },
   };
-  yield call(fetchLogin, body);
+  yield call(fetchLogin, body, errorCodes);
 }
 
 function* signup({ facial_image_id, password, device_imei }) {
@@ -73,7 +73,7 @@ function* signup({ facial_image_id, password, device_imei }) {
     },
   };
   console.log('body', body);
-  yield call(fetchSignup, body);
+  yield call(fetchSignup, body, errorCodes);
 }
 
 function* phoneNumberCreate({ phone_number, account_id }) {
