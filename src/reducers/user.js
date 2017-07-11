@@ -38,6 +38,15 @@ function password(state = '', action) {
   }
 }
 
+function phoneNumber(state = '', action) {
+  switch (action.type) {
+    case ActionTypes.SAVE_PHONE:
+      return action.number;
+    default:
+      return state;
+  }
+}
+
 function account(state = {
   isFetching: false,
   payload: null,
@@ -69,37 +78,6 @@ function account(state = {
   }
 }
 
-function phone(state = {
-  isFetching: false,
-  payload: null,
-}, action) {
-  switch (action.type) {
-    case ActionTypes.PHONE_NUMBER_CREATE.REQUEST:
-    case ActionTypes.PHONE_NUMBER_VALIDATE.REQUEST:
-      return {
-        ...state,
-        isFetching: true,
-        payload: null,
-      };
-    case ActionTypes.PHONE_NUMBER_CREATE.SUCCESS:
-    case ActionTypes.PHONE_NUMBER_VALIDATE.SUCCESS:
-      return {
-        ...state,
-        isFetching: false,
-        payload: action.response,
-      };
-    case ActionTypes.PHONE_NUMBER_CREATE.FAILURE:
-    case ActionTypes.PHONE_NUMBER_VALIDATE.FAILURE:
-      return {
-        ...state,
-        isFetching: false,
-        payload: action.error,
-      };
-    default:
-      return state;
-  }
-}
-
 export const user = combineReducers({
   validate: subroutineReducerCreator({
     types: [
@@ -108,8 +86,22 @@ export const user = combineReducers({
       ActionTypes.VALIDATE.FAILURE,
     ],
   }),
-  phone,
+  phoneValidate: subroutineReducerCreator({
+    types: [
+      ActionTypes.PHONE_NUMBER_VALIDATE.REQUEST,
+      ActionTypes.PHONE_NUMBER_VALIDATE.SUCCESS,
+      ActionTypes.PHONE_NUMBER_VALIDATE.FAILURE,
+    ],
+  }),
+  phoneCreate: subroutineReducerCreator({
+    types: [
+      ActionTypes.PHONE_NUMBER_CREATE.REQUEST,
+      ActionTypes.PHONE_NUMBER_CREATE.SUCCESS,
+      ActionTypes.PHONE_NUMBER_CREATE.FAILURE,
+    ],
+  }),
   account,
   photo,
   password,
+  phoneNumber,
 });

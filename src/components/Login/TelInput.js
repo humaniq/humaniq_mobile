@@ -13,7 +13,7 @@ import VMasker from 'vanilla-masker';
 import CustomStyleSheet from '../../utils/customStylesheet';
 import Confirm from '../Shared/Buttons/Confirm';
 import Keyboard from '../Shared/Components/Keyboard';
-import { phoneNumberCreate } from '../../actions';
+import { phoneNumberCreate, savePhone } from '../../actions';
 
 
 const ic_user = require('../../assets/icons/ic_user.png');
@@ -25,7 +25,7 @@ export class TelInput extends Component {
         payload: PropTypes.object,
         isFetching: PropTypes.bool,
       }).isRequired,
-      phone: PropTypes.shape({
+      phoneCreate: PropTypes.shape({
         payload: PropTypes.object,
         isFetching: PropTypes.bool,
       }).isRequired,
@@ -46,11 +46,12 @@ export class TelInput extends Component {
 
   componentWillReceiveProps(nextProps) {
     // TODO: MOVE TO SAGA TO PREVENT LAG
-    // console.log('📞 nextProps', nextProps.user.validate);
-    if (nextProps.user.phone.payload) {
-      const code = nextProps.user.phone.payload.code;
+    console.log('📞 nextProps', nextProps.user);
+    if (nextProps.user.phoneCreate.payload) {
+      const code = nextProps.user.phoneCreate.payload.code;
+      const phone = nextProps.user.phoneNumber;
 
-      if (code) {
+      if (!phone) {
         switch (code) {
           case 6000:
             alert(nextProps.user.validate.payload.message);
@@ -59,6 +60,7 @@ export class TelInput extends Component {
           case 4005:
             // registered user
             // Account Phone Number Created Successfully. Validation Code Sent
+            this.props.savePhone(VMasker.toNumber(this.state.phone));
             this.props.navigation.navigate('CodeInput');
             // alert('Proceed to codeInput');
             break;
@@ -97,7 +99,6 @@ export class TelInput extends Component {
   };
 
   handlePhoneConfirm = () => {
-    console.log(this.props.user.account);
     const phone_number = VMasker.toNumber(this.state.phone);
     this.props.phoneNumberCreate({
       account_id: this.props.user.account.payload.payload.account_information.account_id,
@@ -123,7 +124,7 @@ export class TelInput extends Component {
             {this.renderInput()}
           </View>
         </View>
-        {!this.props.user.phone.isFetching ?
+        {!this.props.user.phoneCreate.isFetching ?
           <Confirm
             active={this.state.phone.length === this.state.maxPhoneLength}
             onPress={this.handlePhoneConfirm}
@@ -145,6 +146,7 @@ const mapStateToProps = state => ({
 
 export default connect(mapStateToProps, {
   phoneNumberCreate: phoneNumberCreate.request,
+  savePhone,
 })(TelInput);
 
 const styles = CustomStyleSheet({
