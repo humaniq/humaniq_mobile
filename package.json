@@ -7,22 +7,59 @@
     "test": "jest"
   },
   "dependencies": {
+    "es6-promise": "^4.1.0",
+    "firebase": "^4.1.0",
+    "isomorphic-fetch": "^2.2.1",
     "react": "16.0.0-alpha.6",
-    "react-native": "0.44.0"
+    "react-native": "0.44.0",
+    "react-native-asset-library-to-base64": "^1.0.1",
+    "react-native-camera": "git+https://github.com/lwansbrough/react-native-camera.git",
+    "react-native-device-info": "^0.10.2",
+    "react-native-extended-stylesheet": "^0.5.0",
+    "react-native-fetch-blob": "^0.10.5",
+    "react-native-imei": "^0.1.0",
+    "react-native-linear-gradient": "^2.0.0",
+    "react-native-network-info": "^2.2.0",
+    "react-native-progress": "^3.3.0",
+    "react-native-video": "^1.0.0",
+    "react-navigation": "^1.0.0-beta.11",
+    "react-redux": "^5.0.5",
+    "redux": "^3.6.0",
+    "redux-logger": "^3.0.6",
+    "redux-saga": "^0.15.4",
+    "redux-thunk": "^2.2.0",
+    "underscore": "^1.8.3",
+    "vanilla-masker": "^1.2.0"
   },
   "devDependencies": {
     "babel-eslint": "^6.1.2",
-    "babel-jest": "20.0.3",
+    "babel-jest": "*",
+    "babel-preset-env": "*",
+    "babel-preset-react": "*",
     "babel-preset-react-native": "1.9.2",
+    "enzyme": "*",
     "eslint": "^3.19.0",
     "eslint-config-airbnb": "^15.0.1",
     "eslint-plugin-import": "^2.3.0",
     "eslint-plugin-jsx-a11y": "^5.0.3",
     "eslint-plugin-react": "^7.0.1",
-    "jest": "20.0.4",
-    "react-test-renderer": "16.0.0-alpha.6"
+    "jest": "*",
+    "react-addons-test-utils": "15.4.2",
+    "react-dom": "^15.4.2",
+    "react-native-mock-render": "0.0.6",
+    "react-test-renderer": "^15.4.2",
+    "redux-logger": "^3.0.6",
+    "redux-mock-store": "^1.2.3",
+    "sinon": "^2.3.5"
   },
   "jest": {
-    "preset": "react-native"
+    "preset": "react-native",
+    "verbose": false,
+    "transformIgnorePatterns": [
+      "node_modules/(?!(jest-)?react-native|react-navigation|)"
+    ],
+    "setupFiles": [
+      "./setup.js"
+    ]
   }
 }

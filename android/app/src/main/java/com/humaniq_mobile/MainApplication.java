@@ -3,6 +3,13 @@ package com.humaniq_mobile;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import com.pusherman.networkinfo.RNNetworkInfoPackage;
+import codes.simen.IMEI.IMEI;
+import com.learnium.RNDeviceInfo.RNDeviceInfo;
+import com.BV.LinearGradient.LinearGradientPackage;
+import com.brentvatne.react.ReactVideoPackage;
+import com.RNFetchBlob.RNFetchBlobPackage;
+import com.lwansbrough.RCTCamera.RCTCameraPackage;
 import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
 import com.facebook.react.shell.MainReactPackage;
@@ -22,7 +29,14 @@ public class MainApplication extends Application implements ReactApplication {
     @Override
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
-          new MainReactPackage()
+          new MainReactPackage(),
+            new RNNetworkInfoPackage(),
+            new IMEI(),
+            new RNDeviceInfo(),
+            new LinearGradientPackage(),
+            new ReactVideoPackage(),
+            new RNFetchBlobPackage(),
+            new RCTCameraPackage()
       );
     }
   };
