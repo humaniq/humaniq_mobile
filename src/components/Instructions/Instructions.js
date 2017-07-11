@@ -28,7 +28,7 @@ export class Instructions extends Component {
     video: Video;
 
     constructor(props) {
-        super(props)
+        super(props);
         this.state = {
             rate: 1,
             volume: 1,
@@ -40,8 +40,8 @@ export class Instructions extends Component {
             progress: 0,
             source: '',
             loading: true,
-            downloaded: true
-        }
+            downloaded: true,
+        };
     }
 
     async componentDidMount() {
@@ -64,15 +64,15 @@ export class Instructions extends Component {
     onPressEnd = () => {
         // starts video again
         this.setState({paused: false})
-    }
+    };
 
     onPressStart = () => {
         // on click pauses video
         this.setState({paused: true})
-    }
+    };
 
     onBotPress = () => {
-    }
+    };
 
     onClosePress = () => {
         // close component
@@ -80,7 +80,7 @@ export class Instructions extends Component {
             key: null,
         });
         this.props.navigation.dispatch(backAction);
-    }
+    };
 
     onLoad = (data) => {
         this.setState({duration: data.duration});
@@ -88,17 +88,17 @@ export class Instructions extends Component {
 
 
     onEnd = () => {
-        this.setState({paused: true, progress: 1})
+        this.setState({paused: true, progress: 1});
         setTimeout(() => {
             if (this.video) {
-                this.setState({paused: false, progress: 0})
+                this.setState({paused: false, progress: 0});
                 this.video.seek(0)
             }
         }, 250)
     };
 
     render() {
-        var {height, width} = Dimensions.get('window')
+        var {height, width} = Dimensions.get('window');
 
         return (
             <View style={styles.container}>
@@ -181,7 +181,7 @@ const styles = CustomStyleSheet({
         marginRight: 10,
         marginLeft: 2,
         justifyContent: 'space-between',
-        alignItems: 'center'
+        alignItems: 'center',
     },
     fullScreen: {
         position: 'absolute',
@@ -207,8 +207,8 @@ const styles = CustomStyleSheet({
         top: 0,
         bottom: 0,
         left: 0,
-        right: 0
-    }
+        right: 0,
+    },
 });
 
 export default connect(
