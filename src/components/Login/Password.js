@@ -56,8 +56,8 @@ export class Password extends Component {
 
   componentWillReceiveProps(nextProps) {
     // TODO: MOVE TO SAGA TO PREVENT LAG
+    // console.log('next props for password', nextProps.user);
     if (nextProps.user.account.payload) {
-      console.log('☠', nextProps.user.account.payload.payload.errors);
       const code = nextProps.user.account.payload.code;
       const password = nextProps.user.password;
 
@@ -91,7 +91,6 @@ export class Password extends Component {
 
           default:
             alert(`Unknown code ${nextProps.user.account.payload.code}, no info in Postman`);
-
         }
       }
     }

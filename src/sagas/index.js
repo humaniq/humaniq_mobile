@@ -10,12 +10,12 @@ function* fetchEntity(entity, apiFn, body, errorCodes) {
   const { response } = yield call(apiFn, body);
 
   if (response.code) {
-    const responseCode = parseInt(response.code);
-    const errorCode = errorCodes.find((errorCode) => errorCode === responseCode);
-    yield put(entity.success(response));
+    const responseCode = parseInt(response.code, 10);
+    const errorCode = errorCodes.find(errCode => errCode === responseCode);
 
     if (!errorCode) {
       console.log('response ok', response);
+      yield put(entity.success(response));
     } else {
       const error = { ...response };
       console.log('response fail', error);
