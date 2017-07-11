@@ -4,7 +4,8 @@ const API_ROOT = 'https://beta-api.humaniq.co/tapatybe/api/v1/';
 
 function callApi(endpoint, body) {
   const fullUrl = (endpoint.indexOf(API_ROOT) === -1) ? API_ROOT + endpoint : endpoint;
-  // console.log('api request body', body);
+  console.log('api request body', body);
+  console.log('full url', fullUrl);
   return RNFetchBlob.fetch(
     'POST',
     fullUrl,
@@ -15,7 +16,7 @@ function callApi(endpoint, body) {
   )
     .then(response => response.json())
     .then((response) => {
-      // console.log('API response', response);
+      console.log('API response', response);
       // let code = response.code.toString();
       // if (code.slice(0, 1) == 4) {
       //   return Promise.reject(response);

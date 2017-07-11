@@ -19,6 +19,6 @@ function configureStore(initialState) {
 }
 const store = configureStore({});
 sagaMiddleware.run(rootSaga);
-console.log('🗽 current state', store.getState());
+// console.log('🗽 current state', store.getState());
 export default store;
 
