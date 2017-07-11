@@ -74,7 +74,7 @@ export class ProfileSettings extends Component {
                 })
             case constants.IMAGE_OPACITY:
                 return this.state.scrollY.interpolate({
-                    inputRange: [0, HEADER_SCROLL_DISTANCE / 2],
+                    inputRange: [0, HEADER_SCROLL_DISTANCE],
                     outputRange: [1, 0],
                     extrapolate: 'clamp',
                 })
@@ -142,12 +142,16 @@ export class ProfileSettings extends Component {
                 </Animated.View>
 
                 {/* render fab button*/}
-                <Animated.Image
-                    source={require('../../assets/fab.png')}
-                    style={[styles.fabButton,{
-                        opacity: this.getAnimationType(constants.IMAGE_OPACITY),
+                <Animated.View style={[styles.fabContainer,{
+                    opacity: this.getAnimationType(constants.IMAGE_OPACITY),
                         transform: [{translateY: this.getAnimationType(constants.HEADER_TRANSLATE)}],
-                    }]}/>
+                    }]}>
+                    <TouchableOpacity onPress={() => this.onFabButtonPress()}>
+                        <Animated.Image
+                            source={require('../../assets/fab.png')}
+                            style={[styles.fabButton]}/>
+                    </TouchableOpacity>
+                </Animated.View>
             </View>
         )
     }
@@ -185,36 +189,35 @@ export class ProfileSettings extends Component {
                             <Text style={styles.phoneText}>
                                 +1 (234) 567-8901
                             </Text>
-
                             <Image
                                 source={require('../../assets/phone.png')}
                                 style={styles.phoneImage}/>
                         </View>
-
-                        <Image
-                            source={require('../../assets/edit_blue.png')}
-                            style={styles.editImage}/>
+                        <TouchableOpacity onPress={() => this.onPhoneEditPress()}>
+                            <Image
+                                source={require('../../assets/edit_blue.png')}
+                                style={styles.editImage}/>
+                        </TouchableOpacity>
                     </View>
 
                 </View>
                 <View style={styles.divider}/>
-
 
                 <View style={styles.secondSubSection}>
                     <View style={{flex: 1}}>
                         <Text style={styles.passwordText}>
                             ****
                         </Text>
-
                         <Image
                             resizeMode='contain'
                             source={require('../../assets/lock.png')}
                             style={styles.lockImage}/>
                     </View>
-
-                    <Image
-                        source={require('../../assets/edit_blue.png')}
-                        style={styles.editImage}/>
+                    <TouchableOpacity onPress={() => this.onPasswordEditPress()}>
+                        <Image
+                            source={require('../../assets/edit_blue.png')}
+                            style={styles.editImage}/>
+                    </TouchableOpacity>
                 </View>
 
                 <View style={styles.divider}/>
@@ -227,16 +230,34 @@ export class ProfileSettings extends Component {
             <View style={styles.secondSection}>
                 <View style={styles.divider}/>
                 <View style={{marginLeft: 16.5}}>
-                    <Image
-                        source={require('../../assets/edit_blue.png')}
-                        style={styles.profileImage}/>
+                    <TouchableOpacity>
+                        <Image
+                            source={require('../../assets/edit_blue.png')}
+                            style={styles.profileImage}/>
+                    </TouchableOpacity>
 
-                    <Image
-                        source={require('../../assets/edit_blue.png')}
-                        style={styles.logoutImage}/>
+                    <TouchableOpacity onPress={() => this.onLogoutPress()}>
+                        <Image
+                            source={require('../../assets/edit_blue.png')}
+                            style={styles.logoutImage}/>
+                    </TouchableOpacity>
                 </View>
             </View>
         )
+    }
+
+    onPhoneEditPress = () => {
+        this.editHandle()
+    }
+
+    onPasswordEditPress = () => {
+        this.editHandle()
+    }
+
+    onLogoutPress = () => {
+    }
+
+    onFabButtonPress = () => {
     }
 }
 
@@ -318,12 +339,8 @@ const styles = StyleSheet.create({
         flex: 1
     },
     fabButton: {
-        position: 'absolute',
-        right: 24.5,
         width: 56,
         height: 56,
-        top: HEADER_MAX_HEIGHT-28,
-        overflow: 'hidden',
     },
     toolbar: {
         height: TOOLBAR_HEIGHT,
@@ -380,6 +397,12 @@ const styles = StyleSheet.create({
     statusText: {
         fontSize: 16.5,
         color: '#DAE5EE'
+    },
+    fabContainer: {
+        top: HEADER_MAX_HEIGHT-28,
+        position: 'absolute',
+        overflow: 'hidden',
+        right: 24.5,
     }
 });
 

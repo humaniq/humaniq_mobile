@@ -41,7 +41,7 @@ class Item extends Component {
                     <View style={{flex: 1}}>
                         <View style={{flexDirection: 'row', flex: 1, alignItems: 'center'}}>
                             <Text style={styles.phone}>
-                                +1 (416) 464 71 35
+                                {item.phone}
                             </Text>
 
                             <View style={styles.rightContainer}>

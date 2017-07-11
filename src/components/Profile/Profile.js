@@ -20,12 +20,61 @@ import {
 import {connect} from 'react-redux';
 import Item from './Item'
 import * as constants from '../../utils/constants'
+import CustomStyleSheet from '../../utils/customStylesheet';
 
 const HEADER_MAX_HEIGHT = 170;
 const DELTA = 20;
 const TOOLBAR_HEIGHT = 56;
 const HEADER_MIN_HEIGHT = TOOLBAR_HEIGHT + StatusBar.currentHeight;
 const HEADER_SCROLL_DISTANCE = HEADER_MAX_HEIGHT - HEADER_MIN_HEIGHT;
+
+const fakeTransactions = [
+    {
+        phone: "+1 (416) 464 71 35",
+        amount: "+12.08",
+        type: 0, // incoming
+        name: "Серафим",
+        surname: "Петров",
+        pic: '',
+        time: '11.07.2017'
+    },
+    {
+        phone: "+3 (116) 764 17 22",
+        amount: "-44.08",
+        type: 1, // outgoing
+        name: "Джамшид",
+        surname: "Джураев",
+        pic: '',
+        time: '11.07.2017'
+    },
+    {
+        phone: "+998 (97) 720 03 88",
+        amount: "+100",
+        type: 0, //incoming
+        name: "Иван",
+        surname: "Белявский",
+        pic: '',
+        time: '12.07.2017'
+    },
+    {
+        phone: "+998 (90) 144 34 07",
+        amount: "+100",
+        type: 0, //incoming
+        name: "Заир",
+        surname: "Огнев",
+        pic: '',
+        time: '12.07.2017'
+    },
+    {
+        phone: "+971 (58) 273 77 93",
+        amount: "+400",
+        type: 0, //incoming
+        name: "Дониер",
+        surname: "Эркабоев",
+        pic: '',
+        time: '13.07.2017'
+    },
+]
 
 export class Profile extends Component {
     constructor(props) {
@@ -37,25 +86,48 @@ export class Profile extends Component {
     }
 
     componentWillMount() {
+        console.warn(this.convertToMap(fakeTransactions).length)
+    }
+
+    convertToMap = (array) => {
+        let transactionMaps = []
+        for(var i = 0; i < array.length; i++) {
+            if (!transactionMaps[array[i].time]) {
+                transactionMaps[array[i].time] = []
+            }
+            console.warn(JSON.stringify(transactionMaps[array[i].time]))
+        }
+        console.warn(JSON.stringify(transactionMaps))
+        return transactionMaps
     }
 
     // render list
-    renderScrollViewContent() {
-        const data = Array.from({length: 30});
+    async renderScrollViewContent() {
+        let maps = await this.convertToMap(fakeTransactions)
         return (
             <View style={styles.scrollViewContent}>
-                {data.map((_, i) => (
-                    this.renderHeaderSection(i)
+                {maps.map((childMap, i) => (
+                    this.renderItem(childMap, i)
                 ))}
             </View>
         );
     }
 
-    renderHeaderSection = (i) => {
+// {i == 0 ?  : null}
+
+    renderHeaderSection = (item) => {
+        return (
+            <Text style={styles.headerSection}>{item.time}</Text>
+        )
+    }
+
+    renderItem = (categoryMap, parentIndex) => {
         return (
             <View key={i} style={{backgroundColor: '#fff'}}>
-                {i == 0 ? <Text style={styles.headerSection}>26.08.2071</Text> : null}
-                <Item key={i}/>
+                {this.renderHeaderSection(categoryMap[0])}
+                {categoryMap.map((child) => {
+                    return <Item item={child}/>
+                })}
             </View>
         )
     }
@@ -88,7 +160,7 @@ export class Profile extends Component {
                 })
             case constants.IMAGE_OPACITY:
                 return this.state.scrollY.interpolate({
-                    inputRange: [0, HEADER_SCROLL_DISTANCE / 2],
+                    inputRange: [0, HEADER_SCROLL_DISTANCE],
                     outputRange: [1, 0],
                     extrapolate: 'clamp',
                 })
@@ -98,6 +170,7 @@ export class Profile extends Component {
     render() {
         return (
             <View style={styles.mainContainer}>
+                {/* render status bar*/}
                 <StatusBar
                     translucent
                     barStyle="light-content"
@@ -131,7 +204,7 @@ export class Profile extends Component {
                                 source={require('../../assets/cat.jpg')}/>
                             <Animated.View style={styles.infoContainer}>
                                 <Text style={styles.title}>23,456.<Text style={{fontSize: 17.5, color: '#DAE5EE'}}>78 HMQ</Text></Text>
-                                <Text style={{fontSize: 15, color: '#DAE5EE', marginTop: 3}}>19.01 $</Text>
+                                <Text style={{fontSize: 16, color: '#DAE5EE', marginTop: 3}}>19.01 $</Text>
                             </Animated.View>
                         </Animated.View>
                     </Animated.View>
@@ -149,12 +222,18 @@ export class Profile extends Component {
                 </Animated.View>
 
                 {/* render fab button*/}
-                <Animated.Image
-                    source={require('../../assets/fab.png')}
-                    style={[styles.fabButton,{
-                        opacity: this.getAnimationType(constants.IMAGE_OPACITY),
-                        transform: [{translateY: this.getAnimationType(constants.HEADER_TRANSLATE)}],
-                    }]}/>
+                <Animated.View style={[styles.fabContainer,{
+                    opacity: this.getAnimationType(constants.IMAGE_OPACITY),
+                    transform: [{translateY: this.getAnimationType(constants.HEADER_TRANSLATE)}],
+                    }]}>
+                    <TouchableOpacity onPress={() => this.onFabButtonPress()}>
+                        <Animated.Image
+                            source={require('../../assets/fab.png')}
+                            style={[styles.fabButton]}/>
+                    </TouchableOpacity>
+                </Animated.View>
+
+
             </View>
         );
     }
@@ -164,7 +243,7 @@ export class Profile extends Component {
 
     settingsButtonHandle() {
         const navState = this.props.navigation.state;
-        this.props.navigation.navigate('ProfileSettings', { ...navState.params });
+        this.props.navigation.navigate('ProfileSettings', {...navState.params});
     }
 
     onActionClick = (position) => {
@@ -172,6 +251,9 @@ export class Profile extends Component {
             case 0:
                 return this.settingsButtonHandle()
         }
+    }
+    onFabButtonPress = () => {
+        console.warn('axax')
     }
 }
 
@@ -211,7 +293,7 @@ const styles = StyleSheet.create({
     },
     title: {
         color: 'white',
-        fontSize: 30,
+        fontSize: 28,
     },
     scrollViewContent: {
         marginTop: HEADER_MAX_HEIGHT,
@@ -230,12 +312,8 @@ const styles = StyleSheet.create({
         fontSize: 16.5
     },
     fabButton: {
-        position: 'absolute',
-        right: 24.5,
         width: 56,
         height: 56,
-        top: HEADER_MAX_HEIGHT-28,
-        overflow: 'hidden',
     },
     back: {
         height: 24,
@@ -249,6 +327,12 @@ const styles = StyleSheet.create({
         height: TOOLBAR_HEIGHT,
         marginTop: StatusBar.currentHeight,
         backgroundColor: 'transparent'
+    },
+    fabContainer: {
+        top: HEADER_MAX_HEIGHT - 28,
+        position: 'absolute',
+        overflow: 'hidden',
+        right: 24.5,
     }
 });
 
