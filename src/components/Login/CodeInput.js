@@ -32,14 +32,13 @@ class CodeInput extends Component {
   };
 
   componentDidMount() {
-    console.log('props codeInput', this.props.user);
-    const listener = SmsListener.addListener(message => {
+    this.listener = SmsListener.addListener(message => {
       let body = message.body;
       let hmqRegEx = /humaniq/gi;
 
       if (body.match(hmqRegEx)) {
         // request server;
-        let smsCode = body.replace(/\D/g,'');
+        let smsCode = body.replace(/\D/g, '');
 
         this.props.phoneNumberValidate({
           account_id: this.props.user.account.payload.payload.account_information.account_id,
@@ -50,6 +49,7 @@ class CodeInput extends Component {
       }
     });
   }
+
 
   componentWillReceiveProps(nextProps) {
     // TODO: MOVE TO SAGA TO PREVENT LAG
@@ -86,6 +86,10 @@ class CodeInput extends Component {
         }
       }
     }
+  }
+
+  componentWillUnmount() {
+    this.listener.remove();
   }
 
   handleNumberPress = (number) => {
