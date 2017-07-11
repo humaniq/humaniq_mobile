@@ -1,6 +1,6 @@
 import EStyleSheet from 'react-native-extended-stylesheet';
 import * as _ from 'underscore';
-import { vh, vw, pixelRatio } from './units';
+import { vh, vw } from './units';
 
 EStyleSheet.build({
   $colorPrimary: 'tomato',

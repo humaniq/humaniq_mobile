@@ -19,7 +19,11 @@ function* fetchEntity(entity, apiFn, body) {
 export const fetchValidate = fetchEntity.bind(null, actions.validate, api.validate);
 export const fetchLogin = fetchEntity.bind(null, actions.login, api.login);
 export const fetchSignup = fetchEntity.bind(null, actions.signup, api.signup);
-export const fetchPhoneNumberCreate = fetchEntity.bind(null, actions.phoneNumberCreate, api.phoneNumberCreate);
+export const fetchPhoneNumberCreate = fetchEntity.bind(
+  null,
+  actions.phoneNumberCreate,
+  api.phoneNumberCreate,
+);
 
 function* validate({ facial_image }) {
   // do we need cache? place it here and wrap with conditional statement below call
@@ -55,8 +59,8 @@ function* signup({ facial_image_id, password, device_imei }) {
 }
 
 function* phoneNumberCreate({ phone_number, account_id }) {
-  let code = phone_number.toString().slice(0, 1);
-  let number = phone_number.toString().slice(1);
+  const code = phone_number.toString().slice(0, 1);
+  const number = phone_number.toString().slice(1);
   const body = {
     account_id,
     phone_number: {

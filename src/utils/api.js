@@ -1,4 +1,5 @@
 import RNFetchBlob from 'react-native-fetch-blob';
+
 const API_ROOT = 'https://beta-api.humaniq.co/tapatybe/api/v1/';
 
 function callApi(endpoint, body) {

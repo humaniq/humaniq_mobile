@@ -5,7 +5,7 @@ import {shallow} from 'enzyme'
 import React, {Component} from 'react';
 import {Text} from 'react-native';
 import configureMockStore from 'redux-mock-store'
-import Keyboard from '../src/components/Login/Keyboard'
+import Keyboard from '../src/components/Shared/Components/Keyboard'
 import PasswordConnected, {Password} from '../src/components/Login/Password'
 import TelInputConnected, {TelInput} from '../src/components/Login/TelInput'
 import Confirm from '../src/components/Shared/Buttons/Confirm'

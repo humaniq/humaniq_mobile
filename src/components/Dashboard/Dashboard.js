@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { Component } from 'react';
 import {
   ScrollView,
@@ -12,7 +13,7 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import DeviceInfo from 'react-native-device-info';
 import IMEI from 'react-native-imei';
-import { NetworkInfo } from 'react-native-network-info'
+import { NetworkInfo } from 'react-native-network-info';
 
 export class Dashboard extends Component {
 
@@ -20,15 +21,15 @@ export class Dashboard extends Component {
     return (
       <ScrollView>
         <Text>DASHBOARD</Text>
-        {/*<Text>{`${this.props.user.registered ? "EXISTING" : "NEW"} USER`}</Text>*/}
+        {/* <Text>{`${this.props.user.registered ? "EXISTING" : "NEW"} USER`}</Text>*/}
         <Text>{`user id: ${this.props.user.id}`}</Text>
         <Text>{`user pass: ${this.props.user.password}`}</Text>
         <Text>{`user imei: ${this.props.user.imei}`}</Text>
         <Text>{`user phone: ${this.props.user.phone}`}</Text>
         <Text>{`user token: ${this.props.user.token}`}</Text>
-        <Text>{`-------------------------------------------------`}</Text>
-        <Text>{`DEVICE INFO`}</Text>
-        <Text>{`-------------------------------------------------`}</Text>
+        <Text>{'-------------------------------------------------'}</Text>
+        <Text>{'DEVICE INFO'}</Text>
+        <Text>{'-------------------------------------------------'}</Text>
         <Text>{`Device Unique ID           ${DeviceInfo.getUniqueID()}`}</Text>
         <Text>{`Device Manufacturer        ${DeviceInfo.getManufacturer()}`}</Text>
         <Text>{`Device Brand               ${DeviceInfo.getBrand()}`}</Text>
@@ -49,18 +50,18 @@ export class Dashboard extends Component {
         <Text>{`App is running in emulator ${DeviceInfo.isEmulator()}`}</Text>
         <Text>{`App is running on a tablet ${DeviceInfo.isTablet()}`}</Text>
 
-        <Text>{`-------------------------------------------------`}</Text>
-        <Text>{`IMEI`}</Text>
-        <Text>{`-------------------------------------------------`}</Text>
+        <Text>{'-------------------------------------------------'}</Text>
+        <Text>{'IMEI'}</Text>
+        <Text>{'-------------------------------------------------'}</Text>
         <Text>{`IMEI: ${IMEI.getImei()}`}</Text>
 
-        <Text>{`-------------------------------------------------`}</Text>
-        <Text>{`BATTERY-INFO`}</Text>
-        <Text>{`-------------------------------------------------`}</Text>
+        <Text>{'-------------------------------------------------'}</Text>
+        <Text>{'BATTERY-INFO'}</Text>
+        <Text>{'-------------------------------------------------'}</Text>
 
-        <Text>{`-------------------------------------------------`}</Text>
-        <Text>{`NETWORK INFO / not working? :|`}</Text>
-        <Text>{`-------------------------------------------------`}</Text>
+        <Text>{'-------------------------------------------------'}</Text>
+        <Text>{'NETWORK INFO / not working? :|'}</Text>
+        <Text>{'-------------------------------------------------'}</Text>
         <Text>{`IP ${NetworkInfo.getIPAddress(ip => ip)}`}</Text>
         <Text>{`IPV4 ${NetworkInfo.getIPV4Address(ipv4 => ipv4)}`}</Text>
         <Text>{`SSID ${NetworkInfo.getSSID(ssid => ssid)}`}</Text>
@@ -70,10 +71,8 @@ export class Dashboard extends Component {
   }
 }
 
-const mapStateToProps = (state) => {
-  return {
-    user: state.user,
-  };
-};
+const mapStateToProps = state => ({
+  user: state.user,
+});
 
 export default connect(mapStateToProps)(Dashboard);

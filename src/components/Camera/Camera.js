@@ -4,13 +4,13 @@ import {
   TouchableOpacity,
   Image,
   Text,
+  Alert,
 } from 'react-native';
+import PropTypes from 'prop-types';
 import Camera from 'react-native-camera';
-import _ from 'underscore';
 import { NavigationActions } from 'react-navigation';
 import RNFetchBlob from 'react-native-fetch-blob';
 import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
 import { validate, setAvatarLocalPath } from '../../actions';
 
 // console.log('action types🔑', ActionTypes.setAvatarLocalPath());
@@ -18,10 +18,11 @@ import { validate, setAvatarLocalPath } from '../../actions';
 import CustomStyleSheet from '../../utils/customStylesheet';
 
 // assets
-const close = require('../../assets/icons/ic_close.png');
-const confirm = require('../../assets/icons/ic_confirm_dark.png');
 
-console.log('validate', validate);
+// eslint-disable-next-line import/no-unresolved
+const close = require('../../assets/icons/ic_close.png');
+// eslint-disable-next-line import/no-unresolved
+const confirm = require('../../assets/icons/ic_confirm_dark.png');
 
 /*
   on second run check permissions http://facebook.github.io/react-native/docs/permissionsandroid.html
@@ -30,6 +31,23 @@ console.log('validate', validate);
  */
 
 export class Cam extends Component {
+  static propTypes = {
+    user: PropTypes.shape({
+      validate: PropTypes.shape({
+        payload: PropTypes.object,
+        isFetching: PropTypes.bool,
+      }).isRequired,
+      photo: PropTypes.string,
+    }).isRequired,
+
+    setAvatarLocalPath: PropTypes.func.isRequired,
+    validate: PropTypes.func.isRequired,
+    navigation: PropTypes.shape({
+      navigate: PropTypes.func.isRequired,
+      dispatch: PropTypes.func.isRequired,
+    }),
+  };
+
   constructor(props) {
     super(props);
 
@@ -53,7 +71,7 @@ export class Cam extends Component {
       if (!photo) {
         switch (code) {
           case 6000:
-            alert(nextProps.user.validate.payload.message);
+            Alert(nextProps.user.validate.payload.message);
             break;
 
           case 3002:
@@ -70,12 +88,12 @@ export class Cam extends Component {
 
           case 3000:
             this.setState({ path: '' });
-            alert(nextProps.user.validate.payload.message);
+            Alert(nextProps.user.validate.payload.message);
             // reset payload?
             break;
 
           default:
-            alert(`Unknown code ${nextProps.user.validate.payload.code}, no info in Postman`);
+            Alert(`Unknown code ${nextProps.user.validate.payload.code}, no info in Postman`);
         }
       }
     }

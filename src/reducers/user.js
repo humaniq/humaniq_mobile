@@ -1,6 +1,6 @@
 import { combineReducers } from 'redux';
 import * as ActionTypes from '../actions';
-import { subroutineReducerCreator } from './subroutineReducerCreator';
+import subroutineReducerCreator from './subroutineReducerCreator';
 
 /*
 let initialState = {

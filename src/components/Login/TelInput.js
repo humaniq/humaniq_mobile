@@ -3,22 +3,42 @@ import {
   View,
   Image,
   Text,
+  Alert,
 } from 'react-native';
-import { NavigationActions } from 'react-navigation';
+
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import VMasker from 'vanilla-masker';
 
 import CustomStyleSheet from '../../utils/customStylesheet';
 import Confirm from '../Shared/Buttons/Confirm';
-import Keyboard from './Keyboard';
+import Keyboard from '../Shared/Components/Keyboard';
 import { phoneNumberCreate } from '../../actions';
+
 
 const ic_user = require('../../assets/icons/ic_user.png');
 
 export class TelInput extends Component {
-  static navigationOptions = {
-    // header: null,
+  static propTypes = {
+    user: PropTypes.shape({
+      account: PropTypes.shape({
+        payload: PropTypes.object,
+        isFetching: PropTypes.bool,
+      }).isRequired,
+      phone: PropTypes.shape({
+        payload: PropTypes.object,
+        isFetching: PropTypes.bool,
+      }).isRequired,
+      photo: PropTypes.string.isRequired,
+    }).isRequired,
+
+    phoneNumberCreate: PropTypes.func.isRequired,
+    navigation: PropTypes.shape({
+      navigate: PropTypes.func.isRequired,
+      dispatch: PropTypes.func.isRequired,
+    }),
   };
+
   state = {
     maxPhoneLength: 19,
     phone: '',
@@ -46,7 +66,7 @@ export class TelInput extends Component {
   };
 
   handleHelpPress = () => {
-    alert('В шаббат у нас с мамой традиция — зажигать свечи и смотреть „Колесо фортуны“');
+    Alert('В шаббат у нас с мамой традиция — зажигать свечи и смотреть „Колесо фортуны“');
   };
 
   handlePhoneConfirm = () => {
