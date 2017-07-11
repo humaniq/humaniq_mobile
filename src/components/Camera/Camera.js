@@ -64,34 +64,38 @@ export class Cam extends Component {
 
   componentWillReceiveProps(nextProps) {
     // TODO: MOVE TO SAGA TO PREVENT LAG
-    const photo = nextProps.user.photo;
-    if (!photo) {
+    // console.log('📞 nextProps', nextProps.user.validate);
+    if (nextProps.user.validate.payload) {
       const code = nextProps.user.validate.payload.code;
-      switch (code) {
-        case 6000:
-          Alert(nextProps.user.validate.payload.message);
-          break;
+      const photo = nextProps.user.photo;
 
-        case 3002:
-          // registered user
-          this.props.setAvatarLocalPath(this.state.path);
-          this.props.navigation.navigate('Password');
-          break;
+      if (!photo) {
+        switch (code) {
+          case 6000:
+            alert(nextProps.user.validate.payload.message);
+            break;
 
-        case 3003:
-          // new user
-          this.props.setAvatarLocalPath(this.state.path);
-          this.props.navigation.navigate('Tutorial', { nextScene: 'Password' });
-          break;
+          case 3002:
+            // registered user
+            this.props.setAvatarLocalPath(this.state.path);
+            this.props.navigation.navigate('Password');
+            break;
 
-        case 3000:
-          this.setState({ path: '' });
-          Alert(nextProps.user.validate.payload.message);
-          // reset payload?
-          break;
+          case 3003:
+            // new user
+            this.props.setAvatarLocalPath(this.state.path);
+            this.props.navigation.navigate('Tutorial', { nextScene: 'Password' });
+            break;
 
-        default:
-          Alert(`Unknown code ${nextProps.user.validate.payload.code}, no info in Postman`);
+          case 3000:
+            this.setState({ path: '' });
+            alert(nextProps.user.validate.payload.message);
+            // reset payload?
+            break;
+
+          default:
+            alert(`Unknown code ${nextProps.user.validate.payload.code}, no info in Postman`);
+        }
       }
     }
   }

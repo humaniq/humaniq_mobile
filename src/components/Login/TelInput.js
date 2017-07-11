@@ -13,7 +13,7 @@ import VMasker from 'vanilla-masker';
 import CustomStyleSheet from '../../utils/customStylesheet';
 import Confirm from '../Shared/Buttons/Confirm';
 import Keyboard from '../Shared/Components/Keyboard';
-import { phoneNumberCreate } from '../../actions';
+import { phoneNumberCreate, savePhone } from '../../actions';
 
 
 const ic_user = require('../../assets/icons/ic_user.png');
@@ -25,7 +25,7 @@ export class TelInput extends Component {
         payload: PropTypes.object,
         isFetching: PropTypes.bool,
       }).isRequired,
-      phone: PropTypes.shape({
+      phoneCreate: PropTypes.shape({
         payload: PropTypes.object,
         isFetching: PropTypes.bool,
       }).isRequired,
@@ -45,8 +45,37 @@ export class TelInput extends Component {
   };
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.user.phone.payload) {
-      this.props.navigation.navigate('Dashboard');
+    // TODO: MOVE TO SAGA TO PREVENT LAG
+    console.log('📞 nextProps', nextProps.user);
+    if (nextProps.user.phoneCreate.payload) {
+      const code = nextProps.user.phoneCreate.payload.code;
+      const phone = nextProps.user.phoneNumber;
+
+      if (!phone) {
+        switch (code) {
+          case 6000:
+            alert(nextProps.user.validate.payload.message);
+            break;
+
+          case 4005:
+            // registered user
+            // Account Phone Number Created Successfully. Validation Code Sent
+            this.props.savePhone(VMasker.toNumber(this.state.phone));
+            this.props.navigation.navigate('CodeInput');
+            // alert('Proceed to codeInput');
+            break;
+
+          case 4011:
+            // The Account Already Has A Phone Number
+            alert('The Account Already Has A Phone Number');
+            // this.props.setAvatarLocalPath(this.state.path);
+            // this.props.navigation.navigate('Tutorial', { nextScene: 'Password' });
+            break;
+
+          default:
+            alert(`Unknown code ${nextProps.user.validate.payload.code}, no info in Postman`);
+        }
+      }
     }
   }
 
@@ -66,13 +95,13 @@ export class TelInput extends Component {
   };
 
   handleHelpPress = () => {
-    Alert('В шаббат у нас с мамой традиция — зажигать свечи и смотреть „Колесо фортуны“');
+    alert('В шаббат у нас с мамой традиция — зажигать свечи и смотреть „Колесо фортуны“');
   };
 
   handlePhoneConfirm = () => {
     const phone_number = VMasker.toNumber(this.state.phone);
     this.props.phoneNumberCreate({
-      account_id: this.props.user.account.payload.payload.account_id,
+      account_id: this.props.user.account.payload.payload.account_information.account_id,
       phone_number,
     });
   };
@@ -95,7 +124,7 @@ export class TelInput extends Component {
             {this.renderInput()}
           </View>
         </View>
-        {!this.props.user.phone.isFetching ?
+        {!this.props.user.phoneCreate.isFetching ?
           <Confirm
             active={this.state.phone.length === this.state.maxPhoneLength}
             onPress={this.handlePhoneConfirm}
@@ -117,6 +146,7 @@ const mapStateToProps = state => ({
 
 export default connect(mapStateToProps, {
   phoneNumberCreate: phoneNumberCreate.request,
+  savePhone,
 })(TelInput);
 
 const styles = CustomStyleSheet({

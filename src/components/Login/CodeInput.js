@@ -1,21 +1,27 @@
-/*
 import React, { Component } from 'react';
 import {
   View,
-  StyleSheet,
   TouchableOpacity,
   Image,
   Text,
 } from 'react-native';
-import { NavigationActions } from 'react-navigation';
+import { connect } from 'react-redux';
+import SmsListener from 'react-native-android-sms-listener';
+import EStyleSheet from 'react-native-extended-stylesheet';
+import Keyboard from '../Shared/Components/Keyboard';
 import Confirm from '../Shared/Buttons/Confirm';
 import { vh, vw } from '../../utils/units';
-import EStyleSheet from 'react-native-extended-stylesheet';
+import { phoneNumberValidate } from '../../actions';
+
 
 const ic_user = require('../../assets/icons/ic_user.png');
-import Keyboard from './Keyboard';
 
-export default class CodeInput extends Component {
+// SmsListener.addListener(message => {
+//   console.log(message);
+//   console.info(message);
+// });
+
+class CodeInput extends Component {
   static navigationOptions = {
     // header: null,
   };
@@ -24,6 +30,67 @@ export default class CodeInput extends Component {
     maxPasswordLength: 5,
     password: '',
   };
+
+  componentDidMount() {
+    this.listener = SmsListener.addListener(message => {
+      let body = message.body;
+      let hmqRegEx = /humaniq/gi;
+
+      if (body.match(hmqRegEx)) {
+        // request server;
+        let smsCode = body.replace(/\D/g, '');
+
+        this.props.phoneNumberValidate({
+          account_id: this.props.user.account.payload.payload.account_information.account_id,
+          phone_number: this.props.user.phoneNumber,
+          validation_code: smsCode.toString(),
+        });
+        this.setState({ password: smsCode });
+      }
+    });
+  }
+
+
+  componentWillReceiveProps(nextProps) {
+    // TODO: MOVE TO SAGA TO PREVENT LAG
+    // console.log('📞 nextProps', nextProps.user.validate);
+    if (nextProps.user.phoneValidate.payload) {
+      const code = nextProps.user.phoneValidate.payload.code;
+
+      if (true) {
+        switch (code) {
+          case 6000:
+            // alert(nextProps.user.validate.payload.message);
+            break;
+
+          case 4002:
+            // registered user
+            // this.props.setAvatarLocalPath(this.state.path);
+            this.props.navigation.navigate('Dashboard');
+            break;
+
+          case 3003:
+            // new user
+            // this.props.setAvatarLocalPath(this.state.path);
+            // this.props.navigation.navigate('Tutorial', { nextScene: 'Password' });
+            break;
+
+          case 3000:
+            // this.setState({ path: '' });
+            // alert(nextProps.user.validate.payload.message);
+            // reset payload?
+            break;
+
+          default:
+            alert(`Unknown code ${nextProps.user.validate.payload.code}, no info in Postman`);
+        }
+      }
+    }
+  }
+
+  componentWillUnmount() {
+    this.listener.remove();
+  }
 
   handleNumberPress = (number) => {
     if (this.state.password.length < this.state.maxPasswordLength) {
@@ -97,6 +164,14 @@ export default class CodeInput extends Component {
   }
 }
 
+const mapStateToProps = state => ({
+  user: state.user,
+});
+
+export default connect(mapStateToProps, {
+  phoneNumberValidate: phoneNumberValidate.request,
+})(CodeInput);
+
 const styles = EStyleSheet.create({
   container: {
     flex: 1,
@@ -147,5 +222,4 @@ const styles = EStyleSheet.create({
     borderColor: 'tomato',
   },
 });
-*/
 

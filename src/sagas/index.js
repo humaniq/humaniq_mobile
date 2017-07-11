@@ -7,18 +7,15 @@ function* fetchEntity(entity, apiFn, body, errorCodes) {
   // yield put(entity.request(...));
   // console.log('request ready', body);
   // const { response, error } = yield call(apiFn, body);
-  console.log('body', body);
-  // console.log('error codes', errorCodes);
   const { response } = yield call(apiFn, body);
 
   if (response.code) {
-    const responseCode = parseInt(response.code);
-    const errorCode = errorCodes.find((errorCode) => errorCode === responseCode);
-    console.log('response', response);
-    yield put(entity.success(response));
+    const responseCode = parseInt(response.code, 10);
+    const errorCode = errorCodes.find(errCode => errCode === responseCode);
 
     if (!errorCode) {
       console.log('response ok', response);
+      yield put(entity.success(response));
     } else {
       const error = { ...response };
       console.log('response fail', error);
@@ -39,6 +36,11 @@ export const fetchPhoneNumberCreate = fetchEntity.bind(
   actions.phoneNumberCreate,
   api.phoneNumberCreate,
 );
+export const fetchPhoneNumberValidate = fetchEntity.bind(
+  null,
+  actions.phoneNumberValidate,
+  api.phoneNumberValidate,
+);
 
 function* validate({ facial_image }) {
   const errorCodes = [3000, 3001, 6000];
@@ -58,7 +60,7 @@ function* login({ facial_image_id, password, device_imei }) {
       },
     },
   };
-  yield call(fetchLogin, body);
+  yield call(fetchLogin, body, errorCodes);
 }
 
 function* signup({ facial_image_id, password, device_imei }) {
@@ -73,10 +75,11 @@ function* signup({ facial_image_id, password, device_imei }) {
     },
   };
   console.log('body', body);
-  yield call(fetchSignup, body);
+  yield call(fetchSignup, body, errorCodes);
 }
 
 function* phoneNumberCreate({ phone_number, account_id }) {
+  const errorCodes = [4011, 6000];
   const code = phone_number.toString().slice(0, 1);
   const number = phone_number.toString().slice(1);
   const body = {
@@ -88,21 +91,24 @@ function* phoneNumberCreate({ phone_number, account_id }) {
       // phone_number: '5035863325',
     },
   };
-  yield call(fetchPhoneNumberCreate, body);
+  yield call(fetchPhoneNumberCreate, body, errorCodes);
 }
 
-// function* phoneNumberValidate(phoneNumber) {
-//   let code = phoneNumber.toString().slice(0, 1);
-//   let number = phoneNumber.toString().slice(1);
-//   const body = {
-//     phone_number: {
-//       country_code: code,
-//       phone_number: number,
-//     },
-//   };
-//   console.log('body', body);
-//   yield call(fetchSignup, body);
-// }
+function* phoneNumberValidate({ phone_number, validation_code, account_id }) {
+  const errorCodes = [6000, 4010, 4004, 4003, 4001, 4009];
+  let code = phone_number.toString().slice(0, 1);
+  let number = phone_number.toString().slice(1);
+  const body = {
+    validation_code: validation_code.toString(),
+    account_id: account_id.toString(),
+    phone_number: {
+      country_code: code,
+      phone_number: number,
+    },
+  };
+  console.log('validate sms body', body);
+  yield call(fetchPhoneNumberValidate, body, errorCodes);
+}
 
 // WATCHERS
 
@@ -122,9 +128,9 @@ function* watchPhoneNumberCreate() {
   yield takeLatest(actions.PHONE_NUMBER_CREATE.REQUEST, phoneNumberCreate);
 }
 
-// function* watchPhoneNumberValidate() {
-//   yield takeLatest(actions.PHONE_NUMBER_VALIDATE.REQUEST, phoneNumberValidate);
-// }
+function* watchPhoneNumberValidate() {
+  yield takeLatest(actions.PHONE_NUMBER_VALIDATE.REQUEST, phoneNumberValidate);
+}
 
 export default function* root() {
   yield all([
@@ -132,5 +138,6 @@ export default function* root() {
     fork(watchSignup),
     fork(watchLogin),
     fork(watchPhoneNumberCreate),
+    fork(watchPhoneNumberValidate),
   ]);
 }

@@ -17,6 +17,7 @@ export const PHONE_NUMBER_VALIDATE = createRequestTypes('PHONE_NUMBER_VALIDATE')
 
 export const SET_AVATAR_LOCAL_PATH = 'SET_AVATAR_LOCAL_PATH';
 export const SET_PASSWORD = 'SET_PASSWORD';
+export const SAVE_PHONE = 'SAVE_PHONE';
 
 function action(type, payload = {}) {
   return { type, ...payload };
@@ -55,3 +56,4 @@ export const phoneNumberValidate = {
 
 export const setAvatarLocalPath = path => action(SET_AVATAR_LOCAL_PATH, { path });
 export const setPassword = password => action(SET_PASSWORD, { password });
+export const savePhone = number => action(SAVE_PHONE, { number });

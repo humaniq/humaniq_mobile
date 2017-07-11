@@ -11,7 +11,7 @@ import Camera from './components/Camera';
 import {
   Password,
   TelInput,
-  // CodeInput
+  CodeInput
 } from './components/Login';
 import Dashboard from './components/Dashboard';
 import Tutorial from './components/Shared/Components/Tutorial';
@@ -38,9 +38,9 @@ const LoginStack = StackNavigator(
     Camera: { screen: Camera },
     Password: { screen: Password },
     TelInput: { screen: TelInput },
-    // CodeInput: { screen: CodeInput },
+    CodeInput: { screen: CodeInput },
     Dashboard: { screen: Dashboard },
-      Instructions: { screen: Instructions },
+    Instructions: { screen: Instructions },
   },
   {
     headerMode: 'none',

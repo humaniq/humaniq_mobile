@@ -56,6 +56,7 @@ export class Password extends Component {
 
   componentWillReceiveProps(nextProps) {
     // TODO: MOVE TO SAGA TO PREVENT LAG
+    // console.log('next props for password', nextProps.user);
     if (nextProps.user.account.payload) {
       const code = nextProps.user.account.payload.code;
       const password = nextProps.user.password;
@@ -63,7 +64,7 @@ export class Password extends Component {
       if (!password) {
         switch (code) {
           case 6000:
-            Alert(nextProps.user.account.payload.message);
+            alert(nextProps.user.account.payload.message);
             break;
 
           case 1001:
@@ -80,17 +81,16 @@ export class Password extends Component {
           case 2002:
             // Authentication Failed
             this.setState({ password: '' });
-            Alert(nextProps.user.account.payload.message);
+            alert(nextProps.user.account.payload.message);
             break;
 
           case 3003:
             // Facial Image Not Found
-            Alert(nextProps.user.account.payload.message);
+            alert(nextProps.user.account.payload.message);
             break;
 
           default:
-            Alert(`Unknown code ${nextProps.user.account.payload.code}, no info in Postman`);
-
+            alert(`Unknown code ${nextProps.user.account.payload.code}, no info in Postman`);
         }
       }
     }
@@ -121,7 +121,7 @@ export class Password extends Component {
   };
 
   handleHelpPress = () => {
-    Alert('В шаббат у нас с мамой традиция — зажигать свечи и смотреть „Колесо фортуны“');
+    alert('В шаббат у нас с мамой традиция — зажигать свечи и смотреть „Колесо фортуны“');
   };
 
   handlePasswordConfirm = () => {
@@ -153,9 +153,11 @@ export class Password extends Component {
 
   createRegistration = () => {
     // DEV
+    // TODO: set real ID;
     const isEmulator = DeviceInfo.isEmulator();
     const randomImei = Math.floor((10000000 + Math.random()) * 90000000);
-    const imei = isEmulator ? randomImei : IMEI.getImei();
+    // const imei = isEmulator ? randomImei : IMEI.getImei();
+    const imei = randomImei.toString();
 
     this.props.signup({
       facial_image_id: this.props.user.validate.payload.payload.facial_image_id,
