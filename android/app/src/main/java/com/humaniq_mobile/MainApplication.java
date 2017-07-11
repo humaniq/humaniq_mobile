@@ -3,6 +3,7 @@ package com.humaniq_mobile;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import com.centaurwarchief.smslistener.SmsListenerPackage;
 import com.pusherman.networkinfo.RNNetworkInfoPackage;
 import codes.simen.IMEI.IMEI;
 import com.learnium.RNDeviceInfo.RNDeviceInfo;
@@ -30,6 +31,7 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
+            new SmsListenerPackage(),
             new RNNetworkInfoPackage(),
             new IMEI(),
             new RNDeviceInfo(),

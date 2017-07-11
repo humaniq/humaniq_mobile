@@ -137,6 +137,7 @@ android {
 }
 
 dependencies {
+    compile project(':react-native-android-sms-listener')
     compile project(':react-native-network-info')
     compile project(':react-native-imei')
     compile project(':react-native-device-info')

@@ -1,4 +1,3 @@
-/*
 import React, { Component } from 'react';
 import {
   View,
@@ -11,9 +10,15 @@ import { NavigationActions } from 'react-navigation';
 import Confirm from '../Shared/Buttons/Confirm';
 import { vh, vw } from '../../utils/units';
 import EStyleSheet from 'react-native-extended-stylesheet';
+import SmsListener from 'react-native-android-sms-listener';
 
 const ic_user = require('../../assets/icons/ic_user.png');
-import Keyboard from './Keyboard';
+import Keyboard from '../Shared/Components/Keyboard';
+
+// SmsListener.addListener(message => {
+//   console.log(message);
+//   console.info(message);
+// });
 
 export default class CodeInput extends Component {
   static navigationOptions = {
@@ -24,6 +29,13 @@ export default class CodeInput extends Component {
     maxPasswordLength: 5,
     password: '',
   };
+
+  componentDidMount() {
+    const listener = SmsListener.addListener(message => {
+      console.log(message);
+      console.info(message);
+    });
+  }
 
   handleNumberPress = (number) => {
     if (this.state.password.length < this.state.maxPasswordLength) {
@@ -147,5 +159,4 @@ const styles = EStyleSheet.create({
     borderColor: 'tomato',
   },
 });
-*/
 

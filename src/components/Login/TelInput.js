@@ -59,8 +59,8 @@ export class TelInput extends Component {
           case 4005:
             // registered user
             // Account Phone Number Created Successfully. Validation Code Sent
-            // this.props.navigation.navigate('CodeInput');
-            alert('Proceed to codeInput');
+            this.props.navigation.navigate('CodeInput');
+            // alert('Proceed to codeInput');
             break;
 
           case 4011:
