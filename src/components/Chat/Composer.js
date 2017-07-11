@@ -31,7 +31,7 @@ export default class Composer extends React.Component {
         onChange={(e) => this.onChange(e)}
         onChangeText={text => this.onChangeText(text)}
 
-        style={[styles.textInput, this.props.textInputStyle, {height: this.props.composerHeight}]}
+        style={[styles.textInput, this.props.textInputStyle]}
 
         value={this.props.text}
         accessibilityLabel={this.props.text || this.props.placeholder}
@@ -46,17 +46,10 @@ export default class Composer extends React.Component {
 const styles = StyleSheet.create({
   textInput: {
     flex: 1,
-    marginLeft: 10,
+    backgroundColor: 'transparent',
     fontSize: 16,
     lineHeight: 16,
-    marginTop: Platform.select({
-      ios: 6,
-      android: 0,
-    }),
-    marginBottom: Platform.select({
-      ios: 5,
-      android: 3,
-    }),
+    marginBottom: 3,
   },
 });
 
