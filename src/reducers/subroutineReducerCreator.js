@@ -1,4 +1,4 @@
-export function subroutineReducerCreator({ types }) {
+export default function subroutineReducerCreator({ types }) {
   const [requestType, successType, failureType] = types;
 
   return function updatePayload(state = {

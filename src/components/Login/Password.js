@@ -3,23 +3,47 @@ import {
   View,
   Image,
   Text,
+  Alert,
 } from 'react-native';
 
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { NavigationActions } from 'react-navigation';
 import DeviceInfo from 'react-native-device-info';
 import IMEI from 'react-native-imei';
 
-import Keyboard from './Keyboard';
+import Keyboard from '../Shared/Components/Keyboard';
 import CustomStyleSheet from '../../utils/customStylesheet';
 import Confirm from '../Shared/Buttons/Confirm';
 import { login, signup, setPassword } from '../../actions';
 
 
 export class Password extends Component {
-  static navigationOptions = {
-    // header: null,
+  static propTypes = {
+    user: PropTypes.shape({
+      validate: PropTypes.shape({
+        payload: PropTypes.object,
+        isFetching: PropTypes.bool,
+      }).isRequired,
+
+      account: PropTypes.shape({
+        payload: PropTypes.object,
+        isFetching: PropTypes.bool,
+      }).isRequired,
+
+      password: PropTypes.string,
+      photo: PropTypes.string.isRequired,
+    }).isRequired,
+
+    setPassword: PropTypes.func.isRequired,
+    login: PropTypes.func.isRequired,
+    signup: PropTypes.func.isRequired,
+    navigation: PropTypes.shape({
+      navigate: PropTypes.func.isRequired,
+      dispatch: PropTypes.func.isRequired,
+      state: PropTypes.object,
+    }),
   };
+
   state = {
     maxPasswordLength: 4,
     password: '',
@@ -28,11 +52,6 @@ export class Password extends Component {
   };
 
   componentDidMount() {
-    // DEV
-    const imei = DeviceInfo.isEmulator() ? Math.floor((10000000 + Math.random()) * 90000000) : IMEI.getImei();
-    this.setState({
-      imei: imei.toString(),
-    });
   }
 
   componentWillReceiveProps(nextProps) {
@@ -44,7 +63,7 @@ export class Password extends Component {
       if (!password) {
         switch (code) {
           case 6000:
-            alert(nextProps.user.account.payload.message);
+            Alert(nextProps.user.account.payload.message);
             break;
 
           case 1001:
@@ -61,16 +80,16 @@ export class Password extends Component {
           case 2002:
             // Authentication Failed
             this.setState({ password: '' });
-            alert(nextProps.user.account.payload.message);
+            Alert(nextProps.user.account.payload.message);
             break;
 
           case 3003:
             // Facial Image Not Found
-            alert(nextProps.user.account.payload.message);
+            Alert(nextProps.user.account.payload.message);
             break;
 
           default:
-            alert(`Unknown code ${nextProps.user.account.payload.code}, no info in Postman`);
+            Alert(`Unknown code ${nextProps.user.account.payload.code}, no info in Postman`);
 
         }
       }
@@ -102,7 +121,7 @@ export class Password extends Component {
   };
 
   handleHelpPress = () => {
-    alert('В шаббат у нас с мамой традиция — зажигать свечи и смотреть „Колесо фортуны“');
+    Alert('В шаббат у нас с мамой традиция — зажигать свечи и смотреть „Колесо фортуны“');
   };
 
   handlePasswordConfirm = () => {
@@ -133,10 +152,14 @@ export class Password extends Component {
   };
 
   createRegistration = () => {
-    console.log('image id', this.props.user.validate.payload);
+    // DEV
+    const isEmulator = DeviceInfo.isEmulator();
+    const randomImei = Math.floor((10000000 + Math.random()) * 90000000);
+    const imei = isEmulator ? randomImei : IMEI.getImei();
+
     this.props.signup({
       facial_image_id: this.props.user.validate.payload.payload.facial_image_id,
-      device_imei: this.state.imei,
+      device_imei: imei,
       password: this.state.password,
     });
   };
