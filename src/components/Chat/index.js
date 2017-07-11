@@ -1,6 +1,5 @@
 import React from 'react';
 import {
-  Platform,
   StyleSheet,
   Text,
   View,
@@ -8,25 +7,14 @@ import {
   Image,
 } from 'react-native';
 import { connect } from 'react-redux';
-import {GiftedChat, Actions, Bubble} from './GiftedChat';
-import CameraRollPicker from 'react-native-camera-roll-picker';
+import { GiftedChat } from './GiftedChat';
 import Backend from './Backend';
-import CustomActions from './CustomActions';
 import CustomView from './CustomView';
-import CustomSend from './CustomSend';
-import CustomComposer from './CustomComposer';
 import PhotoSelect from './PhotoSelect';
 import SoundSelect from './SoundSelect';
 
-const deleteImg = require('./assets/delete.png');
-const playImg = require('./assets/play.png');
-const recImg = require('./assets/rec.png');
-const sendImg = require('./assets/send.png');
-const stopImg = require('./assets/stop.png');
-
 const combinedShape = require('./../../assets/icons/combined_shape.png');
 const icUser = require('./../../assets/icons/ic_user.png');
-const ovalCopy = require('./../../assets/icons/oval_copy_3.png');
 const voiceMessage = require('./../../assets/icons/voice_message.png');
 const newTransaction = require('./../../assets/icons/new_transaction.png');
 const emoji = require('./../../assets/icons/emoji.png');
@@ -34,11 +22,11 @@ const attach = require('./../../assets/icons/attach.png');
 
 const time = Date.now();
 const name = Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5);
-const num = Math.round(Math.random() * 100)
+const num = Math.round(Math.random() * 100);
 const user1 = {
   _id: time,
   name: `${name} ${num}`,
-  //avatar: 'http://findicons.com/files/icons/1072/face_avatars/300/a02.png',
+  // avatar: 'http://findicons.com/files/icons/1072/face_avatars/300/a02.png',
 };
 
 class Chat extends React.Component {
@@ -54,7 +42,6 @@ class Chat extends React.Component {
 
     this._isMounted = false;
     this.onSend = this.onSend.bind(this);
-    this.renderCustomActions = this.renderCustomActions.bind(this);
     this.renderFooter = this.renderFooter.bind(this);
     this.onLoadEarlier = this.onLoadEarlier.bind(this);
 
@@ -88,24 +75,17 @@ class Chat extends React.Component {
 
     setTimeout(() => {
       if (this._isMounted === true) {
-        this.setState((previousState) => {
-          return {
-            messages: GiftedChat.prepend(previousState.messages, require('./data/old_messages.js')),
-            loadEarlier: false,
-            isLoadingEarlier: false,
-          };
-        });
+        this.setState(previousState => ({
+          messages: GiftedChat.prepend(previousState.messages, require('./data/old_messages.js')),
+          loadEarlier: false,
+          isLoadingEarlier: false,
+        }));
       }
     }, 1000); // simulating network
   }
 
   onSend(message) {
-    // THIS IS APP FUNCTION
-    Backend.sendMessage(message.map((m) => { m.user = user1; return m; }));
-  }
-
-  renderCustomActions(props) {
-    return null;
+    Backend.sendMessage(message.map(m => ({ ...m, user: user1 })));
   }
 
   renderCustomView(props) {
@@ -116,15 +96,6 @@ class Chat extends React.Component {
     );
   }
 
-  renderComposer(props) {
-    return (<CustomComposer {...props} />);
-  }
-
-  renderSend(props) {
-    return (
-      <CustomSend {...props} />
-    );
-  }
   renderFooter(props) {
     const handleAttach = () => {
       this.photoSelectRef.setModalVisible(true);
@@ -148,6 +119,7 @@ class Chat extends React.Component {
         <SoundSelect onSend={this.onSend} ref={(r) => { this.soundSelectRef = r; }} />
       </View>
     );
+
     /*
     if (this.state.typingText) {
       return (
@@ -192,13 +164,9 @@ class Chat extends React.Component {
             // isLoadingEarlier={this.state.isLoadingEarlier}
 
             user={user1}
-
-            renderComposer={this.renderComposer}
-            renderActions={this.renderCustomActions}
             renderBubble={this.renderBubble}
             renderCustomView={this.renderCustomView}
             renderChatFooter={this.renderFooter}
-            renderSend={this.renderSend}
           />
         </View>
       </View>
@@ -261,10 +229,8 @@ const styles = StyleSheet.create({
   },
 });
 
-const mapStateToProps = (state) => {
-  return {
-    user: state.user,
-  };
-};
+const mapStateToProps = state => ({
+  user: state.user,
+});
 
 export default connect(mapStateToProps)(Chat);

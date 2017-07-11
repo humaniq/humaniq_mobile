@@ -4,7 +4,10 @@ import {
   Text,
   TouchableOpacity,
   View,
+  Image,
 } from 'react-native';
+
+const ovalCopy = require('./../../assets/icons/oval_copy_3.png');
 
 export default class Send extends React.Component {
   // shouldComponentUpdate(nextProps, nextState) {
@@ -23,7 +26,7 @@ export default class Send extends React.Component {
           }}
           accessibilityTraits="button"
         >
-          <Text style={[styles.text, this.props.textStyle]}>{this.props.label}</Text>
+          <Image source={ovalCopy} style={{ margin: 7 }} />
         </TouchableOpacity>
       );
     }

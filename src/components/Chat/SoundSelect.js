@@ -109,7 +109,7 @@ class SoundSelect extends Component {
 
     this.setState({
       stoppedRecording: true,
-      recording: false
+      recording: false,
     });
 
     try {
@@ -132,7 +132,7 @@ class SoundSelect extends Component {
 
     this.setState({
       stoppedRecording: true,
-      recording: false
+      recording: false,
     });
 
     try {
@@ -141,7 +141,7 @@ class SoundSelect extends Component {
       if (Platform.OS === 'android') {
         this.finishRecording(true, filePath);
       }
-      return filePath;
+      return;
     } catch (error) {
       console.error(error);
     }
@@ -155,7 +155,7 @@ class SoundSelect extends Component {
     // These timeouts are a hacky workaround for some issues with react-native-sound.
     // See https://github.com/zmxv/react-native-sound/issues/89.
     setTimeout(() => {
-      var sound = new Sound(this.state.audioPath, '', (error) => {
+      const sound = new Sound(this.state.audioPath, '', (error) => {
         if (error) {
           console.log('failed to load the sound', error);
         }
@@ -189,7 +189,7 @@ class SoundSelect extends Component {
     }
 
     this.setState({
-      recording: true
+      recording: true,
     });
 
     try {
@@ -201,7 +201,7 @@ class SoundSelect extends Component {
 
   finishRecording(didSucceed, filePath) {
     this.setState({
-      finished: didSucceed
+      finished: didSucceed,
     });
     console.log(`Finished recording of duration ${this.state.currentTime} seconds at path: ${filePath}`);
   }
@@ -230,7 +230,7 @@ class SoundSelect extends Component {
             { this.renderButton('>', () => { this.play(); }) }
             { this.renderButton('[]', () => { this.stop(); }) }
             { this.renderButton('||', () => { this.pause(); })}
-            { this.renderButton('@', () => { this.stop(); send(); this.setModalVisible(false); })}
+            { this.renderButton('@', () => { send(); this.setModalVisible(false); })}
             <Text style={styles.progressText}>
               { this.state.currentTime}
             </Text>
@@ -284,7 +284,7 @@ const styles = StyleSheet.create({
   activeButtonText: {
     fontSize: 20,
     color: '#B81F00',
-  }
+  },
 
 });
 
