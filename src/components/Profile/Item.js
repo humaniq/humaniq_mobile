@@ -15,6 +15,12 @@ import {
 
 } from 'react-native';
 
+const user1 = require('../../assets/1.png')
+const user2 = require('../../assets/2.png')
+
+const incoming = require('../../assets/trans_incoming.png')
+const outgoing = require('../../assets/trans_payment.png')
+
 import CustomStyleSheet from '../../utils/customStylesheet';
 
 class Item extends Component {
@@ -23,39 +29,68 @@ class Item extends Component {
     }
 
     render() {
-        let {item} = this.props
+        let {item, currentIndex, size, onClick} = this.props
+        let priceBeforePoint = item.amount.split('.')[0]
+        let priceAfterPoint = item.amount.split('.')[1]
         return (
             <View style={styles.container}>
-                <TouchableOpacity style={styles.itemContainer}>
+                <TouchableOpacity
+                    onPress={onClick}
+                    style={styles.itemContainer}>
                     <View style={styles.imageContainer}>
                         <Image
                             resizeMode='contain'
                             style={styles.image}
-                            source={require('../../assets/cat.jpg')}/>
+                            source={item.type == 0 ? user1: user2}/>
                         <Image
                             resizeMode='contain'
                             style={styles.image2}
-                            source={require('../../assets/trans_incoming.png')}/>
+                            source={item.type == 0 ? incoming : outgoing}/>
                     </View>
 
                     <View style={{flex: 1}}>
-                        <View style={{flexDirection: 'row', flex: 1, alignItems: 'center'}}>
-                            <Text style={styles.phone}>
-                                {item.phone}
-                            </Text>
+                        <View style={styles.transactionContainer}>
+                            {item.type == 0 ? this.renderPhone(item) : this.renderNameWithPhone(item)}
 
                             <View style={styles.rightContainer}>
-                                <Text style={{fontSize: 16 , color: '#000000'}}>+12.<Text style={{color: '#8B8B8B', fontSize: 14}}>08 HMQ</Text></Text>
+                                <Text style={styles.priceInt}>
+                                    {priceBeforePoint}
+                                    <Text style={styles.priceDecimal}>
+                                        { priceAfterPoint ? '.' + priceAfterPoint : '.00'} {item.currency}</Text>
+                                </Text>
                                 <Image
                                     style={styles.statusImage}
                                     source={require('../../assets/done.png')}/>
                             </View>
                         </View>
 
-                        <View style={styles.divider}/>
+                        {currentIndex%2 == 0 ? <View style={styles.divider}/> : null}
 
                     </View>
                 </TouchableOpacity>
+            </View>
+        )
+    }
+
+    renderPhone = (item) => {
+        return(
+            <View style={{flex: 1}}>
+                <Text style={styles.phone}>
+                    {item.phone}
+                </Text>
+            </View>
+        )
+    }
+
+    renderNameWithPhone = (item) => {
+        return(
+            <View style={{flex: 1}}>
+                <Text style={styles.name}>
+                    {item.name + ' ' +item.surname}
+                </Text>
+                <Text style={styles.phoneSmall}>
+                    {item.phone}
+                </Text>
             </View>
         )
     }
@@ -87,9 +122,16 @@ const styles = CustomStyleSheet({
         height: 17.5,
     },
     phone: {
-        color: '#000000',
+        color: '#1b1d1d',
         fontSize: 15,
-        flex: 1
+    },
+    phoneSmall: {
+        color: '#1b1d1d',
+        fontSize: 12,
+    },
+    name: {
+        color: '#1b1d1d',
+        fontSize: 15,
     },
     rightContainer: {
         alignItems: 'flex-end',
@@ -108,6 +150,19 @@ const styles = CustomStyleSheet({
         backgroundColor: '#E0E0E0',
         height: 0.5,
         marginTop: 15.5
+    },
+    transactionContainer: {
+        flexDirection: 'row',
+        flex: 1,
+        alignItems: 'center'
+    },
+    priceInt: {
+        fontSize: 16 ,
+        color: '#000000'
+    },
+    priceDecimal: {
+        color: '#8B8B8B',
+        fontSize: 14
     }
 });
 

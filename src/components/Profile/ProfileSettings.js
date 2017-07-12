@@ -20,7 +20,7 @@ import {
 import {NavigationActions} from 'react-navigation';
 import {connect} from 'react-redux';
 import * as constants from '../../utils/constants'
-import CustomStyleSheet from '../../utils/customStylesheet';
+import QrModal from '../../modals/QrModal'
 
 const HEADER_MAX_HEIGHT = 170;
 const DELTA = 20;
@@ -33,6 +33,7 @@ export class ProfileSettings extends Component {
         super(props)
         this.state = {
             scrollY: new Animated.Value(0),
+            modalVisibility: false
         };
     }
 
@@ -116,7 +117,7 @@ export class ProfileSettings extends Component {
                             <Animated.Image
                                 resizeMode='contain'
                                 style={styles.avatar}
-                                source={require('../../assets/cat.jpg')}/>
+                                source={require('../../assets/1.png')}/>
 
                             <Animated.View style={styles.infoContainer}>
                                 <Text style={styles.title}>+1 (234) 567-8901</Text>
@@ -148,10 +149,14 @@ export class ProfileSettings extends Component {
                     }]}>
                     <TouchableOpacity onPress={() => this.onFabButtonPress()}>
                         <Animated.Image
-                            source={require('../../assets/fab.png')}
+                            source={require('../../assets/fab2.png')}
                             style={[styles.fabButton]}/>
                     </TouchableOpacity>
                 </Animated.View>
+
+                <QrModal
+                    onClipboardClick={() => this.onClipboardClick()}
+                    visibility={this.state.modalVisibility}/>
             </View>
         )
     }
@@ -181,7 +186,7 @@ export class ProfileSettings extends Component {
             <View style={styles.firstSection}>
                 <View style={styles.firstSubSection}>
                     <Image
-                        source={require('../../assets/phone.png')}
+                        source={require('../../assets/info_dark.png')}
                         style={styles.info}/>
 
                     <View style={styles.phoneContainer}>
@@ -232,13 +237,13 @@ export class ProfileSettings extends Component {
                 <View style={{marginLeft: 16.5}}>
                     <TouchableOpacity>
                         <Image
-                            source={require('../../assets/edit_blue.png')}
+                            source={require('../../assets/person_blue.png')}
                             style={styles.profileImage}/>
                     </TouchableOpacity>
 
                     <TouchableOpacity onPress={() => this.onLogoutPress()}>
                         <Image
-                            source={require('../../assets/edit_blue.png')}
+                            source={require('../../assets/exit_red.png')}
                             style={styles.logoutImage}/>
                     </TouchableOpacity>
                 </View>
@@ -258,6 +263,15 @@ export class ProfileSettings extends Component {
     }
 
     onFabButtonPress = () => {
+        this.setState({
+            modalVisibility: true
+        })
+    }
+
+    onClipboardClick = () => {
+        this.setState({
+            modalVisibility: false
+        })
     }
 }
 
@@ -348,8 +362,8 @@ const styles = StyleSheet.create({
         backgroundColor: 'transparent'
     },
     info: {
-        width: 12,
-        height: 12,
+        width: 14,
+        height: 14,
         marginBottom: 5.5
     },
     phoneContainer: {
@@ -364,8 +378,8 @@ const styles = StyleSheet.create({
         color: '#1b1d1d'
     },
     phoneImage: {
-        width: 12,
-        height: 12,
+        width: 14,
+        height: 14,
         marginBottom: 16
     },
     editImage: {
@@ -379,19 +393,19 @@ const styles = StyleSheet.create({
         color: '#1b1d1d'
     },
     lockImage: {
-        width: 12,
-        height: 12,
+        width: 14,
+        height: 14,
         marginBottom: 16
     },
     profileImage: {
-        width: 12,
-        height: 12,
+        width: 15,
+        height: 15,
         marginTop: 21,
         marginBottom: 22
     },
     logoutImage: {
-        width: 15,
-        height: 15,
+        width: 18,
+        height: 18,
         marginBottom: 19.5
     },
     statusText: {

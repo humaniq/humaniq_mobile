@@ -3,24 +3,21 @@ import {
     View,
     StyleSheet,
     TouchableOpacity,
-    TouchableWithoutFeedback,
     Image,
     Text,
     StatusBar,
     Animated,
     ActivityIndicator,
-    WebView,
     Dimensions,
     ToolbarAndroid,
     FlatList,
     ListView,
-    Platform
 } from 'react-native';
 
 import {connect} from 'react-redux';
 import Item from './Item'
 import * as constants from '../../utils/constants'
-import CustomStyleSheet from '../../utils/customStylesheet';
+import TransactionView from '../../modals/TransactionView'
 
 const HEADER_MAX_HEIGHT = 170;
 const DELTA = 20;
@@ -28,7 +25,7 @@ const TOOLBAR_HEIGHT = 56;
 const HEADER_MIN_HEIGHT = TOOLBAR_HEIGHT + StatusBar.currentHeight;
 const HEADER_SCROLL_DISTANCE = HEADER_MAX_HEIGHT - HEADER_MIN_HEIGHT;
 
-const fakeTransactions = [
+let fakeTransactions = [
     {
         phone: "+1 (416) 464 71 35",
         amount: "+12.08",
@@ -36,7 +33,8 @@ const fakeTransactions = [
         name: "Серафим",
         surname: "Петров",
         pic: '',
-        time: '11.07.2017'
+        time: '11.07.2017',
+        currency: 'HMQ'
     },
     {
         phone: "+3 (116) 764 17 22",
@@ -45,7 +43,8 @@ const fakeTransactions = [
         name: "Джамшид",
         surname: "Джураев",
         pic: '',
-        time: '11.07.2017'
+        time: '11.07.2017',
+        currency: 'HMQ'
     },
     {
         phone: "+998 (97) 720 03 88",
@@ -54,7 +53,8 @@ const fakeTransactions = [
         name: "Иван",
         surname: "Белявский",
         pic: '',
-        time: '12.07.2017'
+        time: '12.07.2017',
+        currency: 'HMQ'
     },
     {
         phone: "+998 (90) 144 34 07",
@@ -63,7 +63,8 @@ const fakeTransactions = [
         name: "Заир",
         surname: "Огнев",
         pic: '',
-        time: '12.07.2017'
+        time: '12.07.2017',
+        currency: 'HMQ'
     },
     {
         phone: "+971 (58) 273 77 93",
@@ -72,7 +73,8 @@ const fakeTransactions = [
         name: "Дониер",
         surname: "Эркабоев",
         pic: '',
-        time: '13.07.2017'
+        time: '13.07.2017',
+        currency: 'HMQ'
     },
 ]
 
@@ -82,55 +84,11 @@ export class Profile extends Component {
 
         this.state = {
             scrollY: new Animated.Value(0),
+            modalVisibility: false,
+            item: {},
         };
     }
 
-    componentWillMount() {
-        console.warn(this.convertToMap(fakeTransactions).length)
-    }
-
-    convertToMap = (array) => {
-        let transactionMaps = []
-        for(var i = 0; i < array.length; i++) {
-            if (!transactionMaps[array[i].time]) {
-                transactionMaps[array[i].time] = []
-            }
-            console.warn(JSON.stringify(transactionMaps[array[i].time]))
-        }
-        console.warn(JSON.stringify(transactionMaps))
-        return transactionMaps
-    }
-
-    // render list
-    async renderScrollViewContent() {
-        let maps = await this.convertToMap(fakeTransactions)
-        return (
-            <View style={styles.scrollViewContent}>
-                {maps.map((childMap, i) => (
-                    this.renderItem(childMap, i)
-                ))}
-            </View>
-        );
-    }
-
-// {i == 0 ?  : null}
-
-    renderHeaderSection = (item) => {
-        return (
-            <Text style={styles.headerSection}>{item.time}</Text>
-        )
-    }
-
-    renderItem = (categoryMap, parentIndex) => {
-        return (
-            <View key={i} style={{backgroundColor: '#fff'}}>
-                {this.renderHeaderSection(categoryMap[0])}
-                {categoryMap.map((child) => {
-                    return <Item item={child}/>
-                })}
-            </View>
-        )
-    }
 
     getAnimationType = (type) => {
         switch (type) {
@@ -167,6 +125,46 @@ export class Profile extends Component {
         }
     }
 
+    // render list
+    renderScrollViewContent() {
+        let categoryMap = {}
+        fakeTransactions.forEach((item, index) => {
+            var category = item.time
+            if (!categoryMap[category]) {
+                categoryMap[category] = []
+            }
+            categoryMap[category].push(item)
+        })
+
+        return (
+            <View style={styles.scrollViewContent}>
+                {fakeTransactions.map((item, index) => {
+                    return(
+                        <View key={index}>
+                            {index%2 == 0 ?this.renderHeaderSection(index) : null}
+                            <Item item={item} currentIndex={index} size={fakeTransactions.length} onClick={() => this.onItemClick(item)}/>
+                        </View>
+                    )
+                })}
+            </View>
+        );
+    }
+
+    renderHeaderSection = (index) => {
+        return (
+            <Text style={styles.headerSection}>{index+20}.09.2017</Text>
+        )
+    }
+    renderItem = (categoryMap, parentIndex) => {
+        return (
+            <View key={i} style={{backgroundColor: '#fff'}}>
+                {categoryMap.map((child) => {
+                    return <Item item={child} currentIndex={i} size={categoryMap.length}/>
+                })}
+            </View>
+        )
+    }
+
     render() {
         return (
             <View style={styles.mainContainer}>
@@ -177,15 +175,7 @@ export class Profile extends Component {
                     backgroundColor="#598fba"/>
 
                 {/* render list */}
-                <Animated.ScrollView
-                    showsVerticalScrollIndicator={false}
-                    scrollEventThrottle={1}
-                    onScroll={
-                        Animated.event([
-                            { nativeEvent: { contentOffset: { y: this.state.scrollY } }
-                            }],{ useNativeDriver: true})}>
-                    {this.renderScrollViewContent()}
-                </Animated.ScrollView>
+                {fakeTransactions.length > 0 ? this.renderContent() : this.renderEmptyView()}
 
                 {/* render collapse layout */}
                 <Animated.View
@@ -201,7 +191,7 @@ export class Profile extends Component {
                             <Animated.Image
                                 resizeMode='contain'
                                 style={styles.avatar}
-                                source={require('../../assets/cat.jpg')}/>
+                                source={require('../../assets/1.png')}/>
                             <Animated.View style={styles.infoContainer}>
                                 <Text style={styles.title}>23,456.<Text style={{fontSize: 17.5, color: '#DAE5EE'}}>78 HMQ</Text></Text>
                                 <Text style={{fontSize: 16, color: '#DAE5EE', marginTop: 3}}>19.01 $</Text>
@@ -228,12 +218,15 @@ export class Profile extends Component {
                     }]}>
                     <TouchableOpacity onPress={() => this.onFabButtonPress()}>
                         <Animated.Image
-                            source={require('../../assets/fab.png')}
+                            source={require('../../assets/fab1.png')}
                             style={[styles.fabButton]}/>
                     </TouchableOpacity>
                 </Animated.View>
 
-
+                <TransactionView
+                    onChatClick={() => this.onChatClick()}
+                    item={this.state.item}
+                    visibility={this.state.modalVisibility}/>
             </View>
         );
     }
@@ -253,7 +246,45 @@ export class Profile extends Component {
         }
     }
     onFabButtonPress = () => {
-        console.warn('axax')
+    }
+
+    renderContent() {
+        return(
+            <Animated.ScrollView
+                style={{backgroundColor: '#fff'}}
+                showsVerticalScrollIndicator={false}
+                scrollEventThrottle={1}
+                onScroll={
+                        Animated.event([
+                            { nativeEvent: { contentOffset: { y: this.state.scrollY } }
+                            }],{ useNativeDriver: true})}>
+                {this.renderScrollViewContent()}
+            </Animated.ScrollView>
+        )
+    }
+
+    renderEmptyView() {
+        return(
+            <View style={styles.emptyViewContainer}>
+                <Image
+                    resizeMode='contain'
+                    style={styles.emptyImage}
+                    source={require('../../assets/icons/illustration@1x.png')} />
+            </View>
+        )
+    }
+
+    onItemClick(item) {
+        this.setState({
+            item: item,
+            modalVisibility: true
+        })
+    }
+
+    onChatClick() {
+        this.setState({
+            modalVisibility: false
+        })
     }
 }
 
@@ -297,6 +328,7 @@ const styles = StyleSheet.create({
     },
     scrollViewContent: {
         marginTop: HEADER_MAX_HEIGHT,
+        backgroundColor: '#fff',
     },
     backButton: {
         marginLeft: 16
@@ -309,7 +341,7 @@ const styles = StyleSheet.create({
         marginTop: 35,
         marginBottom: 13,
         color: '#2586C6',
-        fontSize: 16.5
+        fontSize: 16.5,
     },
     fabButton: {
         width: 56,
@@ -333,6 +365,16 @@ const styles = StyleSheet.create({
         position: 'absolute',
         overflow: 'hidden',
         right: 24.5,
+    },
+    emptyViewContainer: {
+        marginTop: HEADER_MAX_HEIGHT,
+        flex: 1,
+        backgroundColor: '#fff',
+        alignItems: 'center',
+        justifyContent: 'center'
+    },
+    emptyImage: {
+
     }
 });
 
