@@ -17,6 +17,8 @@ jest.mock('react-native-camera', () => {
         }
     }
 });
+
+jest.mock('react-native-network-info', () => 'DeviceInfo')
 //
 jest.mock('react-native-fetch-blob', () => {
     return {

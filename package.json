@@ -56,7 +56,7 @@
   },
   "jest": {
     "preset": "react-native",
-    "verbose": false,
+    "verbose": true,
     "transformIgnorePatterns": [
       "node_modules/(?!(jest-)?react-native|react-navigation|)"
     ],

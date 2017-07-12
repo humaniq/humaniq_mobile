@@ -17,13 +17,29 @@ import sinon from 'sinon'
 
 
 let user = {
-        registered: true,
-        id: 1,
-        password: 'password',
-        imei: 'imei',
-        phone: '+123456789',
-        token: 'token'
+    account: {
+        payload: {
+            code: 3003
+        },
+        isFetching: false
+    },
+    validate: {
+        payload: {
+            code: 3003
+        },
+        isFetching: false
+    },
+    registered: true,
+    id: 1,
+    password: 'password',
+    imei: 'imei',
+    phone: '+123456789',
+    token: 'token',
+    avatar: {
+        b64: 'path',
+        localPath: 'localPath'
     }
+}
 
 let navigation = {
     dispatch : jest.fn()
@@ -64,8 +80,9 @@ describe('<Camera />', () => {
 
     it('initial imagePath and imageB64 must be equal to empty', () => {
         const wrapper = shallow(<Cam user={user} store={mockedStore} />)
-        expect(wrapper.state().imagePath).toEqual('')
-        expect(wrapper.state().imageB64).toEqual('')
+        expect(wrapper.state().path).toEqual('')
+        expect(wrapper.state().base64).toEqual('')
+        expect(wrapper.state().count).toEqual(1)
     })
 
     it('should return type Function', () => {
