@@ -12,6 +12,7 @@ import {
   Password,
   TelInput,
   CodeInput,
+  Accounts,
 } from './components/Login';
 import Dashboard from './components/Dashboard';
 import Tutorial from './components/Shared/Components/Tutorial';
@@ -33,9 +34,10 @@ const Dashboard = TabNavigator(
 );
 */
 
-let stack = {
+const stack = {
   //Chat: { screen: Chat },
   FirstScreen: { screen: Tutorial },
+  Tutorial: { screen: Tutorial },
   Camera: { screen: Camera },
   Password: { screen: Password },
   TelInput: { screen: TelInput },
@@ -46,7 +48,8 @@ let stack = {
 
 const state = store.getState();
 if (state.accounts.primaryAccount) {
-  stack.FirstScreen = { screen: Instructions };
+  stack.FirstScreen = { screen: Accounts };
+  console.log('log stack', stack);
 }
 
 const LoginStack = StackNavigator(

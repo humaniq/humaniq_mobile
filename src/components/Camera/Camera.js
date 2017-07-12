@@ -83,6 +83,7 @@ export class Cam extends Component {
 
           case 3003:
             // new user
+            console.log('navigation', this.props.navigation);
             this.props.setAvatarLocalPath(this.state.path);
             this.props.navigation.navigate('Tutorial', { nextScene: 'Password' });
             break;
