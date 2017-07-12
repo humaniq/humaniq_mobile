@@ -34,7 +34,6 @@ const Dashboard = TabNavigator(
 );
 */
 
-
 const stack = {
   //Chat: { screen: Chat },
   FirstScreen: { screen: Tutorial },
