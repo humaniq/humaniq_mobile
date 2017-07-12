@@ -34,6 +34,7 @@ const Dashboard = TabNavigator(
 );
 */
 
+
 const stack = {
   //Chat: { screen: Chat },
   FirstScreen: { screen: Tutorial },
@@ -46,11 +47,14 @@ const stack = {
   Instructions: { screen: Instructions },
 };
 
-const state = store.getState();
-if (state.accounts.primaryAccount) {
-  stack.FirstScreen = { screen: Accounts };
-  console.log('log stack', stack);
-}
+
+store.subscribe(() => {
+  const state = store.getState();
+  if (state.accounts.primaryAccount.accountId) {
+    stack.FirstScreen = { screen: Accounts };
+  }
+});
+
 
 const LoginStack = StackNavigator(
   stack,

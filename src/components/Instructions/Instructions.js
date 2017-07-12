@@ -72,7 +72,7 @@ export class Instructions extends Component {
   }
 
   onClosePress = () => {
-        // close component
+    // close component
     const backAction = NavigationActions.back({
       key: null,
     });

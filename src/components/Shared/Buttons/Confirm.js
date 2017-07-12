@@ -17,7 +17,7 @@ export default class Confirm extends Component {
 
   render() {
     // using TouchH instead TouchO to disable pressing when prop active == false
-    const { active, onPress } = this.props;
+    const { active, onPress, text } = this.props;
     return (
       <TouchableHighlight
         style={[styles.container, active && styles.active]}
