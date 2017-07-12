@@ -4,15 +4,12 @@ import android.app.Application;
 import android.support.multidex.MultiDexApplication;
 
 import com.facebook.react.ReactApplication;
-<<<<<<< HEAD
 import com.centaurwarchief.smslistener.SmsListenerPackage;
 import com.pusherman.networkinfo.RNNetworkInfoPackage;
 import codes.simen.IMEI.IMEI;
 import com.learnium.RNDeviceInfo.RNDeviceInfo;
 import com.BV.LinearGradient.LinearGradientPackage;
 import com.brentvatne.react.ReactVideoPackage;
-=======
->>>>>>> origin/chat-libsignal
 import com.zmxv.RNSound.RNSoundPackage;
 import com.rnim.rn.audio.ReactNativeAudioPackage;
 import com.humaniq.libsignals.SignalReactPackage;
