@@ -1,5 +1,6 @@
 # HUMANIQ MOBILE [LITE]
-![Humaniq logo](https://lh5.googleusercontent.com/5K3WoLpcQVlZ8AgE15BFtMEPSFkxCeK6sq5Nllhms4Clj62PPYPx2kig3LFkFf_sKmecJaoXaYnMhps=w1095-h927)
+
+[![Vexor status](https://ci.vexor.io/projects/9c78b9c5-e2d8-4209-8acf-b67152d7024f/status.svg)](https://ci.vexor.io/ui/projects/9c78b9c5-e2d8-4209-8acf-b67152d7024f/builds)
 
 ## About
 [Humaniq](www.humaniq.co) is simple and secure 4th generation mobile bank. Made on blockchain with Bio ID.
