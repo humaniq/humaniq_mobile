@@ -4,8 +4,10 @@ import * as ActionTypes from '../actions';
 function primaryAccount(state = {}, action) {
   switch (action.type) {
     case ActionTypes.ADD_PRIMARY_ACCOUNT:
-      // return action.path;
-      return state;
+      return {
+        ...state,
+        ...action.account,
+      };
     default:
       return state;
   }
@@ -14,8 +16,10 @@ function primaryAccount(state = {}, action) {
 function secondaryAccounts(state = [], action) {
   switch (action.type) {
     case ActionTypes.ADD_SECONDARY_ACCOUNT:
-      // return action.path;
-      return state;
+      return [
+        ...state,
+        action.account,
+      ];
     default:
       return state;
   }

@@ -14,7 +14,7 @@ import IMEI from 'react-native-imei';
 import Keyboard from '../Shared/Components/Keyboard';
 import CustomStyleSheet from '../../utils/customStylesheet';
 import Confirm from '../Shared/Buttons/Confirm';
-import { login, signup, setPassword } from '../../actions';
+import { login, signup, setPassword, addPrimaryAccount, addSecondaryAccount } from '../../actions';
 
 
 export class Password extends Component {
@@ -68,8 +68,26 @@ export class Password extends Component {
             break;
 
           case 1001:
+            const registeredAcc = nextProps.user.account.payload.payload.account_information;
             this.props.setPassword(this.state.password);
-            this.props.navigation.navigate('TelInput');
+            // this.props.navigation.navigate('TelInput');
+
+            // TODO: replace with validated??
+            if (registeredAcc.phone_number.country_code) {
+              // secondary user, redirect to dash
+              this.props.addSecondaryAccount({
+                accountId: registeredAcc.account_id,
+                photo: this.props.user.photo,
+              });
+              this.props.navigation.navigate('Dashboard');
+            } else {
+              //primary user
+              this.props.addPrimaryAccount({
+                accountId: registeredAcc.account_id,
+                photo: this.props.user.photo,
+              });
+              this.props.navigation.navigate('TelInput');
+            }
             break;
 
           case 2001:
@@ -158,6 +176,7 @@ export class Password extends Component {
     const randomImei = Math.floor((10000000 + Math.random()) * 90000000);
     // const imei = isEmulator ? randomImei : IMEI.getImei();
     const imei = randomImei.toString();
+    // const imei = '923456789098765';
 
     this.props.signup({
       facial_image_id: this.props.user.validate.payload.payload.facial_image_id,
@@ -244,6 +263,8 @@ export default connect(mapStateToProps, {
   login: login.request,
   signup: signup.request,
   setPassword,
+  addPrimaryAccount,
+  addSecondaryAccount,
 })(Password);
 
 const styles = CustomStyleSheet({
