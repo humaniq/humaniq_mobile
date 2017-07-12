@@ -4,12 +4,15 @@ import android.app.Application;
 import android.support.multidex.MultiDexApplication;
 
 import com.facebook.react.ReactApplication;
+<<<<<<< HEAD
 import com.centaurwarchief.smslistener.SmsListenerPackage;
 import com.pusherman.networkinfo.RNNetworkInfoPackage;
 import codes.simen.IMEI.IMEI;
 import com.learnium.RNDeviceInfo.RNDeviceInfo;
 import com.BV.LinearGradient.LinearGradientPackage;
 import com.brentvatne.react.ReactVideoPackage;
+=======
+>>>>>>> origin/chat-libsignal
 import com.zmxv.RNSound.RNSoundPackage;
 import com.rnim.rn.audio.ReactNativeAudioPackage;
 import com.humaniq.libsignals.SignalReactPackage;
@@ -35,12 +38,15 @@ public class MainApplication extends MultiDexApplication implements ReactApplica
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
+<<<<<<< HEAD
             new SmsListenerPackage(),
             new RNNetworkInfoPackage(),
             new IMEI(),
             new RNDeviceInfo(),
             new LinearGradientPackage(),
             new ReactVideoPackage(),
+=======
+>>>>>>> origin/chat-libsignal
             new RNSoundPackage(),
             new ReactNativeAudioPackage(),
             new SignalReactPackage(),

@@ -149,12 +149,15 @@ android {
 }
 
 dependencies {
+<<<<<<< HEAD
     compile project(':react-native-android-sms-listener')
     compile project(':react-native-network-info')
     compile project(':react-native-imei')
     compile project(':react-native-device-info')
     compile project(':react-native-linear-gradient')
     compile project(':react-native-video')
+=======
+>>>>>>> origin/chat-libsignal
     compile project(':react-native-sound')
     compile project(':react-native-audio')
     compile project(':humaniq-libsignals')
