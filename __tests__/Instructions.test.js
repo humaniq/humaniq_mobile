@@ -121,5 +121,4 @@ describe('<Instructions />', () => {
         wrapper.instance().onClosePress()
         expect(click).toBeCalled()
     })
-
 })

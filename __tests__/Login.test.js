@@ -96,6 +96,18 @@ describe('<Login />', () => {
      ***/
 
     let user = {
+        account: {
+            payload: {
+                code: 3003
+            },
+            isFetching: false
+        },
+        validate: {
+            payload: {
+                code: 3003
+            },
+            isFetching: false
+        },
         registered: true,
         id: 1,
         password: 'password',
@@ -105,22 +117,37 @@ describe('<Login />', () => {
         avatar: {
             b64: 'path',
             localPath: 'localPath'
+        },
+        photo: 'photo',
+        setPassword: jest.fn(),
+        navigation: {
+            navigate: jest.fn(),
+            dispatch: jest.fn(),
         }
     }
 
     let navigation = {
+        navigate: jest.fn(),
         dispatch: jest.fn(), // spy function
         state: {
             params: jest.fn() // spy function
         }
     }
-
+    //
     it('should render Password component correctly', () => {
-        const wrapper = shallow(<Password store={store} user={user} navigation={navigation}/>)
+        const wrapper = shallow(
+            <Password
+                signup={() => {}}
+                login={() => {}}
+                setPassword={() => {}}
+                store={store}
+                user={user}
+                navigation={navigation}/>
+        )
         expect(wrapper).toMatchSnapshot()
         expect(wrapper.length).toBe(1)
     })
-
+    //
     it('Password component should handle states', () => {
         initialState = {
             maxPasswordLength: 4,
@@ -134,7 +161,15 @@ describe('<Login />', () => {
             imei: 'new imei',
             match: true,
         }
-        const wrapper = shallow(<Password store={store} user={user} navigation={navigation}/>)
+        const wrapper = shallow(
+            <Password
+                signup={() => {}}
+                login={() => {}}
+                setPassword={() => {}}
+                store={store}
+                user={user}
+                navigation={navigation}/>
+        )
         expect(wrapper.state().password).toEqual('')
         expect(wrapper.state().match).toEqual(null)
         // will change state of the app
@@ -146,14 +181,30 @@ describe('<Login />', () => {
         })
         expect(wrapper.state()).toEqual(expectedState)
     })
-
+    //
     it('Password component children count should be equal to 3', () => {
-        const wrapper = shallow(<Password store={store} user={user} navigation={navigation}/>)
+        const wrapper = shallow(
+            <Password
+                signup={() => {}}
+                login={() => {}}
+                setPassword={() => {}}
+                store={store}
+                user={user}
+                navigation={navigation}/>
+        )
         expect(wrapper.find('View').at(0).children().length).toEqual(3)
     })
-
+    //
     it('should render correctly Keyboard', () => {
-        const wrapper = shallow(<Password store={store} user={user} navigation={navigation}/>)
+        const wrapper = shallow(
+            <Password
+                signup={() => {}}
+                login={() => {}}
+                setPassword={() => {}}
+                store={store}
+                user={user}
+                navigation={navigation}/>
+        )
         expect(wrapper.find('View').at(0).children().at(2).length).toBe(1)
     })
 
@@ -172,7 +223,7 @@ describe('<Login />', () => {
     //     keyboardComponent.instance().props.onBackspacePress()
     //     expect(mockClick).toBeCalled()
     // })
-    //
+
     // it('handleHelpPress() should be called', () => {
     //     const mockClick = jest.fn()
     //     const passwordComponent = shallow(<Password store={mockStore} user={user} navigation={navigation}/>)
@@ -182,15 +233,31 @@ describe('<Login />', () => {
     // })
 
     it('passwordConfirmAvailability() should be called and return false value', () => {
-        expectedValue = false
-        const wrapper = shallow(<Password store={mockStore} user={user} navigation={navigation}/>)
+        let expectedValue = false
+        const wrapper = shallow(
+            <Password
+                signup={() => {}}
+                login={() => {}}
+                setPassword={() => {}}
+                store={store}
+                user={user}
+                navigation={navigation}/>
+        )
         expect(
             wrapper.instance().passwordConfirmAvailability()
         ).toEqual(expectedValue)
     })
-
+    //
     it('renderPassMask() should be called and return digits', () => {
-        const wrapper = shallow(<Password store={mockStore} user={user} navigation={navigation}/>)
+        const wrapper = shallow(
+            <Password
+                signup={() => {}}
+                login={() => {}}
+                setPassword={() => {}}
+                store={store}
+                user={user}
+                navigation={navigation}/>
+        )
         expect(
             typeof wrapper.instance().renderPassMask()
         ).toEqual('object')
@@ -204,6 +271,7 @@ describe('<Login />', () => {
         user.registered = false
 
         let navigation = {
+            navigate: jest.fn(),
             dispatch: jest.fn(), // spy function
             state: {
                 params: {
@@ -211,33 +279,132 @@ describe('<Login />', () => {
                 } // spy function
             }
         }
-        const wrapper = shallow(<Password store={mockStore} user={user} navigation={navigation}/>)
+        const wrapper = shallow(
+            <Password
+                signup={() => {}}
+                login={() => {}}
+                setPassword={() => {}}
+                store={store}
+                user={user}
+                navigation={navigation}/>
+        )
         expect(wrapper.instance().renderInputStep().props.children).toEqual(expectedValue)
     })
 
     it('renderInputStep() should return null', () => {
-        expectedValue = null
+
+        let user = {
+            account: {
+                payload: {
+                },
+                isFetching: false
+            },
+            validate: {
+                payload: {
+                },
+                isFetching: false
+            },
+            photo: 'image'
+
+        }
+        let expectedValue = null
         user.registered = true
-        const wrapper = shallow(<Password store={mockStore} user={user} navigation={navigation}/>)
+        const wrapper = shallow(
+            <Password
+                signup={() => {}}
+                login={() => {}}
+                setPassword={() => {}}
+                store={store}
+                user={user}
+                navigation={navigation}/>
+        )
         expect(wrapper.instance().renderInputStep()).toEqual(expectedValue)
     })
 
-    /***
-     * Testing TelInput component
-     ***/
-
+    // /***
+    //  * Testing TelInput component
+    //  ***/
+    //
     it('should render TelInput component correctly', () => {
-        const wrapper = shallow(<TelInput store={store} user={user} navigation={navigation}/>)
+        let user = {
+            account: {
+                payload: {
+                },
+                isFetching: false
+            },
+            validate: {
+                payload: {
+                },
+                isFetching: false
+            },
+            phoneCreate: {
+                isFetching: true
+            },
+            photo: 'image'
+
+        }
+        const wrapper = shallow(
+            <Password
+                signup={() => {}}
+                login={() => {}}
+                setPassword={() => {}}
+                store={store}
+                user={user}
+                navigation={navigation}/>
+        )
         expect(wrapper).toMatchSnapshot()
         expect(wrapper.length).toBe(1)
     })
 
     it('should render child components', () => {
-        const wrapper = shallow(<TelInput store={store} user={user} navigation={navigation}/>)
+        let user = {
+            account: {
+                payload: {
+                },
+                isFetching: false
+            },
+            validate: {
+                payload: {
+                },
+                isFetching: false
+            },
+            phoneCreate: {
+                isFetching: true
+            },
+            photo: 'image'
+
+        }
+        const wrapper = shallow(
+            <Password
+                signup={() => {}}
+                login={() => {}}
+                setPassword={() => {}}
+                store={store}
+                user={user}
+                navigation={navigation}/>
+        )
         expect(wrapper.find('View').first().children().length).toBe(3)
     })
 
+
+
     it('TelInput component should handle states', () => {
+        let user = {
+            account: {
+                payload: {
+                },
+                isFetching: false
+            },
+            validate: {
+                payload: {
+                },
+                isFetching: false
+            },
+            phoneCreate: {
+                isFetching: true
+            },
+            photo: 'image'
+        }
         initialState = {
             maxPhoneLength: 19,
             phone: '',
@@ -246,7 +413,13 @@ describe('<Login />', () => {
             maxPhoneLength: 40,
             phone: '+998901443407',
         }
-        const wrapper = shallow(<TelInput store={store} user={user} navigation={navigation}/>)
+        const wrapper = shallow(
+            <TelInput
+                phoneNumberCreate={() => {}}
+                store={store}
+                user={user}
+                navigation={navigation}/>
+        )
         expect(wrapper.state()).toEqual(initialState)
         // will change state of the app
         wrapper.setState({
@@ -257,15 +430,38 @@ describe('<Login />', () => {
     })
 
     it('renderInput() should be called and return some view with phoneNumber', () => {
+        let user = {
+            account: {
+                payload: {
+                },
+                isFetching: false
+            },
+            validate: {
+                payload: {
+                },
+                isFetching: false
+            },
+            phoneCreate: {
+                isFetching: true
+            },
+            photo: 'image'
+
+        }
         const expectedPhoneNumber = '+998901443407'
         const onClick = jest.fn()
-        const wrapper = shallow(<TelInput store={mockStore} user={user} navigation={navigation}/>)
+        const wrapper = shallow(
+            <TelInput
+                phoneNumberCreate={() => {}}
+                store={store}
+                user={user}
+                navigation={navigation}/>
+        )
         wrapper.setState({
             phone: expectedPhoneNumber
         })
         expect(wrapper.instance().renderInput().props.children.props.children).toEqual(expectedPhoneNumber)
     })
-
+    //
     /***
      * Testing Confirm component
      ***/
@@ -314,6 +510,7 @@ describe('<Login />', () => {
 
     it('should render Tutorial component correctly', () => {
         let navigation = {
+            navigate: jest.fn(),
             dispatch: jest.fn(), // spy function
             state: {
                 params: {
@@ -329,6 +526,7 @@ describe('<Login />', () => {
 
     it('Tutorial should render child components', () => {
         let navigation = {
+            navigate: jest.fn(),
             dispatch: jest.fn(), // spy function
             state: {
                 params: {
@@ -345,6 +543,7 @@ describe('<Login />', () => {
 
     it('Tutorial should call method handleTutorialPlay() and change State', () => {
         let navigation = {
+            navigate: jest.fn(),
             dispatch: jest.fn(), // spy function
             state: {
                 params: {
@@ -376,6 +575,7 @@ describe('<Login />', () => {
         }
 
         let navigation = {
+            navigate: jest.fn(),
             dispatch: jest.fn(), // spy function
             state: {
                 params: {
@@ -407,6 +607,7 @@ describe('<Login />', () => {
     it('should render tutorial text', () => {
         const expectedText = 'tutorial for Camera'
         let navigation = {
+            navigate: jest.fn(),
             dispatch: jest.fn(), // spy function
             state: {
                 params: {
@@ -418,5 +619,4 @@ describe('<Login />', () => {
         expect(wrapper.find('Text').first().props().children).toEqual(expectedText)
 
     })
-
 })

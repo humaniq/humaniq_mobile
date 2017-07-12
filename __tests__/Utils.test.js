@@ -56,5 +56,4 @@ describe('Utils test', () => {
         const integerValue = viewPortCalc(20, 10, 10)
         expect(stringValue).toEqual(NaN)
     })
-
 })
