@@ -33,6 +33,8 @@ const Dashboard = TabNavigator(
 );
 */
 
+
+console.log('store state App', store.getState());
 const LoginStack = StackNavigator(
   {
     //Chat: { screen: Chat },

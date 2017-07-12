@@ -27,6 +27,8 @@
     "react-navigation": "1.0.0-beta.11",
     "react-redux": "5.0.5",
     "redux": "3.6.0",
+    "redux-localstorage": "git+https://github.com/elgerlambert/redux-localstorage.git#1.0-breaking-changes",
+    "redux-localstorage-filter": "0.1.1",
     "redux-logger": "3.0.6",
     "redux-saga": "0.15.4",
     "redux-thunk": "2.2.0",
