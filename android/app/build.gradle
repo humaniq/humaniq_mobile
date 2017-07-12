@@ -137,6 +137,9 @@ android {
 }
 
 dependencies {
+    compile project(':react-native-sound')
+    compile project(':react-native-audio')
+    compile project(':humaniq-libsignals')
     compile project(':react-native-android-sms-listener')
     compile project(':react-native-network-info')
     compile project(':react-native-imei')
