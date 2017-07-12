@@ -35,7 +35,7 @@ class TransactionView extends Component {
         return (
             <View>
                 <Modal
-                    onRequestClose={() => {}}
+                    onRequestClose={onChatClick}
                     animationType={"fade"}
                     transparent={true}
                     visible={visibility}>
@@ -45,7 +45,7 @@ class TransactionView extends Component {
 
                             <View style={styles.header}>
                                 <View style={{flexDirection: 'row', flex: 1}}>
-                                    <Text style={styles.date}>28.08.2017, 21:49:57</Text>
+                                    <Text style={styles.date}>{item.time}</Text>
                                     <Image
                                         style={styles.statusImage}
                                         source={require('../assets/done.png')}/>
@@ -77,7 +77,7 @@ class TransactionView extends Component {
                                 <Text style={styles.priceInt}>
                                     {priceBeforePoint + '.'}
                                     <Text style={styles.priceDecimal}>
-                                        { priceAfterPoint ? priceAfterPoint : '.00'} {item.currency}</Text>
+                                        { priceAfterPoint ? priceAfterPoint : '00'} {item.currency}</Text>
                                 </Text>
                             </View>
 

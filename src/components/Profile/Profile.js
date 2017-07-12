@@ -33,7 +33,36 @@ let fakeTransactions = [
         name: "Серафим",
         surname: "Петров",
         pic: '',
-        time: '11.07.2017',
+        time: '15.07.2017',
+        currency: 'HMQ'
+    },
+    {
+        phone: "+1 (416) 464 71 35",
+        amount: "+12.08",
+        type: 0, // incoming
+        name: "Серафим",
+        surname: "Петров",
+        pic: '',
+        time: '14.07.2017',
+        currency: 'HMQ'
+    },
+    {
+        phone: "+1 (416) 464 71 35",
+        amount: "+12.08",
+        type: 0, // incoming
+        name: "Серафим",
+        surname: "Петров",
+        pic: '',
+        time: '13.07.2017',
+        currency: 'HMQ'
+    },    {
+        phone: "+1 (416) 464 71 35",
+        amount: "+12.08",
+        type: 0, // incoming
+        name: "Серафим",
+        surname: "Петров",
+        pic: '',
+        time: '13.07.2017',
         currency: 'HMQ'
     },
     {
@@ -43,7 +72,7 @@ let fakeTransactions = [
         name: "Джамшид",
         surname: "Джураев",
         pic: '',
-        time: '11.07.2017',
+        time: '14.07.2017',
         currency: 'HMQ'
     },
     {
@@ -73,10 +102,61 @@ let fakeTransactions = [
         name: "Дониер",
         surname: "Эркабоев",
         pic: '',
-        time: '13.07.2017',
+        time: '12.07.2017',
         currency: 'HMQ'
     },
+    {
+        phone: "+971 (58) 273 77 93",
+        amount: "+400",
+        type: 0, //incoming
+        name: "Дониер",
+        surname: "Эркабоев",
+        pic: '',
+        time: '11.07.2017',
+        currency: 'HMQ'
+    },
+    {
+        phone: "+971 (58) 273 77 93",
+        amount: "+400",
+        type: 0, //incoming
+        name: "Дониер",
+        surname: "Эркабоев",
+        pic: '',
+        time: '11.07.2017',
+        currency: 'HMQ'
+    },
+    {
+        phone: "+971 (58) 273 77 93",
+        amount: "+400",
+        type: 0, //incoming
+        name: "Дониер",
+        surname: "Эркабоев",
+        pic: '',
+        time: '11.07.2017',
+        currency: 'HMQ'
+    },    {
+        phone: "+971 (58) 273 77 93",
+        amount: "+400",
+        type: 0, //incoming
+        name: "Дониер",
+        surname: "Эркабоев",
+        pic: '',
+        time: '14.07.2017',
+        currency: 'HMQ'
+    },    {
+        phone: "+971 (58) 273 77 93",
+        amount: "+400",
+        type: 0, //incoming
+        name: "Дониер",
+        surname: "Эркабоев",
+        pic: '',
+        time: '10.07.2017',
+        currency: 'HMQ'
+    },
+
 ]
+
+
 
 export class Profile extends Component {
     constructor(props) {
@@ -89,6 +169,8 @@ export class Profile extends Component {
         };
     }
 
+    componentDidMount() {
+    }
 
     getAnimationType = (type) => {
         switch (type) {
@@ -127,41 +209,46 @@ export class Profile extends Component {
 
     // render list
     renderScrollViewContent() {
+        let i = 0
         let categoryMap = {}
+        let headerIds = []
         fakeTransactions.forEach((item, index) => {
             var category = item.time
             if (!categoryMap[category]) {
                 categoryMap[category] = []
+                headerIds[i] = category
+                i++
             }
             categoryMap[category].push(item)
         })
 
         return (
             <View style={styles.scrollViewContent}>
-                {fakeTransactions.map((item, index) => {
-                    return(
-                        <View key={index}>
-                            {index%2 == 0 ?this.renderHeaderSection(index) : null}
-                            <Item item={item} currentIndex={index} size={fakeTransactions.length} onClick={() => this.onItemClick(item)}/>
-                        </View>
-                    )
+                {headerIds.map((item) => {
+                    return categoryMap[item].map((child, childIndex) => {
+                        return(
+                            <View>
+                                {/* render header text */}
+                                {childIndex == 0 ? this.renderHeaderSection(item) : null}
+
+                                {/* render transaction item */}
+                                <Item
+                                    item={child}
+                                    currentIndex={childIndex}
+                                    size={categoryMap[item].length}
+                                    onClick={() => this.onItemClick(child)}
+                                />
+                            </View>
+                        )
+                    })
                 })}
             </View>
         );
     }
 
-    renderHeaderSection = (index) => {
+    renderHeaderSection = (header) => {
         return (
-            <Text style={styles.headerSection}>{index+20}.09.2017</Text>
-        )
-    }
-    renderItem = (categoryMap, parentIndex) => {
-        return (
-            <View key={i} style={{backgroundColor: '#fff'}}>
-                {categoryMap.map((child) => {
-                    return <Item item={child} currentIndex={i} size={categoryMap.length}/>
-                })}
-            </View>
+            <Text style={styles.headerSection}>{header}</Text>
         )
     }
 
@@ -281,7 +368,7 @@ export class Profile extends Component {
         })
     }
 
-    onChatClick() {
+    onChatClick = () => {
         this.setState({
             modalVisibility: false
         })

@@ -64,7 +64,7 @@ class Item extends Component {
                             </View>
                         </View>
 
-                        {currentIndex%2 == 0 ? <View style={styles.divider}/> : null}
+                        {currentIndex != size - 1? <View style={styles.divider}/> : null}
 
                     </View>
                 </TouchableOpacity>
