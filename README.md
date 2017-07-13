@@ -11,6 +11,30 @@ LITE version of the mobile app (without text), is specially designed for nonread
 This app is based on React Native framework.
 To run this app on your device or simulator please follow [official documentation instructions](https://facebook.github.io/react-native/docs/getting-started.html).
 
+### Setup Android:
+1. [Configure SSH Keys](https://github.com/humaniq/humaniq_mobile/pull/21#issue-242430854)
+1. Run `npm i` in project root dir
+1. Run `react-native link`
+1. Install Android studio and all Android related build tools, according to official React Native documentation
+1. Run AVD
+1. Run `react-native run-android` in project root dir
+
+### Android troubleshooting:
+#### Build:
+
+1. Delete previously installed apk from device:
+```
+Execution failed for task ':app:installDebug'.
+com.android.builder.testing.api.DeviceException: 
+com.android.ddmlib.InstallException: 
+Failed to finalize session : INSTALL_FAILED_VERSION_DOWNGRADE
+```
+
+#### Runtime:
+1. AVD does not have IMEI and has conflict with IMEI library.
+For now you should replace IMEI assignment in Java code with custom string or use real device.
+
+
 ### Tools:
 #### Code inspection:
 * ESlint (Aribnb, babel-parser)
