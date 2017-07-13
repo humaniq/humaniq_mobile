@@ -3,7 +3,6 @@ import {
   View,
   Image,
   Text,
-  Alert,
 } from 'react-native';
 
 import PropTypes from 'prop-types';
@@ -15,7 +14,6 @@ import Keyboard from '../Shared/Components/Keyboard';
 import CustomStyleSheet from '../../utils/customStylesheet';
 import Confirm from '../Shared/Buttons/Confirm';
 import { login, signup, setPassword, addPrimaryAccount, addSecondaryAccount } from '../../actions';
-
 
 export class Password extends Component {
   static propTypes = {
@@ -81,7 +79,7 @@ export class Password extends Component {
               });
               this.props.navigation.navigate('Dashboard');
             } else {
-              //primary user
+              // primary user
               this.props.addPrimaryAccount({
                 accountId: registeredAcc.account_id,
                 photo: this.props.user.photo,

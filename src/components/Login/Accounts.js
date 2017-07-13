@@ -1,3 +1,6 @@
+/* eslint-disable */
+// will be modified entirely
+
 import React, { Component } from 'react';
 import {
   ScrollView,
@@ -32,14 +35,14 @@ export class Accounts extends Component {
 
   renderSecondaryAccounts = () => {
     const arr = this.props.accounts.secondaryAccounts;
-    let res = [];
+    const res = [];
     if (arr.length) {
       arr.forEach((acc) => {
         res.push(
           <TouchableOpacity style={styles.accountButton} onPress={this.validateUser} key={acc.accountId}>
             <Image style={styles.userPhoto} source={{ uri: acc.photo }} />
             <Text>Account id: {acc.accountId}</Text>
-          </TouchableOpacity>
+          </TouchableOpacity>,
         );
       });
     }
@@ -49,7 +52,7 @@ export class Accounts extends Component {
   render() {
     return (
       <ScrollView contentContainerStyle={styles.container}>
-        <View style={{flex: 1,}}>
+        <View style={{ flex: 1 }}>
           <Text style={styles.h1}>Primary Account</Text>
           {this.renderPrimaryAccount()}
           {this.props.accounts.secondaryAccounts.length ? <Text style={styles.h1}>Secondary Accounts</Text> : null}
