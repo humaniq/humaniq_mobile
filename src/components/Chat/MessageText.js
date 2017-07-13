@@ -1,10 +1,8 @@
+/* eslint-disable react/forbid-prop-types */
+/* eslint-disable class-methods-use-this */
+
 import React from 'react';
-import {
-  Linking,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
+import { Linking, StyleSheet, Text, View } from 'react-native';
 
 import ParsedText from 'react-native-parsed-text';
 import Communications from 'react-native-communications';
@@ -22,17 +20,12 @@ export default class MessageText extends React.Component {
   }
 
   onPhonePress(phone) {
-    const options = [
-      'Text',
-      'Call',
-      'Cancel',
-    ];
+    const options = ['Text', 'Call', 'Cancel'];
     const cancelButtonIndex = options.length - 1;
     this.context.actionSheet().showActionSheetWithOptions({
       options,
       cancelButtonIndex,
-    },
-    (buttonIndex) => {
+    }, (buttonIndex) => {
       switch (buttonIndex) {
         case 0:
           Communications.phonecall(phone, true);
@@ -40,6 +33,7 @@ export default class MessageText extends React.Component {
         case 1:
           Communications.text(phone);
           break;
+        default: break;
       }
     });
   }
@@ -50,13 +44,39 @@ export default class MessageText extends React.Component {
 
   render() {
     return (
-      <View style={[styles[this.props.position].container, this.props.containerStyle[this.props.position]]}>
+      <View
+        style={[
+          styles[this.props.position].container,
+          this.props.containerStyle[this.props.position],
+        ]}
+      >
         <ParsedText
           style={[styles[this.props.position].text, this.props.textStyle[this.props.position]]}
           parse={[
-            {type: 'url', style: StyleSheet.flatten([styles[this.props.position].link, this.props.linkStyle[this.props.position]]), onPress: this.onUrlPress},
-            {type: 'phone', style: StyleSheet.flatten([styles[this.props.position].link, this.props.linkStyle[this.props.position]]), onPress: this.onPhonePress},
-            {type: 'email', style: StyleSheet.flatten([styles[this.props.position].link, this.props.linkStyle[this.props.position]]), onPress: this.onEmailPress},
+            {
+              type: 'url',
+              style: StyleSheet.flatten([
+                styles[this.props.position].link,
+                this.props.linkStyle[this.props.position],
+              ]),
+              onPress: this.onUrlPress,
+            },
+            {
+              type: 'phone',
+              style: StyleSheet.flatten([
+                styles[this.props.position].link,
+                this.props.linkStyle[this.props.position],
+              ]),
+              onPress: this.onPhonePress,
+            },
+            {
+              type: 'email',
+              style: StyleSheet.flatten([
+                styles[this.props.position].link,
+                this.props.linkStyle[this.props.position],
+              ]),
+              onPress: this.onEmailPress,
+            },
           ]}
         >
           {this.props.currentMessage.text}
@@ -77,8 +97,7 @@ const textStyle = {
 
 const styles = {
   left: StyleSheet.create({
-    container: {
-    },
+    container: {},
     text: {
       color: '#9b9b9b',
       ...textStyle,
@@ -89,8 +108,7 @@ const styles = {
     },
   }),
   right: StyleSheet.create({
-    container: {
-    },
+    container: {},
     text: {
       color: '#9b9b9b',
       ...textStyle,

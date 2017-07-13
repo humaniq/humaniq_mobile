@@ -1,10 +1,8 @@
+/* eslint-disable react/forbid-prop-types */
+/* eslint-disable react/prefer-stateless-function */
+
 import React from 'react';
-import {
-  Image,
-  StyleSheet,
-  View,
-  Dimensions,
-} from 'react-native';
+import { Image, StyleSheet, View, Dimensions } from 'react-native';
 import Lightbox from 'react-native-lightbox';
 
 export default class MessageImage extends React.Component {
@@ -22,7 +20,7 @@ export default class MessageImage extends React.Component {
           <Image
             {...this.props.imageProps}
             style={[styles.image, this.props.imageStyle]}
-            source={{uri: this.props.currentMessage.image}}
+            source={{ uri: this.props.currentMessage.image }}
           />
         </Lightbox>
       </View>
@@ -31,8 +29,7 @@ export default class MessageImage extends React.Component {
 }
 
 const styles = StyleSheet.create({
-  container: {
-  },
+  container: {},
   image: {
     width: 150,
     height: 100,

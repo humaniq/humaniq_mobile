@@ -1,6 +1,6 @@
-import React, {
-  Component,
-} from 'react';
+/* eslint-disable class-methods-use-this */
+/* eslint-disable react/prefer-stateless-function */
+import React, { Component } from 'react';
 
 import {
   StyleSheet,
@@ -13,13 +13,9 @@ import {
 } from 'react-native';
 
 import Sound from 'react-native-sound';
-import {
-  AudioRecorder,
-  AudioUtils,
-} from 'react-native-audio';
+import { AudioRecorder, AudioUtils } from 'react-native-audio';
 
 class SoundSelect extends Component {
-
   state = {
     currentTime: 0.0,
     recording: false,
@@ -77,33 +73,22 @@ class SoundSelect extends Component {
     }
 
     const rationale = {
-      'title': 'Microphone Permission',
-      'message': 'SoundSelect needs access to your microphone so you can record audio.'
+      title: 'Microphone Permission',
+      message: 'SoundSelect needs access to your microphone so you can record audio.',
     };
 
-    return PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.RECORD_AUDIO, rationale)
-      .then((result) => {
-        console.log('Permission result:', result);
-        return (result === true || result === PermissionsAndroid.RESULTS.GRANTED);
-      });
-  }
-
-  renderButton(title, onPress, active) {
-    const style = (active) ? styles.activeButtonText : styles.buttonText;
-
-    return (
-      <TouchableHighlight
-        style={styles.button}
-        onPress={onPress}
-      >
-        <Text style={style}> { title } </Text>
-      </TouchableHighlight>
-    );
+    return PermissionsAndroid.request(
+      PermissionsAndroid.PERMISSIONS.RECORD_AUDIO,
+      rationale,
+    ).then((result) => {
+      console.log('Permission result:', result);
+      return result === true || result === PermissionsAndroid.RESULTS.GRANTED;
+    });
   }
 
   async pause() {
     if (!this.state.recording) {
-      console.warn('Can\'t pause, not recording!');
+      console.warn("Can't pause, not recording!");
       return;
     }
 
@@ -126,7 +111,7 @@ class SoundSelect extends Component {
 
   async stop() {
     if (!this.state.recording) {
-      console.warn('Can\'t stop, not recording!');
+      console.warn("Can't stop, not recording!");
       return;
     }
 
@@ -180,7 +165,7 @@ class SoundSelect extends Component {
     }
 
     if (!this.state.hasPermission) {
-      console.warn('Can\'t record, no permission granted!');
+      console.warn("Can't record, no permission granted!");
       return;
     }
 
@@ -193,7 +178,7 @@ class SoundSelect extends Component {
     });
 
     try {
-      const filePath = await AudioRecorder.startRecording();
+      await AudioRecorder.startRecording();
     } catch (error) {
       console.error(error);
     }
@@ -203,7 +188,21 @@ class SoundSelect extends Component {
     this.setState({
       finished: didSucceed,
     });
-    console.log(`Finished recording of duration ${this.state.currentTime} seconds at path: ${filePath}`);
+    console.log(
+      `Finished recording of duration ${this.state.currentTime} seconds at path: ${filePath}`,
+    );
+  }
+
+  renderButton(title, onPress, active) {
+    const style = active ? styles.activeButtonText : styles.buttonText;
+
+    return (
+      <TouchableHighlight style={styles.button} onPress={onPress}>
+        <Text style={style}>
+          {' '}{title}{' '}
+        </Text>
+      </TouchableHighlight>
+    );
   }
 
   render() {
@@ -224,15 +223,30 @@ class SoundSelect extends Component {
           this.setModalVisible(false);
         }}
       >
-        <View style={styles.container} >
+        <View style={styles.container}>
           <View style={styles.soundBar}>
-            { this.renderButton('O', () => { this.record(); }, this.state.recording)}
-            { this.renderButton('>', () => { this.play(); }) }
-            { this.renderButton('[]', () => { this.stop(); }) }
-            { this.renderButton('||', () => { this.pause(); })}
-            { this.renderButton('@', () => { send(); this.setModalVisible(false); })}
+            {this.renderButton(
+              'O',
+              () => {
+                this.record();
+              },
+              this.state.recording,
+            )}
+            {this.renderButton('>', () => {
+              this.play();
+            })}
+            {this.renderButton('[]', () => {
+              this.stop();
+            })}
+            {this.renderButton('||', () => {
+              this.pause();
+            })}
+            {this.renderButton('@', () => {
+              send();
+              this.setModalVisible(false);
+            })}
             <Text style={styles.progressText}>
-              { this.state.currentTime}
+              {this.state.currentTime}
             </Text>
           </View>
         </View>
@@ -285,7 +299,10 @@ const styles = StyleSheet.create({
     fontSize: 20,
     color: '#B81F00',
   },
-
 });
+
+SoundSelect.propTypes = {
+  onSend: React.PropTypes.func,
+};
 
 export default SoundSelect;

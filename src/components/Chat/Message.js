@@ -1,24 +1,22 @@
+/* eslint-disable react/forbid-prop-types */
+
 import React from 'react';
-import {
-  View,
-  StyleSheet,
-} from 'react-native';
+import { View, StyleSheet } from 'react-native';
 
 import Avatar from './Avatar';
 import Bubble from './Bubble';
 import Day from './Day';
 
-import {isSameUser, isSameDay} from './utils';
+import { isSameUser, isSameDay } from './utils';
 
 export default class Message extends React.Component {
-
   getInnerComponentProps() {
-    const {containerStyle, ...props} = this.props;
+    const { containerStyle, ...props } = this.props;
     return {
       ...props,
       isSameUser,
-      isSameDay
-    }
+      isSameDay,
+    };
   }
 
   renderDay() {
@@ -27,7 +25,7 @@ export default class Message extends React.Component {
       if (this.props.renderDay) {
         return this.props.renderDay(dayProps);
       }
-      return <Day {...dayProps}/>;
+      return <Day {...dayProps} />;
     }
     return null;
   }
@@ -37,7 +35,7 @@ export default class Message extends React.Component {
     if (this.props.renderBubble) {
       return this.props.renderBubble(bubbleProps);
     }
-    return <Bubble {...bubbleProps}/>;
+    return <Bubble {...bubbleProps} />;
   }
 
   renderAvatar() {
@@ -49,16 +47,22 @@ export default class Message extends React.Component {
     return null;
     */
     const avatarProps = this.getInnerComponentProps();
-    return <Avatar renderAvatarOnTop {...avatarProps}/>;
+    return <Avatar renderAvatarOnTop {...avatarProps} />;
   }
 
   render() {
     return (
       <View>
         {this.renderDay()}
-        <View style={[styles[this.props.position].container, {
-          marginBottom: isSameUser(this.props.currentMessage, this.props.nextMessage) ? 2 : 10,
-        }, this.props.containerStyle[this.props.position]]}>
+        <View
+          style={[
+            styles[this.props.position].container,
+            {
+              marginBottom: isSameUser(this.props.currentMessage, this.props.nextMessage) ? 2 : 10,
+            },
+            this.props.containerStyle[this.props.position],
+          ]}
+        >
           {this.props.position === 'left' ? this.renderAvatar() : null}
           {this.renderBubble()}
           {this.props.position === 'right' ? this.renderAvatar() : null}

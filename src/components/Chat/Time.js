@@ -1,18 +1,24 @@
+/* eslint-disable react/prefer-stateless-function */
+/* eslint-disable react/forbid-prop-types */
+
 import React from 'react';
-import {
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 
 import moment from 'moment/min/moment-with-locales.min';
 
 export default class Time extends React.Component {
   render() {
     return (
-      <View style={[styles[this.props.position].container, this.props.containerStyle[this.props.position]]}>
+      <View
+        style={[
+          styles[this.props.position].container,
+          this.props.containerStyle[this.props.position],
+        ]}
+      >
         <Text style={[styles[this.props.position].text, this.props.textStyle[this.props.position]]}>
-          {moment(this.props.currentMessage.createdAt).locale(this.context.getLocale()).format('h:mm:ss')}
+          {moment(this.props.currentMessage.createdAt)
+            .locale(this.context.getLocale())
+            .format('h:mm:ss')}
         </Text>
       </View>
     );

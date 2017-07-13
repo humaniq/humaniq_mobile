@@ -19,14 +19,20 @@ export default class LoadEarlier extends React.Component {
     }
     return (
       <View>
-        <Text style={[styles.text, this.props.textStyle, {
-            opacity: 0,
-          }]}>
+        <Text
+          style={[
+            styles.text,
+            this.props.textStyle,
+            {
+              opacity: 0,
+            },
+          ]}
+        >
           {this.props.label}
         </Text>
         <ActivityIndicator
-          color='white'
-          size='small'
+          color="white"
+          size="small"
           style={[styles.activityIndicator, this.props.activityIndicatorStyle]}
         />
       </View>
@@ -77,7 +83,7 @@ const styles = StyleSheet.create({
       ios: -14,
       android: -16,
     }),
-  }
+  },
 });
 
 LoadEarlier.defaultProps = {

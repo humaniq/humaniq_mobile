@@ -1,15 +1,15 @@
+/* eslint-disable no-undef */
+/* eslint-disable no-underscore-dangle */
+/* eslint-disable class-methods-use-this */
+/* eslint-disable react/forbid-prop-types */
+
 import {
   Platform,
-  StyleSheet,
-  Text,
-  View,
-  TouchableOpacity,
-  Image,
-  ActivityIndicator,
 } from 'react-native';
 
 import firebase from 'firebase';
 import RNFetchBlob from 'react-native-fetch-blob';
+
 const Blob = RNFetchBlob.polyfill.Blob;
 const fs = RNFetchBlob.fs;
 window.XMLHttpRequest = RNFetchBlob.polyfill.XMLHttpRequest;
@@ -97,13 +97,12 @@ class Backend {
           },
         });
       }
-
     };
     this.messagesRef.limitToLast(20).on('child_added', onReceive);
   }
   // send the message to the Backend
   async sendMessage(message) {
-    for (let i = 0; i < message.length; i++) {
+    for (let i = 0; i < message.length; i += 1) {
       if (message[i].image) {
         console.log('🏝 message with image', message[i].image);
         const imageURI = await this.uploadImage(message[i].image);
@@ -113,8 +112,7 @@ class Backend {
           user: message[i].user,
           createdAt: firebase.database.ServerValue.TIMESTAMP,
         });
-      }
-      else if (message[i].text) {
+      } else if (message[i].text) {
         this.messagesRef.push({
           text: message[i].text,
           user: message[i].user,
@@ -147,10 +145,9 @@ class Backend {
       const storage = firebase.storage();
       const imageRef = storage.ref('images').child(`${sessionId}`);
 
-      fs.readFile(uploadUri, 'base64')
-        .then((data) => {
-          return Blob.build(data, { type: `${mime};BASE64` });
-        })
+      fs
+        .readFile(uploadUri, 'base64')
+        .then(data => Blob.build(data, { type: `${mime};BASE64` }))
         .then((blob) => {
           uploadBlob = blob;
           return imageRef.put(blob, { contentType: mime });
@@ -176,10 +173,9 @@ class Backend {
       const storage = firebase.storage();
       const imageRef = storage.ref('images').child(`${sessionId}`);
 
-      fs.readFile(uploadUri, 'base64')
-        .then((data) => {
-          return Blob.build(data, { type: `${mime};BASE64` });
-        })
+      fs
+        .readFile(uploadUri, 'base64')
+        .then(data => Blob.build(data, { type: `${mime};BASE64` }))
         .then((blob) => {
           uploadBlob = blob;
           return imageRef.put(blob, { contentType: mime });

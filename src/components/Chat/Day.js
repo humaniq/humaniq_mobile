@@ -1,9 +1,8 @@
+/* eslint-disable react/forbid-prop-types */
+/* eslint-disable react/prefer-stateless-function */
+
 import React from 'react';
-import {
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 
 import moment from 'moment/min/moment-with-locales.min';
 
@@ -16,7 +15,10 @@ export default class Day extends React.Component {
         <View style={[styles.container, this.props.containerStyle]}>
           <View style={[styles.wrapper, this.props.wrapperStyle]}>
             <Text style={[styles.text, this.props.textStyle]}>
-              {moment(this.props.currentMessage.createdAt).locale(this.context.getLocale()).format('ll').toUpperCase()}
+              {moment(this.props.currentMessage.createdAt)
+                .locale(this.context.getLocale())
+                .format('ll')
+                .toUpperCase()}
             </Text>
           </View>
         </View>
@@ -62,7 +64,7 @@ Day.defaultProps = {
   containerStyle: {},
   wrapperStyle: {},
   textStyle: {},
-  //TODO: remove in next major release
+  // TODO: remove in next major release
   isSameDay: warnDeprecated(isSameDay),
   isSameUser: warnDeprecated(isSameUser),
 };
@@ -73,7 +75,4 @@ Day.propTypes = {
   containerStyle: View.propTypes.style,
   wrapperStyle: View.propTypes.style,
   textStyle: Text.propTypes.style,
-  //TODO: remove in next major release
-  isSameDay: React.PropTypes.func,
-  isSameUser: React.PropTypes.func,
 };

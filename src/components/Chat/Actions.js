@@ -1,3 +1,5 @@
+/* eslint-disable react/forbid-prop-types */
+
 import React from 'react';
 import {
   StyleSheet,
@@ -13,24 +15,25 @@ export default class Actions extends React.Component {
   }
 
   onActionsPress() {
-    const options = Object.keys(this.props.options);
-    const cancelButtonIndex = Object.keys(this.props.options).length - 1;
+    const { options } = this.props;
+    const optionsKeys = Object.keys(options);
+    const cancelButtonIndex = Object.keys(options).length - 1;
     this.context.actionSheet().showActionSheetWithOptions({
-      options,
+      optionsKeys,
       cancelButtonIndex,
-      tintColor: this.props.optionTintColor
+      tintColor: this.props.optionTintColor,
     },
     (buttonIndex) => {
       let i = 0;
-      for (let key in this.props.options) {
-        if (this.props.options.hasOwnProperty(key)) {
+      optionsKeys.forEach((key) => {
+        if (options[key]) {
           if (buttonIndex === i) {
             this.props.options[key](this.props);
             return;
           }
-          i++;
+          i += 1;
         }
-      }
+      });
     });
   }
 
@@ -90,7 +93,6 @@ Actions.contextTypes = {
 };
 
 Actions.defaultProps = {
-  onSend: () => {},
   options: {},
   optionTintColor: '#007AFF',
   icon: null,
@@ -99,8 +101,8 @@ Actions.defaultProps = {
 };
 
 Actions.propTypes = {
-  onSend: React.PropTypes.func,
   options: React.PropTypes.object,
+  wrapperStyle: React.PropTypes.object,
   optionTintColor: React.PropTypes.string,
   icon: React.PropTypes.func,
   onPressActionButton: React.PropTypes.func,

@@ -1,13 +1,10 @@
+/* eslint-disable react/forbid-prop-types */
+
 /*
 **  This component will be published in a separate package
 */
 import React from 'react';
-import {
-  Image,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import { Image, Text, TouchableOpacity, View } from 'react-native';
 
 // TODO
 // 3 words name initials
@@ -26,7 +23,7 @@ export default class GiftedAvatar extends React.Component {
     }
 
     let sumChars = 0;
-    for(let i = 0; i < userName.length; i++) {
+    for (let i = 0; i < userName.length; i += 1) {
       sumChars += userName.charCodeAt(i);
     }
 
@@ -51,7 +48,7 @@ export default class GiftedAvatar extends React.Component {
     } else if (typeof this.props.user.avatar === 'string') {
       return (
         <Image
-          source={{uri: this.props.user.avatar}}
+          source={{ uri: this.props.user.avatar }}
           style={[defaultStyles.avatarStyle, this.props.avatarStyle]}
         />
       );
@@ -74,20 +71,20 @@ export default class GiftedAvatar extends React.Component {
         <View
           style={[
             defaultStyles.avatarStyle,
-            {backgroundColor: 'transparent'},
+            { backgroundColor: 'transparent' },
             this.props.avatarStyle,
           ]}
           accessibilityTraits="image"
         />
-      )
+      );
     }
     if (this.props.user.avatar) {
       return (
         <TouchableOpacity
-          disabled={this.props.onPress ? false : true}
+          disabled={!this.props.onPress}
           onPress={() => {
-            const {onPress, ...other} = this.props;
-            this.props.onPress && this.props.onPress(other);
+            const { onPress, ...other } = this.props;
+            if (this.props.onPress) this.props.onPress(other);
           }}
           accessibilityTraits="image"
         >
@@ -102,14 +99,14 @@ export default class GiftedAvatar extends React.Component {
 
     return (
       <TouchableOpacity
-        disabled={this.props.onPress ? false : true}
+        disabled={!this.props.onPress}
         onPress={() => {
-          const {onPress, ...other} = this.props;
-          this.props.onPress && this.props.onPress(other);
+          const { onPress, ...other } = this.props;
+          if (this.props.onPress) this.props.onPress(other);
         }}
         style={[
           defaultStyles.avatarStyle,
-          {backgroundColor: this.avatarColor},
+          { backgroundColor: this.avatarColor },
           this.props.avatarStyle,
         ]}
         accessibilityTraits="image"

@@ -35,7 +35,7 @@ const Dashboard = TabNavigator(
 
 const LoginStack = StackNavigator(
   {
-    //Chat: { screen: Chat },
+    Chat: { screen: Chat },
     Tutorial: { screen: Tutorial },
     Camera: { screen: Camera },
     Password: { screen: Password },

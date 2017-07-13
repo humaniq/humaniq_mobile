@@ -1,8 +1,5 @@
 import React from 'react';
-import {
-  StyleSheet,
-  View,
-} from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
 import Composer from './Composer';
 import Send from './Send';
@@ -22,7 +19,7 @@ export default class InputToolbar extends React.Component {
     if (this.props.renderSend) {
       return this.props.renderSend(this.props);
     }
-    return <Send {...this.props}/>;
+    return <Send {...this.props} />;
   }
 
   renderComposer() {
@@ -30,11 +27,7 @@ export default class InputToolbar extends React.Component {
       return this.props.renderComposer(this.props);
     }
 
-    return (
-      <Composer
-        {...this.props}
-      />
-    );
+    return <Composer {...this.props} />;
   }
 
   renderAccessory() {
@@ -64,9 +57,9 @@ export default class InputToolbar extends React.Component {
 
 const styles = StyleSheet.create({
   container: {
-    //borderTopWidth: StyleSheet.hairlineWidth,
-    //borderTopColor: '#b2b2b2',
-    //backgroundColor: '#FFFFFF',
+    // borderTopWidth: StyleSheet.hairlineWidth,
+    // borderTopColor: '#b2b2b2',
+    // backgroundColor: '#FFFFFF',
   },
   primary: {
     flexDirection: 'row',

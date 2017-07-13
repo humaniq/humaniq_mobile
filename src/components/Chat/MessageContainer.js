@@ -1,9 +1,12 @@
+/* eslint-disable react/forbid-prop-types */
+/* eslint-disable react/sort-comp */
+/* eslint-disable no-underscore-dangle */
+/* eslint-disable class-methods-use-this */
+/* eslint-disable react/no-string-refs */
+
 import React from 'react';
 
-import {
-  ListView,
-  View,
-} from 'react-native';
+import { ListView, View } from 'react-native';
 
 import shallowequal from 'shallowequal';
 import InvertibleScrollView from 'react-native-invertible-scroll-view';
@@ -21,14 +24,12 @@ export default class MessageContainer extends React.Component {
     this.renderScrollComponent = this.renderScrollComponent.bind(this);
 
     const dataSource = new ListView.DataSource({
-      rowHasChanged: (r1, r2) => {
-        return r1.hash !== r2.hash;
-      }
+      rowHasChanged: (r1, r2) => r1.hash !== r2.hash,
     });
 
     const messagesData = this.prepareMessages(props.messages);
     this.state = {
-      dataSource: dataSource.cloneWithRows(messagesData.blob, messagesData.keys)
+      dataSource: dataSource.cloneWithRows(messagesData.blob, messagesData.keys),
     };
   }
 
@@ -36,18 +37,19 @@ export default class MessageContainer extends React.Component {
     return {
       keys: messages.map(m => m._id),
       blob: messages.reduce((o, m, i) => {
+        const curo = o;
         const previousMessage = messages[i + 1] || {};
         const nextMessage = messages[i - 1] || {};
         // add next and previous messages to hash to ensure updates
         const toHash = JSON.stringify(m) + previousMessage._id + nextMessage._id;
-        o[m._id] = {
+        curo[m._id] = {
           ...m,
           previousMessage,
           nextMessage,
-          hash: md5(toHash)
+          hash: md5(toHash),
         };
         return o;
-      }, {})
+      }, {}),
     };
   }
 
@@ -67,7 +69,7 @@ export default class MessageContainer extends React.Component {
     }
     const messagesData = this.prepareMessages(nextProps.messages);
     this.setState({
-      dataSource: this.state.dataSource.cloneWithRows(messagesData.blob, messagesData.keys)
+      dataSource: this.state.dataSource.cloneWithRows(messagesData.blob, messagesData.keys),
     });
   }
 
@@ -89,9 +91,7 @@ export default class MessageContainer extends React.Component {
       if (this.props.renderLoadEarlier) {
         return this.props.renderLoadEarlier(loadEarlierProps);
       }
-      return (
-        <LoadEarlier {...loadEarlierProps}/>
-      );
+      return <LoadEarlier {...loadEarlierProps} />;
     }
     return null;
   }
@@ -100,7 +100,8 @@ export default class MessageContainer extends React.Component {
     this._invertibleScrollViewRef.scrollTo(options);
   }
 
-  renderRow(message, sectionId, rowId) {
+  renderRow(_message) {
+    const message = _message;
     if (!message._id && message._id !== 0) {
       console.warn('GiftedChat: `_id` is missing for message', JSON.stringify(message));
     }
@@ -121,7 +122,7 @@ export default class MessageContainer extends React.Component {
     if (this.props.renderMessage) {
       return this.props.renderMessage(messageProps);
     }
-    return <Message {...messageProps}/>;
+    return <Message {...messageProps} />;
   }
 
   renderScrollComponent(props) {
@@ -130,24 +131,21 @@ export default class MessageContainer extends React.Component {
       <InvertibleScrollView
         {...props}
         {...invertibleScrollViewProps}
-        ref={component => this._invertibleScrollViewRef = component}
+        ref={component => (this._invertibleScrollViewRef = component)}
       />
     );
   }
 
   render() {
     return (
-      <View ref='container' style={{flex:1, marginTop: 60}}>
+      <View ref={'container'} style={{ flex: 1, marginTop: 60 }}>
         <ListView
-          enableEmptySections={true}
+          enableEmptySections
           automaticallyAdjustContentInsets={false}
           initialListSize={20}
           pageSize={20}
-
           {...this.props.listViewProps}
-
           dataSource={this.state.dataSource}
-
           renderRow={this.renderRow}
           renderHeader={this.renderFooter}
           renderFooter={this.renderLoadEarlier}
@@ -164,15 +162,16 @@ MessageContainer.defaultProps = {
   renderFooter: null,
   renderMessage: null,
   listViewProps: {},
-  onLoadEarlier: () => {
-  },
+  onLoadEarlier: () => {},
 };
 
 MessageContainer.propTypes = {
+  invertibleScrollViewProps: React.PropTypes.object,
   messages: React.PropTypes.array,
   user: React.PropTypes.object,
+  renderLoadEarlier: React.PropTypes.func,
   renderFooter: React.PropTypes.func,
   renderMessage: React.PropTypes.func,
-  onLoadEarlier: React.PropTypes.func,
+  loadEarlier: React.PropTypes.bool,
   listViewProps: React.PropTypes.object,
 };

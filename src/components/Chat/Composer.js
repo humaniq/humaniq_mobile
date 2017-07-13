@@ -1,9 +1,7 @@
+/* eslint-disable react/forbid-prop-types */
+
 import React from 'react';
-import {
-  Platform,
-  StyleSheet,
-  TextInput,
-} from 'react-native';
+import { Platform, StyleSheet, TextInput } from 'react-native';
 
 export default class Composer extends React.Component {
   onChange(e) {
@@ -11,7 +9,10 @@ export default class Composer extends React.Component {
     if (!this.contentSize) {
       this.contentSize = contentSize;
       this.props.onInputSizeChanged(this.contentSize);
-    } else if (this.contentSize.width !== contentSize.width || this.contentSize.height !== contentSize.height) {
+    } else if (
+      this.contentSize.width !== contentSize.width ||
+      this.contentSize.height !== contentSize.height
+    ) {
       this.contentSize = contentSize;
       this.props.onInputSizeChanged(this.contentSize);
     }
@@ -27,15 +28,12 @@ export default class Composer extends React.Component {
         placeholder={this.props.placeholder}
         placeholderTextColor={this.props.placeholderTextColor}
         multiline={this.props.multiline}
-
-        onChange={(e) => this.onChange(e)}
+        onChange={e => this.onChange(e)}
         onChangeText={text => this.onChangeText(text)}
-
         style={[styles.textInput, this.props.textInputStyle]}
-
         value={this.props.text}
         accessibilityLabel={this.props.text || this.props.placeholder}
-        enablesReturnKeyAutomatically={true}
+        enablesReturnKeyAutomatically
         underlineColorAndroid="transparent"
         {...this.props.textInputProps}
       />
@@ -54,27 +52,22 @@ const styles = StyleSheet.create({
 });
 
 Composer.defaultProps = {
-  onChange: () => {
-  },
+  onChange: () => {},
   composerHeight: Platform.select({
     ios: 33,
     android: 41,
   }), // TODO SHARE with GiftedChat.js and tests
   text: '',
-  //placeholder: 'Type a message...',
+  // placeholder: 'Type a message...',
   placeholderTextColor: '#b2b2b2',
   textInputProps: null,
   multiline: true,
   textInputStyle: {},
-  onTextChanged: () => {
-  },
-  onInputSizeChanged: () => {
-  },
+  onTextChanged: () => {},
+  onInputSizeChanged: () => {},
 };
 
 Composer.propTypes = {
-  onChange: React.PropTypes.func,
-  composerHeight: React.PropTypes.number,
   text: React.PropTypes.string,
   placeholder: React.PropTypes.string,
   placeholderTextColor: React.PropTypes.string,

@@ -1,17 +1,22 @@
-import React from "react";
-import {Image, StyleSheet, View} from "react-native";
-import GiftedAvatar from "./GiftedAvatar";
-import {isSameUser, isSameDay, warnDeprecated} from "./utils";
+/* eslint-disable react/forbid-prop-types */
+
+import React from 'react';
+import { StyleSheet, View } from 'react-native';
+import GiftedAvatar from './GiftedAvatar';
+import { isSameUser, isSameDay, warnDeprecated } from './utils';
 
 export default class Avatar extends React.Component {
   renderAvatar() {
     if (this.props.renderAvatar) {
-      const {renderAvatar, ...avatarProps} = this.props;
+      const { renderAvatar, ...avatarProps } = this.props;
       return this.props.renderAvatar(avatarProps);
     }
     return (
       <GiftedAvatar
-        avatarStyle={StyleSheet.flatten([styles[this.props.position].image, this.props.imageStyle[this.props.position]])}
+        avatarStyle={StyleSheet.flatten([
+          styles[this.props.position].image,
+          this.props.imageStyle[this.props.position],
+        ])}
         user={this.props.currentMessage.user}
       />
     );
@@ -19,21 +24,39 @@ export default class Avatar extends React.Component {
 
   render() {
     const renderAvatarOnTop = this.props.renderAvatarOnTop;
-    const messageToCompare = renderAvatarOnTop ? this.props.previousMessage : this.props.nextMessage;
-    const computedStyle = renderAvatarOnTop ? "onTop" : "onBottom"
+    const messageToCompare = renderAvatarOnTop
+      ? this.props.previousMessage
+      : this.props.nextMessage;
+    const computedStyle = renderAvatarOnTop ? 'onTop' : 'onBottom';
 
-    if (isSameUser(this.props.currentMessage, messageToCompare) && isSameDay(this.props.currentMessage, messageToCompare)) {
+    if (
+      isSameUser(this.props.currentMessage, messageToCompare) &&
+      isSameDay(this.props.currentMessage, messageToCompare)
+    ) {
       return (
-        <View style={[styles[this.props.position].container, this.props.containerStyle[this.props.position]]}>
+        <View
+          style={[
+            styles[this.props.position].container,
+            this.props.containerStyle[this.props.position],
+          ]}
+        >
           <GiftedAvatar
-            avatarStyle={StyleSheet.flatten([styles[this.props.position].image, this.props.imageStyle[this.props.position]])}
+            avatarStyle={StyleSheet.flatten([
+              styles[this.props.position].image,
+              this.props.imageStyle[this.props.position],
+            ])}
           />
         </View>
       );
     }
     return (
       <View
-        style={[styles[this.props.position].container, styles[this.props.position][computedStyle], this.props.containerStyle[this.props.position]]}>
+        style={[
+          styles[this.props.position].container,
+          styles[this.props.position][computedStyle],
+          this.props.containerStyle[this.props.position],
+        ]}
+      >
         {this.renderAvatar()}
       </View>
     );
@@ -43,10 +66,10 @@ export default class Avatar extends React.Component {
 const styles = {
   left: StyleSheet.create({
     container: {
-      marginRight: 8
+      marginRight: 8,
     },
     onTop: {
-      alignSelf: "flex-start"
+      alignSelf: 'flex-start',
     },
     onBottom: {},
     image: {
@@ -60,7 +83,7 @@ const styles = {
       marginLeft: 8,
     },
     onTop: {
-      alignSelf: "flex-start"
+      alignSelf: 'flex-start',
     },
     onBottom: {},
     image: {
@@ -80,15 +103,17 @@ Avatar.defaultProps = {
   nextMessage: {},
   containerStyle: {},
   imageStyle: {},
-  //TODO: remove in next major release
+  // TODO: remove in next major release
   isSameDay: warnDeprecated(isSameDay),
-  isSameUser: warnDeprecated(isSameUser)
+  isSameUser: warnDeprecated(isSameUser),
 };
 
 Avatar.propTypes = {
   renderAvatarOnTop: React.PropTypes.bool,
   position: React.PropTypes.oneOf(['left', 'right']),
+  renderAvatar: React.PropTypes.object,
   currentMessage: React.PropTypes.object,
+  previousMessage: React.PropTypes.object,
   nextMessage: React.PropTypes.object,
   containerStyle: React.PropTypes.shape({
     left: View.propTypes.style,
@@ -98,7 +123,7 @@ Avatar.propTypes = {
     left: View.propTypes.style,
     right: View.propTypes.style,
   }),
-  //TODO: remove in next major release
+  // TODO: remove in next major release
   isSameDay: React.PropTypes.func,
-  isSameUser: React.PropTypes.func
+  isSameUser: React.PropTypes.func,
 };

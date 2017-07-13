@@ -1,11 +1,9 @@
+/* eslint-disable import/no-unresolved */
+/* eslint-disable no-underscore-dangle */
+/* eslint-disable class-methods-use-this */
+
 import React from 'react';
-import {
-  StyleSheet,
-  Text,
-  View,
-  TouchableOpacity,
-  Image,
-} from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, Image } from 'react-native';
 import { connect } from 'react-redux';
 import { GiftedChat } from './GiftedChat';
 import Backend from './Backend';
@@ -34,16 +32,13 @@ class Chat extends React.Component {
     super(props);
     this.state = {
       messages: [],
-      loadEarlier: true,
       typingText: null,
-      isLoadingEarlier: false,
       time: 0,
     };
 
     this._isMounted = false;
     this.onSend = this.onSend.bind(this);
     this.renderFooter = this.renderFooter.bind(this);
-    this.onLoadEarlier = this.onLoadEarlier.bind(this);
 
     this._isAlright = null;
 
@@ -54,11 +49,9 @@ class Chat extends React.Component {
   componentWillMount() {
     this._isMounted = true;
     Backend.loadMessages((message) => {
-      this.setState((previousState) => {
-        return {
-          messages: GiftedChat.append(previousState.messages, message),
-        };
-      });
+      this.setState(previousState => ({
+        messages: GiftedChat.append(previousState.messages, message),
+      }));
     });
   }
 
@@ -66,57 +59,44 @@ class Chat extends React.Component {
     this._isMounted = false;
   }
 
-  onLoadEarlier() {
-    this.setState((previousState) => {
-      return {
-        isLoadingEarlier: true,
-      };
-    });
-
-    setTimeout(() => {
-      if (this._isMounted === true) {
-        this.setState(previousState => ({
-          messages: GiftedChat.prepend(previousState.messages, require('./data/old_messages.js')),
-          loadEarlier: false,
-          isLoadingEarlier: false,
-        }));
-      }
-    }, 1000); // simulating network
-  }
-
   onSend(message) {
     Backend.sendMessage(message.map(m => ({ ...m, user: user1 })));
   }
 
   renderCustomView(props) {
-    return (
-      <CustomView
-        {...props}
-      />
-    );
+    return <CustomView {...props} />;
   }
 
-  renderFooter(props) {
+  renderFooter() {
     const handleAttach = () => {
       this.photoSelectRef.setModalVisible(true);
     };
     const handleSound = () => {
       this.soundSelectRef.setModalVisible(true);
     };
-    const CustomBtn = props => (
-      <TouchableOpacity onPress={props.onPress} style={styles.btn}>
+    const CustomBtn = props =>
+      (<TouchableOpacity onPress={props.onPress} style={styles.btn}>
         <Image source={props.src} style={styles.imgBtn} />
-      </TouchableOpacity>
-    );
+      </TouchableOpacity>);
 
     return (
       <View style={styles.panelContainer}>
         <CustomBtn onPress={handleAttach} src={attach} />
-        <PhotoSelect onSend={this.onSend} ref={(r) => { this.photoSelectRef = r; }} />
+        <PhotoSelect
+          onSend={this.onSend}
+          ref={(r) => {
+            this.photoSelectRef = r;
+          }}
+        />
         <CustomBtn onPress={this.handleEmoji} src={emoji} />
         <CustomBtn onPress={this.handleTransaction} src={newTransaction} />
         <CustomBtn onPress={handleSound} src={voiceMessage} />
-        <SoundSelect onSend={this.onSend} ref={(r) => { this.soundSelectRef = r; }} />
+        <SoundSelect
+          onSend={this.onSend}
+          ref={(r) => {
+            this.soundSelectRef = r;
+          }}
+        />
       </View>
     );
 
@@ -141,15 +121,14 @@ class Chat extends React.Component {
       <View style={{ backgroundColor: '#ffffff', flex: 1 }}>
         <View style={styles.navbar}>
           <View style={{ width: 60, flex: 0.5, alignItems: 'flex-start' }}>
-            <TouchableOpacity
-              onPress={() => alert('back')}
-              style={{ padding: 10 }}
-            >
+            <TouchableOpacity style={{ padding: 10 }}>
               <Image source={combinedShape} />
             </TouchableOpacity>
           </View>
           <View style={{ flex: 1, alignItems: 'center' }}>
-            <Text style={{ fontSize: 20 }}>{'+375295738689'}</Text>
+            <Text style={{ fontSize: 20 }}>
+              {'+375295738689'}
+            </Text>
           </View>
           <View style={{ width: 60, flex: 0.5, alignItems: 'flex-end' }}>
             <Image style={{ margin: 10 }} source={icUser} />
@@ -159,10 +138,6 @@ class Chat extends React.Component {
           <GiftedChat
             messages={this.state.messages}
             onSend={this.onSend}
-            // loadEarlier={this.state.loadEarlier}
-            // onLoadEarlier={this.onLoadEarlier}
-            // isLoadingEarlier={this.state.isLoadingEarlier}
-
             user={user1}
             renderBubble={this.renderBubble}
             renderCustomView={this.renderCustomView}
