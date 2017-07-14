@@ -3,7 +3,6 @@ import {
   View,
   Image,
   Text,
-  Alert,
 } from 'react-native';
 
 import PropTypes from 'prop-types';
@@ -14,7 +13,6 @@ import CustomStyleSheet from '../../utils/customStylesheet';
 import Confirm from '../Shared/Buttons/Confirm';
 import Keyboard from '../Shared/Components/Keyboard';
 import { phoneNumberCreate, savePhone } from '../../actions';
-
 
 const ic_user = require('../../assets/icons/ic_user.png');
 
@@ -30,9 +28,11 @@ export class TelInput extends Component {
         isFetching: PropTypes.bool,
       }).isRequired,
       photo: PropTypes.string.isRequired,
+      phoneNumber: PropTypes.string,
     }).isRequired,
 
     phoneNumberCreate: PropTypes.func.isRequired,
+    savePhone: PropTypes.func.isRequired,
     navigation: PropTypes.shape({
       navigate: PropTypes.func.isRequired,
       dispatch: PropTypes.func.isRequired,
@@ -54,7 +54,7 @@ export class TelInput extends Component {
       if (!phone) {
         switch (code) {
           case 6000:
-            alert(nextProps.user.validate.payload.message);
+            alert(nextProps.user.phoneCreate.payload.message);
             break;
 
           case 4005:
@@ -73,7 +73,7 @@ export class TelInput extends Component {
             break;
 
           default:
-            alert(`Unknown code ${nextProps.user.validate.payload.code}, no info in Postman`);
+            alert(`Unknown code ${nextProps.user.phoneCreate.payload.code}, no info in Postman`);
         }
       }
     }

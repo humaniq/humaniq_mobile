@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 import {
   View,
-  TouchableOpacity,
   Image,
   Text,
 } from 'react-native';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import SmsListener from 'react-native-android-sms-listener';
 import EStyleSheet from 'react-native-extended-stylesheet';
@@ -22,9 +22,26 @@ const ic_user = require('../../assets/icons/ic_user.png');
 // });
 
 class CodeInput extends Component {
-  static navigationOptions = {
-    // header: null,
+  static propTypes = {
+    user: PropTypes.shape({
+      account: PropTypes.shape({
+        payload: PropTypes.object,
+        isFetching: PropTypes.bool,
+      }).isRequired,
+      phoneValidate: PropTypes.shape({
+        payload: PropTypes.object,
+        isFetching: PropTypes.bool,
+      }).isRequired,
+      phoneNumber: PropTypes.string,
+    }).isRequired,
+
+    phoneNumberValidate: PropTypes.func.isRequired,
+    navigation: PropTypes.shape({
+      navigate: PropTypes.func.isRequired,
+      dispatch: PropTypes.func.isRequired,
+    }),
   };
+
   state = {
     code: 55555,
     maxPasswordLength: 5,
@@ -32,13 +49,13 @@ class CodeInput extends Component {
   };
 
   componentDidMount() {
-    this.listener = SmsListener.addListener(message => {
-      let body = message.body;
-      let hmqRegEx = /humaniq/gi;
+    this.listener = SmsListener.addListener((message) => {
+      const body = message.body;
+      const hmqRegEx = /humaniq/gi;
 
       if (body.match(hmqRegEx)) {
         // request server;
-        let smsCode = body.replace(/\D/g, '');
+        const smsCode = body.replace(/\D/g, '');
 
         this.props.phoneNumberValidate({
           account_id: this.props.user.account.payload.payload.account_information.account_id,
@@ -82,7 +99,7 @@ class CodeInput extends Component {
             break;
 
           default:
-            alert(`Unknown code ${nextProps.user.validate.payload.code}, no info in Postman`);
+            alert(`Unknown code ${nextProps.user.phoneValidate.payload.code}, no info in Postman`);
         }
       }
     }
@@ -94,13 +111,13 @@ class CodeInput extends Component {
 
   handleNumberPress = (number) => {
     if (this.state.password.length < this.state.maxPasswordLength) {
-      this.setState({password: this.state.password += number});
+      this.setState({ password: this.state.password += number });
     }
   };
 
   handleBackspacePress = () => {
     const password = this.state.password.slice(0, -1);
-    this.setState({password});
+    this.setState({ password });
   };
 
   handleHelpPress = () => {
@@ -113,29 +130,32 @@ class CodeInput extends Component {
   };
 
   renderBullets = () => {
-    const {password, maxPasswordLength} = this.state;
+    const { password, maxPasswordLength } = this.state;
     const passLen = password.length;
     const bullets = [];
 
+    /*
     let error;
     if (passLen == maxPasswordLength) {
       error = password === this.state.code;
     }
+    */
 
-    for (let i = 0; i < maxPasswordLength; ++i) {
+    for (let i = 0; i < maxPasswordLength; i += 1) {
       bullets.push(
         <View key={i}>
           {password[i] ?
             <View style={[
               styles.passFilled,
-              passLen === maxPasswordLength && styles.passMaxLen
-            ]}>
+              passLen === maxPasswordLength && styles.passMaxLen,
+            ]}
+            >
               <Text style={styles.number}>{password[i]}</Text>
             </View> :
             <View style={styles.passEmpty} />
           }
-        </View>
-      )
+        </View>,
+      );
     }
     return bullets;
   };

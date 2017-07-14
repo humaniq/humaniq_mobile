@@ -11,11 +11,12 @@ import Camera from './components/Camera';
 import {
   Password,
   TelInput,
-  CodeInput
+  CodeInput,
+  Accounts,
 } from './components/Login';
 import Dashboard from './components/Dashboard';
 import Tutorial from './components/Shared/Components/Tutorial';
-import Instructions from './components/Instructions/Instructions'
+import Instructions from './components/Instructions/Instructions';
 import Chat from './components/Chat';
 
 /*
@@ -33,17 +34,30 @@ const Dashboard = TabNavigator(
 );
 */
 
+
+const stack = {
+  //Chat: { screen: Chat },
+  FirstScreen: { screen: Tutorial },
+  Tutorial: { screen: Tutorial },
+  Camera: { screen: Camera },
+  Password: { screen: Password },
+  TelInput: { screen: TelInput },
+  CodeInput: { screen: CodeInput },
+  Dashboard: { screen: Dashboard },
+  Instructions: { screen: Instructions },
+};
+
+
+store.subscribe(() => {
+  const state = store.getState();
+  if (state.accounts.primaryAccount.accountId) {
+    stack.FirstScreen = { screen: Accounts };
+  }
+});
+
+
 const LoginStack = StackNavigator(
-  {
-    //Chat: { screen: Chat },
-    Tutorial: { screen: Tutorial },
-    Camera: { screen: Camera },
-    Password: { screen: Password },
-    TelInput: { screen: TelInput },
-    CodeInput: { screen: CodeInput },
-    Dashboard: { screen: Dashboard },
-    Instructions: { screen: Instructions },
-  },
+  stack,
   {
     headerMode: 'none',
   },

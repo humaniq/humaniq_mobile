@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   Image,
   Text,
+  TouchableHighlight,
 } from 'react-native';
 import { NavigationActions } from 'react-navigation';
 import CustomStyleSheet from '../../../utils/customStylesheet';
@@ -44,6 +45,10 @@ export default class Tutorial extends Component {
     this.props.navigation.navigate(this.state.nextScene, { ...navState.params });
   };
 
+  handleNavigateInstruction = () => {
+    this.props.navigation.navigate('Instructions');
+  };
+
   render() {
     return (
       <View style={styles.container}>
@@ -58,10 +63,13 @@ export default class Tutorial extends Component {
           <Image source={illustration} />
           <Image style={styles.iconPlay} source={play} />
         </TouchableOpacity>
-        <Confirm
-          active={this.state.watched}
-          onPress={this.handleNavigate}
-        />
+        <TouchableHighlight style={styles.btn} onPress={this.handleNavigate}>
+          <Text>show next screen</Text>
+        </TouchableHighlight>
+
+        <TouchableHighlight style={styles.btn} onPress={this.handleNavigateInstruction}>
+          <Text>show video tutorial</Text>
+        </TouchableHighlight>
       </View>
     );
   }
@@ -81,4 +89,9 @@ const styles = CustomStyleSheet({
   iconPlay: {
     marginTop: -15,
   },
+  btn: {
+    height: 50,
+    marginVertical: 10,
+    backgroundColor: 'lightgray'
+  }
 });
