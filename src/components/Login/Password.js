@@ -172,9 +172,9 @@ export class Password extends Component {
     // TODO: set real ID;
     const isEmulator = DeviceInfo.isEmulator();
     const randomImei = Math.floor((10000000 + Math.random()) * 90000000);
-    // const imei = isEmulator ? randomImei : IMEI.getImei();
+    const imei = isEmulator ? randomImei : IMEI.getImei();
     // const imei = randomImei.toString();
-    const imei = '1111111111923';
+    // const imei = '1111111111925';
 
     this.props.signup({
       facial_image_id: this.props.user.validate.payload.payload.facial_image_id,
