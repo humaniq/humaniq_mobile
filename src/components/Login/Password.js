@@ -114,9 +114,10 @@ export class Password extends Component {
 
   handleNumberPress = (number) => {
     const params = this.props.navigation.state.params;
-
-    if (this.state.password.length < this.state.maxPasswordLength) {
+    if (this.state.password.length + 1 < this.state.maxPasswordLength) {
       this.setState({ password: this.state.password += number });
+    } else {
+      this.handlePasswordConfirm();
     }
 
     if (params) {
@@ -201,7 +202,7 @@ export class Password extends Component {
               match === true && styles.success,
               match === false && styles.error,
             ]}
-            />
+              />
             : <View style={styles.passEmpty} />
           }
         </View>,
@@ -231,18 +232,18 @@ export class Password extends Component {
       <View style={styles.container}>
         <View style={styles.header}>
           <Image style={styles.userPhoto} source={{ uri: this.props.user.photo }} />
-          {this.renderInputStep()}
-          <Text>{this.state.password}</Text>
+          {this.renderInputStep() }
           <View style={styles.passContainer}>
-            {this.renderPassMask()}
+            {this.renderPassMask() }
           </View>
         </View>
 
         <Keyboard
+          isBackspaceEnabled={this.state.password != ""}
           onNumberPress={this.handleNumberPress}
           onBackspacePress={this.handleBackspacePress}
           onHelpPress={this.handleHelpPress}
-        />
+          />
       </View>
     );
   }
@@ -267,18 +268,20 @@ const styles = CustomStyleSheet({
   },
   header: {
     width: 130,
-    height: 250,
+    height: 240,
     alignSelf: 'center',
     justifyContent: 'space-between',
-    paddingVertical: 80,
+    paddingBottom: 80,
+    paddingTop: 30,
   },
   stage: {
-    fontSize: 20,
-    color: 'red',
+    fontSize: 12,
+    color: '$cPaper',
+    alignSelf: 'center'
   },
   userPhoto: {
     alignSelf: 'center',
-    round: 50,
+    round: 70,
     borderRadius: 50,
   },
   passContainer: {
@@ -287,13 +290,13 @@ const styles = CustomStyleSheet({
     marginHorizontal: 18,
   },
   passEmpty: {
-    round: 13,
+    round: 12,
     borderRadius: 50,
     borderWidth: 2,
     borderColor: '$cGrayLight',
   },
   passFilled: {
-    round: 13,
+    round: 12,
     borderRadius: 50,
     borderWidth: 6,
     borderColor: '$cPaper',
