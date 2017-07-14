@@ -1,7 +1,7 @@
 import { combineReducers } from 'redux';
 import * as ActionTypes from '../actions';
 
-function primaryAccount(state = {}, action) {
+function primaryAccount(state, action) {
   switch (action.type) {
     case ActionTypes.ADD_PRIMARY_ACCOUNT:
       return {
@@ -13,7 +13,16 @@ function primaryAccount(state = {}, action) {
   }
 }
 
-function secondaryAccounts(state = [], action) {
+function saved(state, action) {
+  switch (action.type) {
+    case ActionTypes.ADD_PRIMARY_ACCOUNT:
+      return true;
+    default:
+      return state;
+  }
+}
+
+function secondaryAccounts(state, action) {
   switch (action.type) {
     case ActionTypes.ADD_SECONDARY_ACCOUNT:
       return [
@@ -25,7 +34,26 @@ function secondaryAccounts(state = [], action) {
   }
 }
 
-export const accounts = combineReducers({
-  primaryAccount,
-  secondaryAccounts,
-});
+const defaultState = {
+  primaryAccount: {},
+  secondaryAccounts: [],
+  saved: null,
+};
+
+export function accounts(state = defaultState, action) {
+  switch (action.type) {
+    case ActionTypes.ADD_PRIMARY_ACCOUNT:
+      return {
+        ...state,
+        primaryAccount: primaryAccount(state.primaryAccount, action),
+        saved: saved(state.saved, action),
+      };
+    case ActionTypes.ADD_SECONDARY_ACCOUNT:
+      return {
+        ...state,
+        secondaryAccounts: secondaryAccounts(state.secondaryAccounts, action),
+      };
+    default:
+      return state;
+  }
+}
