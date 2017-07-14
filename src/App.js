@@ -16,6 +16,7 @@ import {
 import Dashboard from './components/Dashboard';
 import Tutorial from './components/Shared/Components/Tutorial';
 import Instructions from './components/Instructions/Instructions'
+import Chat from './components/Chat';
 
 /*
 const Dashboard = TabNavigator(
@@ -34,6 +35,7 @@ const Dashboard = TabNavigator(
 
 const LoginStack = StackNavigator(
   {
+    //Chat: { screen: Chat },
     Tutorial: { screen: Tutorial },
     Camera: { screen: Camera },
     Password: { screen: Password },
