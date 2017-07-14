@@ -3,9 +3,10 @@ import * as _ from 'underscore';
 import { vh, vw } from './units';
 
 EStyleSheet.build({
-  $colorPrimary: 'tomato',
+  $cBrand: '#3aa3e3',
   $cGray: '#9B9B9B',
   $cGrayLight: '#D8D8D8',
+  $cPaper: '#fff',
 });
 
 const adjustableProperties = {
