@@ -268,7 +268,7 @@ export default connect(mapStateToProps, {
 const styles = CustomStyleSheet({
   container: {
     flex: 1,
-    backgroundColor: 'white',
+    backgroundColor: '$cBrand',
   },
   header: {
     flex: 1,
