@@ -1,19 +1,13 @@
-/* eslint-disable */
 import React, { Component, PropTypes } from 'react';
 import {
   View,
-  StyleSheet,
-  TouchableOpacity,
-  Image,
-  Text,
-  TouchableHighlight,
 } from 'react-native';
-import { NavigationActions } from 'react-navigation';
 import CustomStyleSheet from '../../../utils/customStylesheet';
-import Confirm from '../Buttons/Confirm';
+import ConfirmButton from '../Buttons/ConfirmButton';
+import HelpButton from '../Buttons/HelpButton';
 // assets
-const illustration = require('../../../assets/icons/illustration.png');
-const play = require('../../../assets/icons/ic_play.png');
+// const illustration = require('../../../assets/icons/illustration.png');
+// const play = require('../../../assets/icons/ic_play.png');
 
 export default class Tutorial extends Component {
   static propTypes = {
@@ -36,40 +30,22 @@ export default class Tutorial extends Component {
     }
   }
 
-  handleTutorialPlay = () => {
-    this.setState({ watched: true });
-  };
-
-  handleNavigate = () => {
+  handleConfirmPress = () => {
     const navState = this.props.navigation.state;
     this.props.navigation.navigate(this.state.nextScene, { ...navState.params });
   };
 
-  handleNavigateInstruction = () => {
+  handleHelpPress = () => {
     this.props.navigation.navigate('Instructions');
   };
 
   render() {
     return (
       <View style={styles.container}>
-        <Text style={{ alignSelf: 'center', fontSize: 30 }}>
-          {`tutorial for ${this.state.nextScene}`}
-        </Text>
-
-        <TouchableOpacity
-          style={styles.player}
-          onPress={this.handleTutorialPlay}
-        >
-          <Image source={illustration} />
-          <Image style={styles.iconPlay} source={play} />
-        </TouchableOpacity>
-        <TouchableHighlight style={styles.btn} onPress={this.handleNavigate}>
-          <Text>show next screen</Text>
-        </TouchableHighlight>
-
-        <TouchableHighlight style={styles.btn} onPress={this.handleNavigateInstruction}>
-          <Text>show video tutorial</Text>
-        </TouchableHighlight>
+        <View style={styles.buttonsContainer}>
+          <HelpButton onPress={this.handleHelpPress} />
+          <ConfirmButton onPress={this.handleConfirmPress} />
+        </View>
       </View>
     );
   }
@@ -79,19 +55,11 @@ const styles = CustomStyleSheet({
   container: {
     flex: 1,
     justifyContent: 'flex-end',
-    backgroundColor: 'white',
+    backgroundColor: '$cBrand',
   },
-  player: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 47,
+  buttonsContainer: {
+    flexDirection: 'row',
+    padding: 16,
+    justifyContent: 'space-between',
   },
-  iconPlay: {
-    marginTop: -15,
-  },
-  btn: {
-    height: 50,
-    marginVertical: 10,
-    backgroundColor: 'lightgray'
-  }
 });

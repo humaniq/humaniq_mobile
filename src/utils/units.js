@@ -2,8 +2,8 @@ import { Dimensions } from 'react-native';
 
 const SCREEN_HEIGHT = Dimensions.get('window').height;
 const SCREEN_WIDTH = Dimensions.get('window').width;
-const DESIGN_WIDTH = 320;
-const DESIGN_HEIGHT = 568;
+const DESIGN_WIDTH = 360;
+const DESIGN_HEIGHT = 640;
 
 export function fontScale(sWidth, dWidth) {
   return sWidth / dWidth;
