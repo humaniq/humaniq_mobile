@@ -1,6 +1,3 @@
-/* eslint-disable */
-// will be modified entirely
-
 import React, { Component } from 'react';
 import {
   ScrollView,
@@ -14,11 +11,19 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import CustomStyleSheet from '../../utils/customStylesheet';
 
+const ic_chevrone_right = require('../../assets/icons/ic_chevrone_right.png');
+const ic_add_user = require('../../assets/icons/ic_add_user.png');
+
 export class Accounts extends Component {
   static propTypes = {
     accounts: PropTypes.shape({
       primaryAccount: PropTypes.object.isRequired,
       secondaryAccounts: PropTypes.array,
+    }).isRequired,
+    navigation: PropTypes.shape({
+      navigate: PropTypes.func.isRequired,
+      dispatch: PropTypes.func.isRequired,
+      state: PropTypes.object,
     }).isRequired,
   };
 
@@ -26,40 +31,31 @@ export class Accounts extends Component {
     this.props.navigation.navigate('Camera');
   };
 
-  renderPrimaryAccount = () => (
-    <TouchableOpacity style={styles.accountButton} onPress={this.validateUser}>
-      <Image style={styles.userPhoto} source={{ uri: this.props.accounts.primaryAccount.photo }} />
-      <Text>Account id: {this.props.accounts.primaryAccount.accountId}</Text>
-    </TouchableOpacity>
-  );
-
-  renderSecondaryAccounts = () => {
-    const arr = this.props.accounts.secondaryAccounts;
-    const res = [];
-    if (arr.length) {
-      arr.forEach((acc) => {
-        res.push(
-          <TouchableOpacity style={styles.accountButton} onPress={this.validateUser} key={acc.accountId}>
-            <Image style={styles.userPhoto} source={{ uri: acc.photo }} />
-            <Text>Account id: {acc.accountId}</Text>
-          </TouchableOpacity>,
-        );
-      });
-    }
-    return res;
-  };
-
   render() {
+    const accounts = this.props.accounts;
+    const allAccounts = [accounts.primaryAccount, ...accounts.secondaryAccounts];
+
     return (
       <ScrollView contentContainerStyle={styles.container}>
-        <View style={{ flex: 1 }}>
-          <Text style={styles.h1}>Primary Account</Text>
-          {this.renderPrimaryAccount()}
-          {this.props.accounts.secondaryAccounts.length ? <Text style={styles.h1}>Secondary Accounts</Text> : null}
-          {this.renderSecondaryAccounts()}
+        <View style={styles.header} />
+
+        <View style={styles.accountsContainer}>
+          {allAccounts.map(acc => (
+            <TouchableOpacity
+              style={styles.accountBtn}
+              onPress={this.validateUser}
+              key={acc.accountId}
+            >
+              <View style={styles.accountInfoContainer}>
+                <Image style={styles.profilePhoto} source={{ uri: acc.photo }} />
+                <Text style={styles.id}>{acc.accountId}</Text>
+              </View>
+              <Image source={ic_chevrone_right} />
+            </TouchableOpacity>
+          ))}
         </View>
         <TouchableOpacity style={styles.newUserBtn} onPress={this.validateUser}>
-          <Text style={styles.newUserTxt}>Create New User</Text>
+          <Image source={ic_add_user} />
         </TouchableOpacity>
       </ScrollView>
     );
@@ -75,35 +71,42 @@ export default connect(mapStateToProps)(Accounts);
 const styles = CustomStyleSheet({
   container: {
     flex: 1,
-    backgroundColor: 'white',
+    backgroundColor: '$cBrand_dark',
   },
-  h1: {
-    fontSize: 20,
-    paddingVertical: 20,
+  header: {
+    height: 147,
+    marginBottom: 24,
+    backgroundColor: '$cBrand_dark',
+    borderBottomWidth: 1,
+    borderColor: 'lightgray',
   },
-  accountButton: {
-    // flex: 1,
-    height: 80,
-    backgroundColor: 'lightgray',
-    // justifyContent: 'center',
-    alignItems: 'center',
+  accountBtn: {
     flexDirection: 'row',
+    height: 63,
+    paddingHorizontal: 21,
+    paddingVertical: 11,
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
-  userPhoto: {
-    width: 40,
-    height: 40,
+  accountInfoContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  profilePhoto: {
+    round: 41,
+    marginRight: 11,
     borderRadius: 20,
-    marginRight: 15,
+  },
+  id: {
+    fontSize: 15,
+    color: '$cPaper',
+    fontWeight: '700',
   },
   newUserBtn: {
-    height: 100,
-    // flex: 1,
-    backgroundColor: 'green',
+    alignSelf: 'flex-start',
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  newUserTxt: {
-    fontSize: 25,
-    color: 'white',
+    paddingHorizontal: 21,
+    paddingVertical: 11,
   },
 });
