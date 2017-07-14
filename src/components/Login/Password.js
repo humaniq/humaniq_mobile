@@ -237,12 +237,7 @@ export class Password extends Component {
             {this.renderPassMask()}
           </View>
         </View>
-        {!this.props.user.account.isFetching ?
-          <Confirm
-            active={this.passwordConfirmAvailability()}
-            onPress={this.handlePasswordConfirm}
-          /> : <Text>uploading</Text>
-        }
+
         <Keyboard
           onNumberPress={this.handleNumberPress}
           onBackspacePress={this.handleBackspacePress}
@@ -271,9 +266,11 @@ const styles = CustomStyleSheet({
     backgroundColor: '$cBrand',
   },
   header: {
-    flex: 1,
+    width: 130,
+    height: 250,
+    alignSelf: 'center',
     justifyContent: 'space-between',
-    paddingVertical: 20,
+    paddingVertical: 80,
   },
   stage: {
     fontSize: 20,
@@ -290,16 +287,16 @@ const styles = CustomStyleSheet({
     marginHorizontal: 18,
   },
   passEmpty: {
-    round: 30,
+    round: 13,
     borderRadius: 50,
-    borderWidth: 25,
-    borderColor: '$cGray',
+    borderWidth: 2,
+    borderColor: '$cGrayLight',
   },
   passFilled: {
-    round: 30,
+    round: 13,
     borderRadius: 50,
-    borderWidth: 20,
-    borderColor: '$cGray',
+    borderWidth: 6,
+    borderColor: '$cPaper',
   },
   error: {
     borderColor: 'tomato',
