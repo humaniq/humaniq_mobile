@@ -3,6 +3,7 @@ import {
     Text,
     View,
     TouchableOpacity,
+    TouchableHighlight,
     Image,
 } from 'react-native';
 import PropTypes from 'prop-types';
@@ -30,7 +31,9 @@ export default class VirtualKeyboard extends Component {
   renderCell = (number) => {
     const middleCellValues = [2, 5, 8, 0];
     return (
-      <TouchableOpacity
+      <TouchableHighlight
+        activeOpacity={0.5}
+        underlayColor={'#FFFFFF30'}
         style={[
           styles.cell,
           middleCellValues.includes(number) && styles.middleCell,
@@ -41,8 +44,8 @@ export default class VirtualKeyboard extends Component {
           this.props.onNumberPress(number.toString());
         }}
       >
-        <Text style={[styles.number, { color: this.props.color }]}>{number}</Text>
-      </TouchableOpacity>
+        <Text style={[styles.number]}>{number}</Text>
+      </TouchableHighlight >
     );
   };
 
@@ -70,6 +73,7 @@ export default class VirtualKeyboard extends Component {
         {this.renderRow([1, 2, 3])}
         {this.renderRow([4, 5, 6])}
         {this.renderRow([7, 8, 9])}
+        {this.renderRow([7, 8, 9])}
         <View style={styles.row}>
           {this.renderHelp()}
           {this.renderCell(0)}
@@ -81,15 +85,19 @@ export default class VirtualKeyboard extends Component {
 } // return
 
 const styles = CustomStyleSheet({
+  container: {
+    height: 224,
+    width: 216,
+    backgroundColor: 'transparent'
+  },
   row: {
     flexDirection: 'row',
-    borderBottomWidth: 1,
-    borderBottomColor: '#CACCCC',
-    backgroundColor: '#D8D8D8',
+    justifyContent: 'space-between'
   },
   number: {
     fontSize: 25,
     textAlign: 'center',
+    color: '$cPaper'
   },
   backspace: {
     flex: 1,
@@ -102,15 +110,11 @@ const styles = CustomStyleSheet({
     alignItems: 'center',
   },
   cell: {
-    height: 30,
-    width: 60,
-    flex: 1,
+    height: 40,
+    width: 40,
+    borderRadius: 18,
     justifyContent: 'center',
   },
   middleCell: {
-    borderRightWidth: 1,
-    borderLeftWidth: 1,
-    borderLeftColor: '#CACCCC',
-    borderRightColor: '#CACCCC',
   },
 });
