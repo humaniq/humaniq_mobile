@@ -86,6 +86,7 @@ export default class VirtualKeyboard extends Component {
 
 const styles = CustomStyleSheet({
   container: {
+    alignSelf: 'center',
     height: 224,
     width: 216,
     backgroundColor: 'transparent'
