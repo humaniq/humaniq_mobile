@@ -13,29 +13,23 @@ const ic_close = require('../../../assets/icons/ic_close_black.png');
 
 export default class Modal extends Component {
   static propTypes = {
-  };
-  static navigationOptions = {
-  };
-
-  state = {};
-
-  componentWillMount() {
-  }
-
-  handleConfirmPress = () => {
+    onPress: PropTypes.func.isRequired,
+    code: PropTypes.number.isRequired,
   };
 
   render() {
     return (
       <View style={styles.container}>
-        <TouchableOpacity style={styles.closeBtn}>
+        <TouchableOpacity style={styles.closeBtn} onPress={this.props.onPress}>
           <Image source={ic_close} />
         </TouchableOpacity>
         <View style={styles.modal}>
           <View style={styles.content}>
-            <View style={{ width: 100, height: 100, backgroundColor: 'red', borderRadius: 50 }} />
+            <View style={{ width: 100, height: 100, backgroundColor: 'red', borderRadius: 50 }}>
+              <Text>{this.props.code}</Text>
+            </View>
           </View>
-          <TouchableOpacity style={styles.button}>
+          <TouchableOpacity style={styles.button} onPress={this.props.onPress}>
             <Image source={ic_confirm} />
           </TouchableOpacity>
         </View>
