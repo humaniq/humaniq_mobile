@@ -2,12 +2,15 @@ import React, { Component } from 'react';
 import {
   View,
   TouchableOpacity,
+  TouchableWithoutFeedback,
   Image,
   Text,
   Alert,
 } from 'react-native';
 import PropTypes from 'prop-types';
 import Camera from 'react-native-camera';
+import { Animated } from 'react-native';
+import Animation from 'lottie-react-native';
 import { NavigationActions } from 'react-navigation';
 import RNFetchBlob from 'react-native-fetch-blob';
 import { connect } from 'react-redux';
@@ -20,9 +23,14 @@ import CustomStyleSheet from '../../utils/customStylesheet';
 // assets
 
 // eslint-disable-next-line import/no-unresolved
-const close = require('../../assets/icons/ic_close.png');
+const close = require('../../assets/icons/close_dark.png');
 // eslint-disable-next-line import/no-unresolved
-const confirm = require('../../assets/icons/ic_confirm_dark.png');
+const pressAnimation = require('../../assets/animations/press.json');
+const scaleAnimation = require('../../assets/animations/scale.json');
+const loadAnimation = require('../../assets/animations/progress.json');
+const doneAnimation = require('../../assets/animations/done.json');
+const whiteMask = require('../../assets/icons/white_mask.png');
+
 
 /*
   on second run check permissions http://facebook.github.io/react-native/docs/permissionsandroid.html
@@ -54,7 +62,8 @@ export class Cam extends Component {
     this.state = {
       path: '',
       base64: '',
-      count: 1,
+      progress: new Animated.Value(0),
+      animation: pressAnimation,
     };
   }
 
@@ -70,31 +79,39 @@ export class Cam extends Component {
       const photo = nextProps.user.photo;
 
       if (!photo) {
+        this.state.progress.stopAnimation();
+        this.state.progress.setValue(0);
         switch (code) {
           case 6000:
+            this.setState({ path: '', animation: pressAnimation });
             alert(nextProps.user.validate.payload.message);
             break;
 
           case 3002:
             // registered user
+            this.setState({ animation: doneAnimation })
+            this.animate(1000, 0, 1);
             this.props.setAvatarLocalPath(this.state.path);
             this.props.navigation.navigate('Password');
             break;
 
           case 3003:
             // new user
-            console.log('navigation', this.props.navigation);
-            this.props.setAvatarLocalPath(this.state.path);
-            this.props.navigation.navigate('Tutorial', { nextScene: 'Password' });
+            this.setState({ animation: doneAnimation })
+            this.animate(1000, 0, 1, () => {
+              this.props.setAvatarLocalPath(this.state.path);
+              this.props.navigation.navigate('Tutorial', { nextScene: 'Password' });
+            });
             break;
 
           case 3000:
-            this.setState({ path: '' });
+            this.setState({ path: '', animation: pressAnimation });
             alert(nextProps.user.validate.payload.message);
             // reset payload?
             break;
 
           default:
+            this.setState({ path: '', animation: pressAnimation });
             alert(`Unknown code ${nextProps.user.validate.payload.code}, no info in Postman`);
         }
       }
@@ -109,16 +126,36 @@ export class Cam extends Component {
   };
 
   handleImageCapture = () => {
-    this.camera.capture()
-      .then((data) => {
-        this.setState({ path: data.path });
-        this.convertToBase64(data.path);
-      })
-      .catch((err) => { console.error('error during image capture', err); });
+    if (!this.state.path) {
+      this.camera.capture()
+        .then((data) => {
+          this.setState({ path: data.path });
+          this.convertToBase64(data.path);
+
+          this.setState({ animation: scaleAnimation });
+          this.state.progress.setValue(0);
+          Animated.sequence([
+            Animated.timing(this.state.progress, {
+              toValue: 1,
+              duration: 1500,
+            }),
+            Animated.timing(this.state.progress, {
+              toValue: 4,
+              duration: 10000,
+            }),
+          ]).start();
+          this.handleImageUpload();
+        })
+        .catch((err) => { console.error('error during image capture', err); });
+    } else {
+
+    }
+
   };
 
   handleImageDelete = () => {
-    this.setState({ path: '' });
+    this.state.progress.setValue(0);
+    this.setState({ path: '', animation: pressAnimation });
   };
 
   // TODO: вынести
@@ -141,14 +178,14 @@ export class Cam extends Component {
       <Camera
         ref={(cam) => {
           this.camera = cam;
-        }}
+        } }
         style={styles.camera}
         aspect={Camera.constants.Aspect.fill}
         captureQuality={Camera.constants.CaptureQuality.low}
-        // type={Camera.constants.Type.front}
+        //type={Camera.constants.Type.front}
         captureTarget={Camera.constants.CaptureTarget.disk}
         // captureTarget={Camera.constants.CaptureTarget.memory}
-      />
+        />
     );
   }
 
@@ -158,33 +195,56 @@ export class Cam extends Component {
         // resizeMode={'center'}
         source={{ uri: this.state.path }}
         style={styles.previewImage}
-      />
+        />
     );
   }
 
+  //Animation
+  animate(time, fr = 0, to = 1, callback) {
+    console.log("press in");
+    this.state.progress.setValue(fr);
+    let animationref = Animated.timing(this.state.progress, {
+      toValue: to,
+      duration: time,
+    }).start(callback);
+    this.setState({ animationref: animationref });
+  }
+
   render() {
+
     return (
       <View style={styles.container}>
-        <View style={styles.navbar}>
-          <TouchableOpacity
-            style={styles.closeBtn}
-            onPress={this.state.path ? this.handleImageDelete : this.handleCameraClose}
-          >
-            <Image source={close} />
-          </TouchableOpacity>
+        <View style={styles.cameraImageContainer}>
+          {this.state.path ? this.renderImage() : this.renderCamera() }
         </View>
-        <View style={{ borderWidth: 5, flex: 1, borderColor: 'tomato' }}>
-          {this.state.path ? this.renderImage() : this.renderCamera()}
+        <View style={styles.maskLayer}>
+          <Image source={ whiteMask } style={styles.maskImageStyle}/>
         </View>
-        <View style={styles.captureContainer}>
-          {this.props.user.validate.isFetching ? <Text>Uploading</Text> :
-          <TouchableOpacity
-            style={[styles.captureBtn, this.state.path && styles.uploadBtn]}
-            onPress={this.state.path ? this.handleImageUpload : this.handleImageCapture}
-          >
-            {this.state.path ? <Image source={confirm} /> : null}
-          </TouchableOpacity>
-          }
+        <View style={styles.buttonsLayer}>
+          <View style={styles.navbar}>
+            <TouchableOpacity
+              style={styles.closeBtn}
+              onPress={this.state.path ? this.handleImageDelete : this.handleCameraClose}>
+              <Image source={close} />
+            </TouchableOpacity>
+          </View>
+          <View style={styles.captureContainer}>
+            {
+              <TouchableWithoutFeedback
+                activeOpacity={1}
+                style={[styles.captureBtn, this.state.path && styles.uploadBtn]}
+                onPress={() => { this.handleImageCapture() } }
+                onPressIn={() => { !this.state.path && this.animate(200, 0, 0.7) } }
+                onPressOut={() => { !this.state.path && this.animate(200, 0.7, 0) } }>
+                {
+                  <Animation
+                    style={styles.animationStyle}
+                    source={this.state.animation}
+                    progress={this.state.progress}/>
+                }
+              </TouchableWithoutFeedback>
+            }
+          </View>
         </View>
       </View>
     );
@@ -203,36 +263,72 @@ export default connect(mapStateToProps, {
 const styles = CustomStyleSheet({
   container: {
     flex: 1,
+    backgroundColor: 'white'
+  },
+  maskLayer: {
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
+    zIndex: 1,
+    backgroundColor: 'transparent'
+  },
+  maskImageStyle: {
+    height: 640,
+    width: 360
+  },
+  buttonsLayer: {
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
+    justifyContent: 'space-between',
+    zIndex: 2
   },
   navbar: {
-    height: 40,
+    height: 56,
     flexDirection: 'row',
     justifyContent: 'flex-end',
-    alignItems: 'center',
-    backgroundColor: 'white',
+    alignItems: 'flex-start',
+    backgroundColor: 'transparent',
   },
   camera: {
+    height: 640,
+    width: 360
+  },
+  cameraImageContainer: {
     flex: 1,
+    alignItems: 'center',
+    backgroundColor: 'white'
   },
   previewImage: {
-    flex: 1,
+    height: 640,
+    width: 360
   },
   captureContainer: {
-    backgroundColor: 'white',
+    backgroundColor: 'transparent',
     justifyContent: 'center',
     alignItems: 'center',
-    height: 70,
+    height: 224,
   },
   captureBtn: {
-    round: 50,
-    borderRadius: 55,
-    borderWidth: 5,
+    opacity: 1,
+    width: 79,
+    height: 79,
+    marginBottom: 88
   },
   uploadBtn: {
     alignItems: 'center',
     justifyContent: 'center',
   },
   closeBtn: {
-    padding: 10,
+    marginTop: 16,
+    marginRight: 16,
   },
+  animationStyle: {
+    width: 79,
+    height: 79
+  }
 });
