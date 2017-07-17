@@ -40,3 +40,11 @@ For now you should replace IMEI assignment in Java code with custom string or us
 * ESlint (Aribnb, babel-parser)
 
 To lint run ```node_modules/.bin/eslint ./src```
+
+### Running Tests:
+1. To start tests, run `npm test`
+2. To start tests with snapshot, run `npm test -- -u`
+3. To start tests on single component, run `npm test -- -u <test_component>`
+
+#### Example
+`npm test -- -u Login`
