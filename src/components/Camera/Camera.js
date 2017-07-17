@@ -275,8 +275,8 @@ const styles = CustomStyleSheet({
     backgroundColor: 'transparent'
   },
   maskImageStyle: {
-    height: 640,
-    width: 360
+    height: 660,
+    width: 360,
   },
   buttonsLayer: {
     position: 'absolute',
@@ -300,6 +300,8 @@ const styles = CustomStyleSheet({
   },
   cameraImageContainer: {
     flex: 1,
+    marginTop: 56,
+    marginBottom: 224,
     alignItems: 'center',
     backgroundColor: 'white'
   },
@@ -309,15 +311,14 @@ const styles = CustomStyleSheet({
   },
   captureContainer: {
     backgroundColor: 'transparent',
-    justifyContent: 'center',
+    justifyContent: 'flex-end',
     alignItems: 'center',
     height: 224,
+    paddingBottom: 29.5
   },
   captureBtn: {
-    opacity: 1,
     width: 79,
     height: 79,
-    marginBottom: 88
   },
   uploadBtn: {
     alignItems: 'center',
@@ -328,7 +329,7 @@ const styles = CustomStyleSheet({
     marginRight: 16,
   },
   animationStyle: {
-    width: 79,
-    height: 79
+    width: 100,
+    height: 100,
   }
 });
