@@ -47,7 +47,7 @@ public class MainApplication extends MultiDexApplication implements ReactApplica
             new ReactVideoPackage(),
             new RNFetchBlobPackage(),
             new RCTCameraPackage(),
-            new LottiePackage(),
+            new LottiePackage()
       );
     }
   };
