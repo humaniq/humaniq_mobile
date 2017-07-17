@@ -20,6 +20,11 @@ jest.mock('react-native-network-info', () => 'DeviceInfo');
 //
 jest.mock('react-native-fetch-blob', () => ({
   DocumentDir: () => {},
+  fs: {
+    dirs: {
+      CacheDir: 'path',
+    },
+  },
 }));
 
 jest.mock('Linking', () => ({
