@@ -6,6 +6,7 @@ import com.facebook.react.ReactApplication;
 import com.zmxv.RNSound.RNSoundPackage;
 import com.rnim.rn.audio.ReactNativeAudioPackage;
 import com.humaniq.libsignals.SignalReactPackage;
+import com.airbnb.android.react.lottie.LottiePackage;
 import com.centaurwarchief.smslistener.SmsListenerPackage;
 import com.pusherman.networkinfo.RNNetworkInfoPackage;
 import codes.simen.IMEI.IMEI;
@@ -45,7 +46,8 @@ public class MainApplication extends MultiDexApplication implements ReactApplica
             new LinearGradientPackage(),
             new ReactVideoPackage(),
             new RNFetchBlobPackage(),
-            new RCTCameraPackage()
+            new RCTCameraPackage(),
+            new LottiePackage(),
       );
     }
   };
