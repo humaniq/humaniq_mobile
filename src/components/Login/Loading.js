@@ -1,39 +1,43 @@
-/* eslint-disable */
-// will be modified entirely
-
 import React, { Component } from 'react';
 import {
-  ScrollView,
   View,
   Image,
-  Text,
-  TouchableOpacity,
 } from 'react-native';
 
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import CustomStyleSheet from '../../utils/customStylesheet';
 
-class Loading extends Component {
-  state = {
-    timeout: false,
-  };
+const logo_face = require('../../assets/icons/logo_face.png');
+const logo_text = require('../../assets/icons/logo_text.png');
 
+class Loading extends Component {
   static propTypes = {
     accounts: PropTypes.shape({
       primaryAccount: PropTypes.object.isRequired,
       secondaryAccounts: PropTypes.array,
+      saved: PropTypes.bool,
     }).isRequired,
+
+    navigation: PropTypes.shape({
+      navigate: PropTypes.func.isRequired,
+      dispatch: PropTypes.func.isRequired,
+      state: PropTypes.object,
+    }),
+  };
+
+  state = {
+    timeout: false,
   };
 
   componentDidMount() {
     setTimeout(() => {
-      this.setState({timeout: true}, this.onTimeoutFinish)
+      this.setState({ timeout: true }, this.onTimeoutFinish);
     }, 2000);
   }
 
   onTimeoutFinish = () => {
-    let savedDataExists = this.props.accounts.saved === true;
+    const savedDataExists = this.props.accounts.saved === true;
 
     if (savedDataExists) {
       // go to accs
@@ -45,12 +49,10 @@ class Loading extends Component {
   };
 
   render() {
-    let savedDataExists = this.props.accounts.saved === true;
-    let timeoutFinished = this.state.timeout;
-
     return (
       <View style={styles.container}>
-        <Text style={styles.loadingTxt}>LOADING, timeout 3 seconds</Text>
+        <Image source={logo_face} />
+        <Image source={logo_text} />
       </View>
     );
   }
@@ -65,11 +67,10 @@ export default connect(mapStateToProps)(Loading);
 const styles = CustomStyleSheet({
   container: {
     flex: 1,
-    backgroundColor: 'white',
-    justifyContent: 'center',
+    paddingTop: 122,
+    paddingBottom: 22,
+    backgroundColor: '$cPaper',
+    justifyContent: 'space-between',
     alignItems: 'center',
-  },
-  loadingTxt: {
-    fontSize: 25,
   },
 });
