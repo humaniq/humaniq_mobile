@@ -6,14 +6,14 @@
  */
 import React from 'react';
 
-/***
+/** *
  * Testing actions
  ***/
 
 describe('init Action', () => {
-    it('should return INIT action', () => {
-        expect(1).toBe(1)
-    })
+  it('should return INIT action', () => {
+    expect(1).toBe(1);
+  });
 
     // it('should return updateRegistrationStatus action', () => {
     //     let status = "isRegistered"
@@ -91,4 +91,4 @@ describe('init Action', () => {
     //         saveUserToken(token)
     //     ).toEqual(expectedAction)
     // })
-})
+});
