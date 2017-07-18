@@ -228,8 +228,8 @@ export class Cam extends Component {
                 activeOpacity={1}
                 style={[styles.captureBtn, this.state.path && styles.uploadBtn]}
                 onPress={this.handleImageCapture}
-                onPressIn={() => { !this.state.path && this.animate(200, 0, 0.7) } }
-                onPressOut={() => { !this.state.path && this.animate(200, 0.7, 0) } }>                
+                onPressIn={() => !this.state.path && this.animate(200, 0, 0.7)}
+                onPressOut={() => !this.state.path && this.animate(200, 0.7, 0)}
               >
                 {
                   <Animation
