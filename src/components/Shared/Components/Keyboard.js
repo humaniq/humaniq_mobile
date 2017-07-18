@@ -3,18 +3,16 @@ import {
   Text,
   View,
   TouchableOpacity,
-  TouchableHighlight,
   Image,
 } from 'react-native';
 import PropTypes from 'prop-types';
 import CustomStyleSheet from '../../../utils/customStylesheet';
 
-const ic_help = require('../../../assets/icons/chat_white.png');
-const back_space_white = require('../../../assets/icons/back_space_white.png');
+const icHelp = require('../../../assets/icons/chat_white.png');
+const backSpaceWhite = require('../../../assets/icons/back_space_white.png');
 
 export default class VirtualKeyboard extends Component {
   static propTypes = {
-    color: PropTypes.string,
     isBackspaceEnabled: PropTypes.bool,
     onNumberPress: PropTypes.func.isRequired,
     onBackspacePress: PropTypes.func.isRequired,
@@ -39,11 +37,11 @@ export default class VirtualKeyboard extends Component {
           middleCellValues.includes(number) && styles.middleCell,
         ]}
         key={number}
-        accessibilityLabel={number.toString() }
+        accessibilityLabel={number.toString()}
         onPress={() => {
           this.props.onNumberPress(number.toString());
-        } }
-        >
+        }}
+      >
         <Text style={[styles.number]}>{number}</Text>
       </TouchableOpacity>
     );
@@ -53,8 +51,8 @@ export default class VirtualKeyboard extends Component {
     <TouchableOpacity
       style={styles.backspace}
       onPress={this.props.onBackspacePress}
-      >
-      {this.props.isBackspaceEnabled && <Image source={back_space_white} />}
+    >
+      {this.props.isBackspaceEnabled && <Image source={backSpaceWhite} />}
     </TouchableOpacity>
   );
 
@@ -62,8 +60,8 @@ export default class VirtualKeyboard extends Component {
     <TouchableOpacity
       style={styles.help}
       onPress={this.props.onHelpPress}
-      >
-      <Image source={ic_help} />
+    >
+      <Image source={icHelp} />
     </TouchableOpacity>
   );
 
@@ -93,7 +91,7 @@ const styles = CustomStyleSheet({
   row: {
     flex: 1,
     flexDirection: 'row',
-    justifyContent: 'space-between'
+    justifyContent: 'space-between',
   },
   number: {
     fontSize: 30,

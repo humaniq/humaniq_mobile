@@ -12,7 +12,6 @@ import IMEI from 'react-native-imei';
 
 import Keyboard from '../Shared/Components/Keyboard';
 import CustomStyleSheet from '../../utils/customStylesheet';
-import Confirm from '../Shared/Buttons/Confirm';
 import { login, signup, setPassword, addPrimaryAccount, addSecondaryAccount } from '../../actions';
 
 export class Password extends Component {
@@ -40,6 +39,9 @@ export class Password extends Component {
       dispatch: PropTypes.func.isRequired,
       state: PropTypes.object,
     }),
+
+    addPrimaryAccount: PropTypes.func.isRequired,
+    addSecondaryAccount: PropTypes.func.isRequired,
   };
 
   state = {
@@ -58,6 +60,7 @@ export class Password extends Component {
     if (nextProps.user.account.payload) {
       const code = nextProps.user.account.payload.code;
       const password = nextProps.user.password;
+      const registeredAcc = nextProps.user.account.payload.payload.account_information;
 
       if (!password) {
         switch (code) {
@@ -66,7 +69,6 @@ export class Password extends Component {
             break;
 
           case 1001:
-            const registeredAcc = nextProps.user.account.payload.payload.account_information;
             this.props.setPassword(this.state.password);
             // this.props.navigation.navigate('TelInput');
 
@@ -114,10 +116,10 @@ export class Password extends Component {
 
   handleNumberPress = (number) => {
     const params = this.props.navigation.state.params;
-    const res = this.state.password += number;
+    const res = this.state.password + number;
     if (res.length <= this.state.maxPasswordLength) {
       this.setState({ password: res });
-      if (res.length == this.state.maxPasswordLength && !params.password) {
+      if (res.length === this.state.maxPasswordLength && !params.password) {
         this.handlePasswordConfirm(false);
       }
     }
@@ -148,13 +150,11 @@ export class Password extends Component {
 
     if (registered) {
       this.authenticate();
-    } else {
-      if (match) {
+    } else if (match) {
         // TODO: go to tel input with reset
-        this.createRegistration();
-      } else {
-        this.props.navigation.navigate('Password', { password: this.state.password });
-      }
+      this.createRegistration();
+    } else {
+      this.props.navigation.navigate('Password', { password: this.state.password });
     }
   };
 
@@ -184,14 +184,14 @@ export class Password extends Component {
   };
 
   renderPassMask = () => {
-    const { password, maxPasswordLength} = this.state;
+    const { password, maxPasswordLength } = this.state;
     const digits = [];
 
     for (let i = 0; i < maxPasswordLength; i += 1) {
       digits.push(
         <View key={i}>
           {password[i] ?
-            <View style={styles.passFilled}/>
+            <View style={styles.passFilled} />
             : <View style={styles.passEmpty} />
           }
         </View>,
@@ -228,11 +228,11 @@ export class Password extends Component {
         </View>
 
         <Keyboard
-          isBackspaceEnabled={this.state.password != ""}
+          isBackspaceEnabled={this.state.password !== ''}
           onNumberPress={this.handleNumberPress}
           onBackspacePress={this.handleBackspacePress}
           onHelpPress={this.handleHelpPress}
-          />
+        />
       </View>
     );
   }
@@ -255,7 +255,7 @@ const styles = CustomStyleSheet({
     flex: 1,
     backgroundColor: '$cBrand',
     justifyContent: 'space-between',
-    alignItems: 'center'
+    alignItems: 'center',
   },
   header: {
     width: 360,
@@ -282,7 +282,7 @@ const styles = CustomStyleSheet({
     width: 144,
     height: 24,
     paddingHorizontal: 18,
-    marginTop: 8.5
+    marginTop: 8.5,
   },
   passEmpty: {
     round: 12,
