@@ -4,12 +4,10 @@ import {
   TouchableOpacity,
   TouchableWithoutFeedback,
   Image,
-  Text,
-  Alert,
+  Animated,
 } from 'react-native';
 import PropTypes from 'prop-types';
 import Camera from 'react-native-camera';
-import { Animated } from 'react-native';
 import Animation from 'lottie-react-native';
 import { NavigationActions } from 'react-navigation';
 import RNFetchBlob from 'react-native-fetch-blob';
@@ -24,12 +22,11 @@ import CustomStyleSheet from '../../utils/customStylesheet';
 
 // eslint-disable-next-line import/no-unresolved
 const close = require('../../assets/icons/close_dark.png');
+const whiteMask = require('../../assets/icons/white_mask.png');
 // eslint-disable-next-line import/no-unresolved
 const pressAnimation = require('../../assets/animations/press.json');
 const scaleAnimation = require('../../assets/animations/scale.json');
-const loadAnimation = require('../../assets/animations/progress.json');
 const doneAnimation = require('../../assets/animations/done.json');
-const whiteMask = require('../../assets/icons/white_mask.png');
 
 
 /*
@@ -89,7 +86,7 @@ export class Cam extends Component {
 
           case 3002:
             // registered user
-            this.setState({ animation: doneAnimation })
+            this.setState({ animation: doneAnimation });
             this.animate(1000, 0, 1);
             this.props.setAvatarLocalPath(this.state.path);
             this.props.navigation.navigate('Password');
@@ -97,7 +94,7 @@ export class Cam extends Component {
 
           case 3003:
             // new user
-            this.setState({ animation: doneAnimation })
+            this.setState({ animation: doneAnimation });
             this.animate(1000, 0, 1, () => {
               this.props.setAvatarLocalPath(this.state.path);
               this.props.navigation.navigate('Tutorial', { nextScene: 'Password' });
@@ -147,10 +144,7 @@ export class Cam extends Component {
           this.handleImageUpload();
         })
         .catch((err) => { console.error('error during image capture', err); });
-    } else {
-
     }
-
   };
 
   handleImageDelete = () => {
@@ -173,20 +167,16 @@ export class Cam extends Component {
     // console.log('this.props.validate', this.props);
   };
 
-  renderCamera() {
-    return (
-      <Camera
-        ref={(cam) => {
-          this.camera = cam;
-        } }
-        style={styles.camera}
-        aspect={Camera.constants.Aspect.fill}
-        captureQuality={Camera.constants.CaptureQuality.low}
-        //type={Camera.constants.Type.front}
-        captureTarget={Camera.constants.CaptureTarget.disk}
-        // captureTarget={Camera.constants.CaptureTarget.memory}
-        />
-    );
+
+  // Animation
+  animate = (time, fr = 0, to = 1, callback) => {
+    console.log('press in');
+    this.state.progress.setValue(fr);
+    const animationref = Animated.timing(this.state.progress, {
+      toValue: to,
+      duration: time,
+    }).start(callback);
+    this.setState({ animationref });
   }
 
   renderImage() {
@@ -195,36 +185,40 @@ export class Cam extends Component {
         // resizeMode={'center'}
         source={{ uri: this.state.path }}
         style={styles.previewImage}
-        />
+      />
     );
   }
 
-  //Animation
-  animate(time, fr = 0, to = 1, callback) {
-    console.log("press in");
-    this.state.progress.setValue(fr);
-    let animationref = Animated.timing(this.state.progress, {
-      toValue: to,
-      duration: time,
-    }).start(callback);
-    this.setState({ animationref: animationref });
+  renderCamera() {
+    return (
+      <Camera
+        ref={(cam) => {
+          this.camera = cam;
+        }}
+        style={styles.camera}
+        aspect={Camera.constants.Aspect.fill}
+        captureQuality={Camera.constants.CaptureQuality.low}
+        // type={Camera.constants.Type.front}
+        captureTarget={Camera.constants.CaptureTarget.disk}
+      />
+    );
   }
 
   render() {
-
     return (
       <View style={styles.container}>
         <View style={styles.cameraImageContainer}>
           {this.state.path ? this.renderImage() : this.renderCamera() }
         </View>
         <View style={styles.maskLayer}>
-          <Image source={ whiteMask } style={styles.maskImageStyle}/>
+          <Image source={whiteMask} style={styles.maskImageStyle} />
         </View>
         <View style={styles.buttonsLayer}>
           <View style={styles.navbar}>
             <TouchableOpacity
               style={styles.closeBtn}
-              onPress={this.state.path ? this.handleImageDelete : this.handleCameraClose}>
+              onPress={this.state.path ? this.handleImageDelete : this.handleCameraClose}
+            >
               <Image source={close} />
             </TouchableOpacity>
           </View>
@@ -233,14 +227,16 @@ export class Cam extends Component {
               <TouchableWithoutFeedback
                 activeOpacity={1}
                 style={[styles.captureBtn, this.state.path && styles.uploadBtn]}
-                onPress={() => { this.handleImageCapture() } }
+                onPress={this.handleImageCapture}
                 onPressIn={() => { !this.state.path && this.animate(200, 0, 0.7) } }
-                onPressOut={() => { !this.state.path && this.animate(200, 0.7, 0) } }>
+                onPressOut={() => { !this.state.path && this.animate(200, 0.7, 0) } }>                
+              >
                 {
                   <Animation
                     style={styles.animationStyle}
                     source={this.state.animation}
-                    progress={this.state.progress}/>
+                    progress={this.state.progress}
+                  />
                 }
               </TouchableWithoutFeedback>
             }
@@ -263,7 +259,7 @@ export default connect(mapStateToProps, {
 const styles = CustomStyleSheet({
   container: {
     flex: 1,
-    backgroundColor: 'white'
+    backgroundColor: 'white',
   },
   maskLayer: {
     position: 'absolute',
@@ -272,7 +268,7 @@ const styles = CustomStyleSheet({
     left: 0,
     right: 0,
     zIndex: 1,
-    backgroundColor: 'transparent'
+    backgroundColor: 'transparent',
   },
   maskImageStyle: {
     height: 660,
@@ -285,7 +281,7 @@ const styles = CustomStyleSheet({
     left: 0,
     right: 0,
     justifyContent: 'space-between',
-    zIndex: 2
+    zIndex: 2,
   },
   navbar: {
     height: 56,
@@ -296,25 +292,25 @@ const styles = CustomStyleSheet({
   },
   camera: {
     height: 640,
-    width: 360
+    width: 360,
   },
   cameraImageContainer: {
     flex: 1,
     marginTop: 56,
     marginBottom: 224,
     alignItems: 'center',
-    backgroundColor: 'white'
+    backgroundColor: 'white',
   },
   previewImage: {
     height: 640,
-    width: 360
+    width: 360,
   },
   captureContainer: {
     backgroundColor: 'transparent',
     justifyContent: 'flex-end',
     alignItems: 'center',
     height: 224,
-    paddingBottom: 29.5
+    paddingBottom: 29.5,
   },
   captureBtn: {
     width: 79,
@@ -331,5 +327,5 @@ const styles = CustomStyleSheet({
   animationStyle: {
     width: 100,
     height: 100,
-  }
+  },
 });
