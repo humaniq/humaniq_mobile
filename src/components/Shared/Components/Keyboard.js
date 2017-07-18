@@ -33,9 +33,7 @@ export default class VirtualKeyboard extends Component {
   renderCell = (number) => {
     const middleCellValues = [2, 5, 8, 0];
     return (
-      <TouchableHighlight
-        activeOpacity={0.5}
-        underlayColor={'#FFFFFF30'}
+      <TouchableOpacity
         style={[
           styles.cell,
           middleCellValues.includes(number) && styles.middleCell,
@@ -47,7 +45,7 @@ export default class VirtualKeyboard extends Component {
         } }
         >
         <Text style={[styles.number]}>{number}</Text>
-      </TouchableHighlight >
+      </TouchableOpacity>
     );
   };
 
@@ -90,6 +88,7 @@ const styles = CustomStyleSheet({
     alignSelf: 'center',
     height: 224,
     width: 230,
+    marginBottom: 113,
   },
   row: {
     flex: 1,
@@ -99,23 +98,21 @@ const styles = CustomStyleSheet({
   number: {
     fontSize: 30,
     textAlign: 'center',
-    color: '$cPaper'
+    color: '$cPaper',
   },
   backspace: {
-    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: 10,
+    width: 37.5,
   },
   help: {
-    flex: 1,
-    marginLeft: 6,
     justifyContent: 'center',
     alignItems: 'center',
+    width: 23.5,
+    marginRight: 14,
   },
   cell: {
-    flex: 1,
-    marginHorizontal: 12,
+    width: 23.5,
     borderRadius: 100,
     justifyContent: 'center',
   },

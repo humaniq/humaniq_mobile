@@ -266,35 +266,41 @@ const styles = CustomStyleSheet({
   container: {
     flex: 1,
     backgroundColor: '$cBrand',
+    justifyContent: 'space-between',
+    alignItems: 'center'
   },
   header: {
-    width: 130,
-    height: 240,
-    alignSelf: 'center',
-    justifyContent: 'space-between',
-    paddingBottom: 80,
-    paddingTop: 30,
+    width: 360,
+    height: 188,
+    alignItems: 'center',
   },
   stage: {
-    fontSize: 12,
+    fontSize: 15,
+    lineHeight: 17,
     color: '$cPaper',
-    alignSelf: 'center'
+    alignSelf: 'center',
+    marginTop: 13.5,
   },
   userPhoto: {
     alignSelf: 'center',
-    round: 70,
+    round: 71,
     borderRadius: 50,
+    marginTop: 53.5,
   },
   passContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginHorizontal: 18,
+    alignItems: 'center',
+    width: 144,
+    height: 24,
+    paddingHorizontal: 18,
+    marginTop: 8.5
   },
   passEmpty: {
     round: 12,
     borderRadius: 50,
     borderWidth: 2,
-    borderColor: '$cGrayLight',
+    borderColor: '$cPaperTransparent',
   },
   passFilled: {
     round: 12,
