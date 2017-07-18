@@ -114,8 +114,9 @@ export class Password extends Component {
 
   handleNumberPress = (number) => {
     const params = this.props.navigation.state.params;
-    if (this.state.password.length + 1 < this.state.maxPasswordLength) {
-      this.setState({ password: this.state.password += number });
+    const res = this.state.password += number;
+    if (res.length < this.state.maxPasswordLength) {
+      this.setState({ password: res });
     } else {
       this.handlePasswordConfirm();
     }
