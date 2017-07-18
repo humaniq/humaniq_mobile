@@ -115,25 +115,23 @@ export class Password extends Component {
   handleNumberPress = (number) => {
     const params = this.props.navigation.state.params;
     const res = this.state.password += number;
-    if (res.length < this.state.maxPasswordLength) {
+    if (res.length <= this.state.maxPasswordLength) {
       this.setState({ password: res });
-    } else {
-      this.handlePasswordConfirm();
+      if (res.length == this.state.maxPasswordLength && !params.password) {
+        this.handlePasswordConfirm(false);
+      }
     }
 
     if (params) {
       if (params.password && params.password.length === this.state.password.length) {
         if (params.password === this.state.password) {
-          this.setState({ match: true });
-        } else {
-          this.setState({ match: false });
+          this.handlePasswordConfirm(true);
         }
       }
     }
   };
 
   handleBackspacePress = () => {
-    this.setState({ match: '' });
     const password = this.state.password.slice(0, -1);
     this.setState({ password });
   };
@@ -142,7 +140,7 @@ export class Password extends Component {
     alert('В шаббат у нас с мамой традиция — зажигать свечи и смотреть „Колесо фортуны“');
   };
 
-  handlePasswordConfirm = () => {
+  handlePasswordConfirm = (match) => {
     // TODO: CHANGE
     // 3002 - registered
     // 3003 - new user
@@ -151,7 +149,7 @@ export class Password extends Component {
     if (registered) {
       this.authenticate();
     } else {
-      if (this.state.match) {
+      if (match) {
         // TODO: go to tel input with reset
         this.createRegistration();
       } else {
@@ -185,25 +183,15 @@ export class Password extends Component {
     });
   };
 
-  passwordConfirmAvailability = () => {
-    const { password, maxPasswordLength } = this.state;
-    return password.length === maxPasswordLength && this.state.match !== false;
-  };
-
   renderPassMask = () => {
-    const { password, maxPasswordLength, match } = this.state;
+    const { password, maxPasswordLength} = this.state;
     const digits = [];
 
     for (let i = 0; i < maxPasswordLength; i += 1) {
       digits.push(
         <View key={i}>
           {password[i] ?
-            <View style={[
-              styles.passFilled,
-              match === true && styles.success,
-              match === false && styles.error,
-            ]}
-              />
+            <View style={styles.passFilled}/>
             : <View style={styles.passEmpty} />
           }
         </View>,
