@@ -19,6 +19,7 @@ import Instructions from './components/Instructions/Instructions'
 import Profile from './components/Profile/Profile'
 import ProfileSettings from './components/Profile/ProfileSettings'
 import ProfileEdit from './components/Profile/ProfileEdit'
+import Chats from './components/Chats/Chats'
 
 /*
 const Dashboard = TabNavigator(
@@ -37,10 +38,11 @@ const Dashboard = TabNavigator(
 
 const LoginStack = StackNavigator(
   {
-      Profile: {screen: Profile},
-      ProfileSettings: {screen: ProfileSettings},
-      ProfileEdit: {screen: ProfileEdit},
-      Tutorial: { screen: Tutorial },
+    Chats: { screen: Chats },
+    Profile: { screen: Profile },
+    ProfileSettings: { screen: ProfileSettings },
+    ProfileEdit: { screen: ProfileEdit },
+    Tutorial: { screen: Tutorial },
     Camera: { screen: Camera },
     Password: { screen: Password },
     TelInput: { screen: TelInput },
@@ -52,6 +54,7 @@ const LoginStack = StackNavigator(
     headerMode: 'none',
   },
 );
+
 
 const App = () => (
   <Provider store={store}>
