@@ -19,6 +19,7 @@ import com.facebook.react.ReactPackage;
 import com.facebook.react.shell.MainReactPackage;
 import com.facebook.soloader.SoLoader;
 import android.support.multidex.MultiDexApplication;
+import com.humaniq.libsignals.GreenDaoDatabase;
 
 import java.util.Arrays;
 import java.util.List;
@@ -59,5 +60,6 @@ public class MainApplication extends MultiDexApplication implements ReactApplica
   public void onCreate() {
     super.onCreate();
     SoLoader.init(this, /* native exopackage */ false);
+    GreenDaoDatabase.createEncryptedInstance(this, "super-secret");
   }
 }
