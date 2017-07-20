@@ -6,6 +6,7 @@ import com.facebook.react.ReactApplication;
 import com.zmxv.RNSound.RNSoundPackage;
 import com.rnim.rn.audio.ReactNativeAudioPackage;
 import com.humaniq.libsignals.SignalReactPackage;
+import com.airbnb.android.react.lottie.LottiePackage;
 import com.centaurwarchief.smslistener.SmsListenerPackage;
 import com.pusherman.networkinfo.RNNetworkInfoPackage;
 import codes.simen.IMEI.IMEI;
@@ -19,6 +20,7 @@ import com.facebook.react.ReactPackage;
 import com.facebook.react.shell.MainReactPackage;
 import com.facebook.soloader.SoLoader;
 import android.support.multidex.MultiDexApplication;
+import com.humaniq.libsignals.GreenDaoDatabase;
 
 import java.util.Arrays;
 import java.util.List;
@@ -45,7 +47,8 @@ public class MainApplication extends MultiDexApplication implements ReactApplica
             new LinearGradientPackage(),
             new ReactVideoPackage(),
             new RNFetchBlobPackage(),
-            new RCTCameraPackage()
+            new RCTCameraPackage(),
+            new LottiePackage()
       );
     }
   };
@@ -59,5 +62,6 @@ public class MainApplication extends MultiDexApplication implements ReactApplica
   public void onCreate() {
     super.onCreate();
     SoLoader.init(this, /* native exopackage */ false);
+    GreenDaoDatabase.createEncryptedInstance(this, "super-secret");
   }
 }
