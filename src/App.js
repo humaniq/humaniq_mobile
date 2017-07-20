@@ -14,6 +14,7 @@ import {
   CodeInput,
   Accounts,
   Loading,
+  CountryCode
 } from './components/Login';
 import Dashboard from './components/Dashboard';
 import Tutorial from './components/Shared/Components/Tutorial';
@@ -37,7 +38,7 @@ const Dashboard = TabNavigator(
 
 const stack = {
   //Chat: { screen: Chat },
-  Loading: { screen: Loading },
+  CountryCode: { screen: CountryCode },
   Accounts: { screen: Accounts },
   Tutorial: { screen: Tutorial },
   Camera: { screen: Camera },
