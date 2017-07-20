@@ -67,10 +67,11 @@ export class CountryCode extends Component {
                 <View style={{ width: 296 }}>
                     {
                         countryArray.map((o, i) => {
+                            let resname = o.name.toLowerCase().replace(" ", "_");
                             return (
                                 <TouchableOpacity key={i} style={{ height: 56, justifyContent: 'space-between', alignItems: 'center', flexDirection: 'row' }}>
                                     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                        <View style={{ height: 24, width: 36 }} />
+                                        <Image style={{ height: 24, width: 36 }} source={{uri: resname}}/>
                                         <Text style={{ lineHeight: 17, width: 200, marginLeft: 8, fontSize: 15 }} >{o.name}</Text>
                                     </View>
                                     <Text style={{ lineHeight: 16, marginRight: 32, fontSize: 16, textAlign: 'right' }} >{o.dial_code}</Text>

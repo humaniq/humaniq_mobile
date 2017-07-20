@@ -3,6 +3,7 @@ import {
   View,
   Image,
   Text,
+  TouchableOpacity
 } from 'react-native';
 
 import PropTypes from 'prop-types';
@@ -11,10 +12,13 @@ import VMasker from 'vanilla-masker';
 
 import CustomStyleSheet from '../../utils/customStylesheet';
 import Confirm from '../Shared/Buttons/Confirm';
-import Keyboard from '../Shared/Components/Keyboard';
+import PhoneKeyboard from '../Shared/Components/PhoneKeyboard';
+import ConfirmButton from '../Shared/Buttons/ConfirmButton';
+import HelpButton from '../Shared/Buttons/HelpButton';
 import { phoneNumberCreate, savePhone } from '../../actions';
 
 const ic_user = require('../../assets/icons/ic_user.png');
+const arrowDownWhite = require('../../assets/icons/arrow_down_white.png');
 
 export class TelInput extends Component {
   static propTypes = {
@@ -83,14 +87,14 @@ export class TelInput extends Component {
     if (this.state.phone.length < this.state.maxPhoneLength) {
       let inputVal = this.state.phone;
       inputVal += number;
-      inputVal = VMasker.toPattern(VMasker.toNumber(inputVal), '+ 9 (999) 999-99-99');
+      inputVal = VMasker.toPattern(VMasker.toNumber(inputVal), '(999) 999 9999');
       this.setState({ phone: inputVal });
     }
   };
 
   handleBackspacePress = () => {
     let phone = this.state.phone.slice(0, -1);
-    phone = VMasker.toPattern(VMasker.toNumber(phone), '+ 9 (999) 999-99-99');
+    phone = VMasker.toPattern(VMasker.toNumber(phone), '(999) 999 9999');
     this.setState({ phone });
   };
 
@@ -109,6 +113,11 @@ export class TelInput extends Component {
   renderInput = () => {
     return (
       <View style={styles.telInput}>
+        <TouchableOpacity style={{ height: 72, flexDirection: 'row', alignItems: 'center', justifyContent: 'center'}}>
+          <Image style={{width: 32, height: 28}} source={{uri: 'picture'}}/>
+          <Text style={{fontSize: 25, color: 'white', marginLeft: 4.5, lineHeight: 29}}>{"+1"}</Text>
+          <Image style={{marginTop: 28.5, marginBottom: 24.5, width: 19, height: 19}} source={arrowDownWhite}/>
+        </TouchableOpacity>
         <Text style={styles.number}>{this.state.phone}</Text>
       </View>
     );
@@ -118,19 +127,15 @@ export class TelInput extends Component {
     return (
       <View style={styles.container}>
         <View style={styles.header}>
-          <Image style={styles.userPhoto} source={ic_user} />
-          <Text>{this.state.password}</Text>
           <View style={styles.passContainer}>
             {this.renderInput()}
           </View>
         </View>
-        {!this.props.user.phoneCreate.isFetching ?
-          <Confirm
-            active={this.state.phone.length === this.state.maxPhoneLength}
-            onPress={this.handlePhoneConfirm}
-          /> : <Text>uploading</Text>
-        }
-        <Keyboard
+        <View style={{height: 61, width: 360, justifyContent: 'space-between', flexDirection: 'row', paddingLeft: 16, paddingRight: 16}}>
+          <HelpButton onPress={this.handleHelpPress} />
+          <ConfirmButton onPress={this.handleConfirmPress} />
+        </View>
+        <PhoneKeyboard
           onNumberPress={this.handleNumberPress}
           onBackspacePress={this.handleBackspacePress}
           onHelpPress={this.handleHelpPress}
@@ -152,31 +157,27 @@ export default connect(mapStateToProps, {
 const styles = CustomStyleSheet({
   container: {
     flex: 1,
-    backgroundColor: 'white',
+    backgroundColor: '#439fe0',
   },
   header: {
     flex: 1,
-    justifyContent: 'space-between',
-    paddingVertical: 20,
-  },
-  userPhoto: {
-    alignSelf: 'center',
+    paddingTop: 120,
   },
   passContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginHorizontal: 18,
+    width: 328,
+    marginLeft: 16
   },
   telInput: {
-    flex: 1,
-    height: 30,
-    backgroundColor: '$cGray',
-    borderRadius: 10,
+    flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
   },
   number: {
     textAlign: 'center',
-    fontSize: 30,
+    fontSize: 25,
+    marginLeft: 10,
+    color: 'white'
   },
 });
