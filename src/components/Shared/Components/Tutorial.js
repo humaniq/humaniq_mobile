@@ -1,12 +1,13 @@
 import React, { Component, PropTypes } from 'react';
 import {
   View,
+  Image,
 } from 'react-native';
 import CustomStyleSheet from '../../../utils/customStylesheet';
 import ConfirmButton from '../Buttons/ConfirmButton';
 import HelpButton from '../Buttons/HelpButton';
 // assets
-// const illustration = require('../../../assets/icons/illustration.png');
+const illustration = require('../../../assets/icons/camera_illustration.png');
 // const play = require('../../../assets/icons/ic_play.png');
 
 export default class Tutorial extends Component {
@@ -42,6 +43,7 @@ export default class Tutorial extends Component {
   render() {
     return (
       <View style={styles.container}>
+        <Image style={styles.illustration} source={illustration} />
         <View style={styles.buttonsContainer}>
           <HelpButton onPress={this.handleHelpPress} />
           <ConfirmButton onPress={this.handleConfirmPress} />
@@ -54,10 +56,17 @@ export default class Tutorial extends Component {
 const styles = CustomStyleSheet({
   container: {
     flex: 1,
-    justifyContent: 'flex-end',
     backgroundColor: '$cBrand',
   },
+  illustration: {
+    width: "100%",
+    height: "100%"
+  },
   buttonsContainer: {
+    position: 'absolute',
+    bottom: 0,
+    width: 360,
+    height: 77,
     flexDirection: 'row',
     padding: 16,
     justifyContent: 'space-between',
