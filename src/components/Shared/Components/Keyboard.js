@@ -3,13 +3,73 @@ import {
   Text,
   View,
   TouchableOpacity,
+  TouchableWithoutFeedback,
   Image,
+  Animated
 } from 'react-native';
 import PropTypes from 'prop-types';
+import Animation from 'lottie-react-native';
 import CustomStyleSheet from '../../../utils/customStylesheet';
 
 const icHelp = require('../../../assets/icons/chat_white.png');
 const backSpaceWhite = require('../../../assets/icons/back_space_white.png');
+const btnRoundRipple = require('../../../assets/animations/btn-round-ripple.json');
+
+class Key extends Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      progress: new Animated.Value(0),
+    };
+  }
+
+  animate = (time, fr = 0, to = 1, callback) => {
+    this.state.progress.setValue(fr);
+    Animated.timing(this.state.progress, {
+      toValue: to,
+      duration: time,
+    }).start(callback);
+  }
+
+  shouldComponentUpdate() {
+    return false;
+  }
+
+  render() {
+    const rightCellValues = [3, 6, 9];
+    const leftCellValues = [1, 4, 7];
+    let style = {};
+    if (rightCellValues.includes(this.props.number)) {
+      style = styles.right;
+    } else if (leftCellValues.includes(this.props.number)) {
+      style = styles.left;
+    }
+    return (
+      <TouchableWithoutFeedback
+        style={styles.cell}
+        accessibilityLabel={this.props.number.toString() }
+        onPress={() => { this.props.onPress(this.props.number); } }
+        onPressOut={() => { this.animate(500, 0, 1); } }
+        >
+        <View style={{ width: 64, justifyContent: 'center' }}>
+          <View style={{
+            position: 'absolute', top: 0, left: 0, right: 0,
+            bottom: 0, alignItems: 'center', justifyContent: 'center',
+          }}>
+            <Animation
+              style={styles.animation}
+              source={btnRoundRipple}
+              progress={this.state.progress}
+              />
+          </View>
+          <Text
+            style={styles.number}>{this.props.number}</Text>
+        </View>
+      </TouchableWithoutFeedback>
+    );
+  }
+}
 
 export default class VirtualKeyboard extends Component {
   static propTypes = {
@@ -29,21 +89,8 @@ export default class VirtualKeyboard extends Component {
   };
 
   renderCell = (number) => {
-    const middleCellValues = [2, 5, 8, 0];
     return (
-      <TouchableOpacity
-        style={[
-          styles.cell,
-          middleCellValues.includes(number) && styles.middleCell,
-        ]}
-        key={number}
-        accessibilityLabel={number.toString()}
-        onPress={() => {
-          this.props.onNumberPress(number.toString());
-        }}
-      >
-        <Text style={[styles.number]}>{number}</Text>
-      </TouchableOpacity>
+      <Key number={number} onPress={(e) => this.props.onNumberPress(e) }/>
     );
   };
 
@@ -51,7 +98,7 @@ export default class VirtualKeyboard extends Component {
     <TouchableOpacity
       style={styles.backspace}
       onPress={this.props.onBackspacePress}
-    >
+      >
       {this.props.isBackspaceEnabled && <Image source={backSpaceWhite} />}
     </TouchableOpacity>
   );
@@ -60,7 +107,7 @@ export default class VirtualKeyboard extends Component {
     <TouchableOpacity
       style={styles.help}
       onPress={this.props.onHelpPress}
-    >
+      >
       <Image source={icHelp} />
     </TouchableOpacity>
   );
@@ -71,7 +118,7 @@ export default class VirtualKeyboard extends Component {
         {this.renderRow([1, 2, 3]) }
         {this.renderRow([4, 5, 6]) }
         {this.renderRow([7, 8, 9]) }
-        <View style={styles.row}>
+        <View style={[styles.row, styles.bottomrow]}>
           {this.renderHelp() }
           {this.renderCell(0) }
           {this.renderBackspace() }
@@ -85,13 +132,17 @@ const styles = CustomStyleSheet({
   container: {
     alignSelf: 'center',
     height: 224,
-    width: 230,
+    width: 270,
     marginBottom: 113,
   },
   row: {
     flex: 1,
     flexDirection: 'row',
     justifyContent: 'space-between',
+  },
+  bottomrow: {
+    paddingRight: 20,
+    paddingLeft: 20,
   },
   number: {
     fontSize: 30,
@@ -110,10 +161,17 @@ const styles = CustomStyleSheet({
     marginRight: 14,
   },
   cell: {
-    width: 23.5,
-    borderRadius: 100,
-    justifyContent: 'center',
+    width: 64,
+    alignItems: 'center',
   },
-  middleCell: {
+  animation: {
+    width: 64,
+    height: 64,
   },
+  right: {
+    alignSelf: 'flex-end'
+  },
+  left: {
+    alignSelf: 'flex-start'
+  }
 });
