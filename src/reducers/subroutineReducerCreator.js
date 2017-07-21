@@ -3,7 +3,7 @@ export default function subroutineReducerCreator({ types }) {
 
   return function updatePayload(state = {
     isFetching: false,
-    payload: null,
+    payload: {code: 0},
   }, action) {
     switch (action.type) {
       case requestType:
