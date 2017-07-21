@@ -3,15 +3,18 @@ import {
   View,
   Image,
   Text,
+  Animated
 } from 'react-native';
 
 import PropTypes from 'prop-types';
+import Animation from 'lottie-react-native';
 import { connect } from 'react-redux';
 import DeviceInfo from 'react-native-device-info';
 import IMEI from 'react-native-imei';
 
 import Keyboard from '../Shared/Components/Keyboard';
 import CustomStyleSheet from '../../utils/customStylesheet';
+const spinner = require('../../assets/animations/s-spiner.json');
 import { login, signup, setPassword, addPrimaryAccount, addSecondaryAccount } from '../../actions';
 
 export class Password extends Component {
@@ -49,18 +52,41 @@ export class Password extends Component {
     password: '',
     imei: Math.floor((10000000 + Math.random()) * 90000000).toString(),
     match: null,
+    progress: new Animated.Value(0),
   };
 
   componentDidMount() {
   }
 
+  animateCycle = (time, fr = 0, to = 1, callback) => {
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(this.state.progress, {
+          toValue: 1,
+          duration: 2000,
+        }),
+        Animated.timing(this.state.progress, {
+          toValue: 0,
+          duration: 0
+        })
+      ])
+    ).start()
+  }
+
   componentWillReceiveProps(nextProps) {
     // TODO: MOVE TO SAGA TO PREVENT LAG
     // console.log('next props for password', nextProps.user);
+
+    if (nextProps.user.account.isFetching) {
+      console.log("fetch");
+      this.animateCycle(2000, 0, 1);
+    } else {
+      this.state.progress.stopAnimation();
+    }
+
     if (nextProps.user.account.payload) {
       const code = nextProps.user.account.payload.code;
       const password = nextProps.user.password;
-      const registeredAcc = nextProps.user.account.payload.payload.account_information;
 
       if (!password) {
         switch (code) {
@@ -69,6 +95,7 @@ export class Password extends Component {
             break;
 
           case 1001:
+            const registeredAcc = nextProps.user.account.payload.payload.account_information;
             this.props.setPassword(this.state.password);
             // this.props.navigation.navigate('TelInput');
 
@@ -98,8 +125,11 @@ export class Password extends Component {
 
           case 2002:
             // Authentication Failed
-            this.setState({ password: '' });
-            alert(nextProps.user.account.payload.message);
+            this.setState({
+              password: '',
+              error: true,
+              errorCode: nextProps.user.account.payload.code,
+            });
             break;
 
           case 3003:
@@ -119,16 +149,25 @@ export class Password extends Component {
     const res = this.state.password + number;
     if (res.length <= this.state.maxPasswordLength) {
       this.setState({ password: res });
-      if (res.length === this.state.maxPasswordLength && !params.password) {
-        this.handlePasswordConfirm(false);
-      }
     }
 
     if (params) {
-      if (params.password && params.password.length === this.state.password.length) {
-        if (params.password === this.state.password) {
-          this.handlePasswordConfirm(true);
+      if (params.password) {
+        // Registration step 2
+        if (this.state.maxPasswordLength === res.length && params.password === res) {
+          this.handlePasswordConfirm(true, res);
+        } else {
+          // incorrect password
         }
+      } else if (res.length === this.state.maxPasswordLength) {
+        // Registration step 1
+        this.handlePasswordConfirm(false, res);
+      }
+    } else {
+      if (res.length === this.state.maxPasswordLength) {
+        // Auth
+        console.log("authenticate");
+        this.handlePasswordConfirm(false, res);
       }
     }
   };
@@ -142,32 +181,32 @@ export class Password extends Component {
     alert('В шаббат у нас с мамой традиция — зажигать свечи и смотреть „Колесо фортуны“');
   };
 
-  handlePasswordConfirm = (match) => {
+  handlePasswordConfirm = (match, password) => {
     // TODO: CHANGE
     // 3002 - registered
     // 3003 - new user
     const registered = this.props.user.validate.payload.code === 3002;
 
     if (registered) {
-      this.authenticate();
+      this.authenticate(password);
     } else if (match) {
-        // TODO: go to tel input with reset
-      this.createRegistration();
+      // TODO: go to tel input with reset
+      this.createRegistration(password);
     } else {
-      this.props.navigation.navigate('Password', { password: this.state.password });
+      this.props.navigation.navigate('Password', { password: password });
     }
   };
 
-  authenticate = () => {
+  authenticate = (password) => {
     // image_id, password, imei
     this.props.login({
       facial_image_id: this.props.user.validate.payload.payload.facial_image_id,
       device_imei: this.state.imei,
-      password: this.state.password,
+      password: password,
     });
   };
 
-  createRegistration = () => {
+  createRegistration = (password) => {
     // DEV
     // TODO: set real ID;
     const isEmulator = DeviceInfo.isEmulator();
@@ -179,7 +218,7 @@ export class Password extends Component {
     this.props.signup({
       facial_image_id: this.props.user.validate.payload.payload.facial_image_id,
       device_imei: imei,
-      password: this.state.password,
+      password: password,
     });
   };
 
@@ -220,6 +259,13 @@ export class Password extends Component {
     return (
       <View style={styles.container}>
         <View style={styles.header}>
+          <View style={styles.animationContainer}>
+            <Animation
+              style={styles.animation}
+              source={spinner}
+              progress={this.state.progress}
+              />
+          </View>
           <Image style={styles.userPhoto} source={{ uri: this.props.user.photo }} />
           {this.renderInputStep() }
           <View style={styles.passContainer}>
@@ -232,7 +278,7 @@ export class Password extends Component {
           onNumberPress={this.handleNumberPress}
           onBackspacePress={this.handleBackspacePress}
           onHelpPress={this.handleHelpPress}
-        />
+          />
       </View>
     );
   }
@@ -261,6 +307,15 @@ const styles = CustomStyleSheet({
     width: 360,
     height: 188,
     alignItems: 'center',
+  },
+  animationContainer: {
+    position: 'absolute',
+    top: 16,
+    right: 16,
+  },
+  animation: {
+    width: 24,
+    height: 24,
   },
   stage: {
     fontSize: 15,

@@ -52,11 +52,8 @@ class Key extends Component {
         onPress={() => { this.props.onPress(this.props.number); } }
         onPressOut={() => { this.animate(500, 0, 1); } }
         >
-        <View style={{ width: 64, justifyContent: 'center' }}>
-          <View style={{
-            position: 'absolute', top: 0, left: 0, right: 0,
-            bottom: 0, alignItems: 'center', justifyContent: 'center',
-          }}>
+        <View style={styles.cellContainer}>
+          <View style={styles.animationContainer}>
             <Animation
               style={styles.animation}
               source={btnRoundRipple}
@@ -90,7 +87,7 @@ export default class VirtualKeyboard extends Component {
 
   renderCell = (number) => {
     return (
-      <Key number={number} onPress={(e) => this.props.onNumberPress(e) }/>
+      <Key key={number} number={number} onPress={(e) => this.props.onNumberPress(e) }/>
     );
   };
 
@@ -164,9 +161,22 @@ const styles = CustomStyleSheet({
     width: 64,
     alignItems: 'center',
   },
+  cellContainer: { 
+    width: 64, 
+    justifyContent: 'center' 
+  },
+  animationContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   animation: {
-    width: 64,
-    height: 64,
+    width: 60,
+    height: 60,
   },
   right: {
     alignSelf: 'flex-end'
