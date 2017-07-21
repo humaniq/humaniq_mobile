@@ -16,7 +16,7 @@ import { validate, setAvatarLocalPath } from '../../actions';
 // console.log('action types🔑', ActionTypes.setAvatarLocalPath());
 
 import CustomStyleSheet from '../../utils/customStylesheet';
-import Modal from "../Shared/Components/Modal";
+import Modal from '../Shared/Components/Modal';
 
 // assets
 
@@ -75,7 +75,11 @@ export class Cam extends Component {
       if (!photo) {
         switch (code) {
           case 6000:
-            alert(nextProps.user.validate.payload.message);
+            this.setState({
+              error: true,
+              errorCode: nextProps.user.validate.payload.code,
+              path: '',
+            });
             break;
 
           case 3002:
@@ -86,15 +90,16 @@ export class Cam extends Component {
 
           case 3003:
             // new user
-            console.log('navigation', this.props.navigation);
             this.props.setAvatarLocalPath(this.state.path);
             this.props.navigation.navigate('Tutorial', { nextScene: 'Password' });
             break;
 
           case 3000:
-            this.setState({ path: '' });
-            alert(nextProps.user.validate.payload.message);
-            // reset payload?
+            this.setState({
+              error: true,
+              errorCode: nextProps.user.validate.payload.code,
+              path: '',
+            });
             break;
 
           default:
@@ -103,7 +108,6 @@ export class Cam extends Component {
               errorCode: nextProps.user.validate.payload.code,
               path: '',
             });
-            // alert(`Unknown code ${nextProps.user.validate.payload.code}, no info in Postman`);
         }
       }
     }
@@ -170,14 +174,18 @@ export class Cam extends Component {
     );
   }
 
-  dismissModal = () => {
+  handleDismissModal = () => {
     this.setState({ error: false, errorCode: null });
   };
 
   render() {
     return (
       <View style={styles.container}>
-        <Modal onPress={this.dismissModal} code={this.state.errorCode} visible={this.state.error} />
+        <Modal
+          onPress={this.handleDismissModal}
+          code={this.state.errorCode}
+          visible={this.state.error}
+        />
         <View style={styles.navbar}>
           <TouchableOpacity
             style={styles.closeBtn}

@@ -19,7 +19,15 @@ export default class Modal extends Component {
   };
 
   renderErrorMessage = () => {
-
+    return this.props.code;
+    /*
+    switch(this.props.code) {
+      case 6000:
+        return 'Error in request';
+        break;
+        // case
+    }
+    */
   };
 
   render() {
@@ -33,7 +41,7 @@ export default class Modal extends Component {
             <View style={styles.content}>
               {/* here should be image rendered based on status code in renderErrorMessage */}
               <View style={{ width: 100, height: 100, backgroundColor: 'red', borderRadius: 50, justifyContent: 'center', alignItems: 'center' }}>
-                <Text>{this.renderErrorMessage}</Text>
+                <Text>{this.renderErrorMessage()}</Text>
               </View>
             </View>
             <TouchableOpacity style={styles.button} onPress={this.props.onPress}>
