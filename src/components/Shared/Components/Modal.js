@@ -15,26 +15,30 @@ export default class Modal extends Component {
   static propTypes = {
     onPress: PropTypes.func.isRequired,
     code: PropTypes.number.isRequired,
+    visible: PropTypes.bool.isRequired,
   };
 
   render() {
-    return (
-      <View style={styles.container}>
-        <TouchableOpacity style={styles.closeBtn} onPress={this.props.onPress}>
-          <Image source={ic_close} />
-        </TouchableOpacity>
-        <View style={styles.modal}>
-          <View style={styles.content}>
-            <View style={{ width: 100, height: 100, backgroundColor: 'red', borderRadius: 50 }}>
-              <Text>{this.props.code}</Text>
-            </View>
-          </View>
-          <TouchableOpacity style={styles.button} onPress={this.props.onPress}>
-            <Image source={ic_confirm} />
+    if (this.props.visible) {
+      return (
+        <View style={styles.container}>
+          <TouchableOpacity style={styles.closeBtn} onPress={this.props.onPress}>
+            <Image source={ic_close} />
           </TouchableOpacity>
+          <View style={styles.modal}>
+            <View style={styles.content}>
+              <View style={{ width: 100, height: 100, backgroundColor: 'red', borderRadius: 50 }}>
+                <Text>{this.props.code}</Text>
+              </View>
+            </View>
+            <TouchableOpacity style={styles.button} onPress={this.props.onPress}>
+              <Image source={ic_confirm} />
+            </TouchableOpacity>
+          </View>
         </View>
-      </View>
-    );
+      );
+    }
+    return null;
   }
 }
 
