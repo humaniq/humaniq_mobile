@@ -16,6 +16,7 @@ import { validate, setAvatarLocalPath } from '../../actions';
 // console.log('action types🔑', ActionTypes.setAvatarLocalPath());
 
 import CustomStyleSheet from '../../utils/customStylesheet';
+import Modal from "../Shared/Components/Modal";
 
 // assets
 
@@ -55,6 +56,8 @@ export class Cam extends Component {
       path: '',
       base64: '',
       count: 1,
+      error: false,
+      errorCode: null,
     };
   }
 
@@ -95,7 +98,12 @@ export class Cam extends Component {
             break;
 
           default:
-            alert(`Unknown code ${nextProps.user.validate.payload.code}, no info in Postman`);
+            this.setState({
+              error: true,
+              errorCode: nextProps.user.validate.payload.code,
+              path: '',
+            });
+            // alert(`Unknown code ${nextProps.user.validate.payload.code}, no info in Postman`);
         }
       }
     }
@@ -162,9 +170,14 @@ export class Cam extends Component {
     );
   }
 
+  dismissModal = () => {
+    this.setState({ error: false, errorCode: null });
+  };
+
   render() {
     return (
       <View style={styles.container}>
+        <Modal onPress={this.dismissModal} code={this.state.errorCode} visible={this.state.error} />
         <View style={styles.navbar}>
           <TouchableOpacity
             style={styles.closeBtn}

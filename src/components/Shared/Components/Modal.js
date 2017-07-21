@@ -14,8 +14,12 @@ const ic_close = require('../../../assets/icons/ic_close_black.png');
 export default class Modal extends Component {
   static propTypes = {
     onPress: PropTypes.func.isRequired,
-    code: PropTypes.number.isRequired,
+    code: PropTypes.number,
     visible: PropTypes.bool.isRequired,
+  };
+
+  renderErrorMessage = () => {
+
   };
 
   render() {
@@ -27,8 +31,9 @@ export default class Modal extends Component {
           </TouchableOpacity>
           <View style={styles.modal}>
             <View style={styles.content}>
-              <View style={{ width: 100, height: 100, backgroundColor: 'red', borderRadius: 50 }}>
-                <Text>{this.props.code}</Text>
+              {/* here should be image rendered based on status code in renderErrorMessage */}
+              <View style={{ width: 100, height: 100, backgroundColor: 'red', borderRadius: 50, justifyContent: 'center', alignItems: 'center' }}>
+                <Text>{this.renderErrorMessage}</Text>
               </View>
             </View>
             <TouchableOpacity style={styles.button} onPress={this.props.onPress}>
@@ -38,7 +43,7 @@ export default class Modal extends Component {
         </View>
       );
     }
-    return null;
+    return <View />;
   }
 }
 
