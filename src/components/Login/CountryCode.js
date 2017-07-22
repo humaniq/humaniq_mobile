@@ -8,6 +8,7 @@ import {
     TextInput
 } from 'react-native';
 import PropTypes from 'prop-types';
+import { NavigationActions } from 'react-navigation';
 import { connect } from 'react-redux';
 import CustomStyleSheet from '../../utils/customStylesheet';
 
@@ -166,45 +167,52 @@ export class CountryCode extends Component {
         this.state.isSearchActive ? this.setState({ isSearchActive: false, searchText: '' }) : this.setState({ isSearchActive: true });
     }
 
+    onBackPress = () => {
+        const backAction = NavigationActions.back({
+            key: null,
+        });
+        this.props.navigation.dispatch(backAction);
+    }
+
     render() {
         return (
             <View style={styles.container}>
                 <View style={styles.header}>
                     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
 
-                        <TouchableOpacity style={styles.backButton}>
-                            <Image source={backWhite}/>
+                        <TouchableOpacity style={styles.backButton} onPress={this.onBackPress} >
+                        <Image source={backWhite}/>
                         </TouchableOpacity>
-                        {
-                            this.state.isSearchActive ? <TextInput
-                                style={{ height: 24, padding: 0, lineHeight: 24, width: 200, fontSize: 16, color: "#FFFFFF", textDecorationLine: 'none', fontWeight: 'normal' }}
-                                onChangeText={(e) => this.setState({ searchText: e }) }
-                                underlineColorAndroid={"transparent"}
-                                autoCorrect={false}
-                                autoFocus={true}
-                                placeholder={"Search Country"}
-                                placeholderTextColor={"#FFFFFFB2"}
-                                selectionColor={"#FFFFFF"}/> : null
-                        }
-                    </View>
                     {
-                        this.state.isSearchActive ?
-                            <TouchableOpacity style={styles.searchButton} onPress={this.toggleSearch}>
-                                <Image source={closeWhite}/>
-                            </TouchableOpacity> :
-                            <TouchableOpacity style={styles.searchButton} onPress={this.toggleSearch}>
-                                <Image source={searchWhite}/>
-                            </TouchableOpacity>
+                        this.state.isSearchActive ? <TextInput
+                            style={{ height: 24, padding: 0, lineHeight: 24, width: 200, fontSize: 16, color: "#FFFFFF", textDecorationLine: 'none', fontWeight: 'normal' }}
+                            onChangeText={(e) => this.setState({ searchText: e }) }
+                            underlineColorAndroid={"transparent"}
+                            autoCorrect={false}
+                            autoFocus={true}
+                            placeholder={"Search Country"}
+                            placeholderTextColor={"#FFFFFFB2"}
+                            selectionColor={"#FFFFFF"}/> : null
                     }
                 </View>
-                <View style={styles.row}>
-                    <ScrollView style={styles.scroll}>
-                        {
-                            this.state.isSearchActive ? this.renderSearchResult() : this.renderList(countryArray)
-                        }
-                    </ScrollView>
-                </View>
+                {
+                    this.state.isSearchActive ?
+                        <TouchableOpacity style={styles.searchButton} onPress={this.toggleSearch}>
+                            <Image source={closeWhite}/>
+                        </TouchableOpacity> :
+                        <TouchableOpacity style={styles.searchButton} onPress={this.toggleSearch}>
+                            <Image source={searchWhite}/>
+                        </TouchableOpacity>
+                }
             </View>
+            <View style={styles.row}>
+                <ScrollView style={styles.scroll}>
+                    {
+                        this.state.isSearchActive ? this.renderSearchResult() : this.renderList(countryArray)
+                    }
+                </ScrollView>
+            </View>
+            </View >
         );
     }
 }
