@@ -10,6 +10,7 @@ import Backend from './Backend';
 import CustomView from './CustomView';
 import PhotoSelect from './PhotoSelect';
 import SoundSelect from './SoundSelect';
+import messagesMock from './MessagesMock';
 
 const combinedShape = require('./../../assets/icons/combined_shape.png');
 const icUser = require('./../../assets/icons/ic_user.png');
@@ -48,11 +49,9 @@ class Chat extends React.Component {
 
   componentWillMount() {
     this._isMounted = true;
-    Backend.loadMessages((message) => {
-      this.setState(previousState => ({
-        messages: GiftedChat.append(previousState.messages, message),
-      }));
-    });
+    this.setState(previousState => ({
+      messages: GiftedChat.append(previousState.messages, messagesMock),
+    }));
   }
 
   componentWillUnmount() {
@@ -60,7 +59,10 @@ class Chat extends React.Component {
   }
 
   onSend(message) {
-    Backend.sendMessage(message.map(m => ({ ...m, user: user1 })));
+    const msg = message.map(m => ({ ...m, user: user1 }));
+    this.setState(previousState => ({
+      messages: GiftedChat.append(previousState.messages, msg),
+    }));
   }
 
   renderCustomView(props) {
@@ -115,13 +117,14 @@ class Chat extends React.Component {
   }
 
   render() {
-    console.log(this.props);
 
     return (
       <View style={{ backgroundColor: '#ffffff', flex: 1 }}>
         <View style={styles.navbar}>
           <View style={{ width: 60, flex: 0.5, alignItems: 'flex-start' }}>
-            <TouchableOpacity style={{ padding: 10 }}>
+            <TouchableOpacity onPress={()=>{
+              console.log(JSON.stringify(this.state.messages, null, 2))
+            }} style={{ padding: 10 }}>
               <Image source={combinedShape} />
             </TouchableOpacity>
           </View>
