@@ -117,14 +117,14 @@ export class TelInput extends Component {
     return (
       <View style={styles.telInput}>
         <TouchableOpacity
-          style={{ height: 72, flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}
-          onPress={() => { 
-            this.props.navigation.navigate('CountryCode', 
-            { refresh: (t, flag) => {t != null ? this.setState({code: t, flag: flag}) : null} }) 
-          }}>
-          <Image style={{ width: 32, height: 28 }} source={{ uri: this.state.flag }}/>
-          <Text style={{ fontSize: 25, color: 'white', marginLeft: 4.5, lineHeight: 29 }}>{this.state.code}</Text>
-          <Image style={{ marginTop: 28.5, marginBottom: 24.5, width: 19, height: 19 }} source={arrowDownWhite}/>
+          style={styles.countryCodeContainer}
+          onPress={() => {
+            this.props.navigation.navigate('CountryCode',
+              { refresh: (t, flag) => { t != null ? this.setState({ code: t, flag: flag }) : null } })
+          } }>
+          <Image style={styles.flag} source={{ uri: this.state.flag }}/>
+          <Text style={styles.code}>{this.state.code}</Text>
+          <Image style={styles.arrow} source={arrowDownWhite}/>
         </TouchableOpacity>
         <Text style={styles.number}>{this.state.phone}</Text>
       </View>
@@ -139,7 +139,7 @@ export class TelInput extends Component {
             {this.renderInput() }
           </View>
         </View>
-        <View style={{ height: 61, width: 360, justifyContent: 'space-between', flexDirection: 'row', paddingLeft: 16, paddingRight: 16 }}>
+        <View style={styles.buttonsContainer}>
           <HelpButton onPress={this.handleHelpPress} />
           <ConfirmButton onPress={this.handlePhoneConfirm} />
         </View>
@@ -171,6 +171,28 @@ const styles = CustomStyleSheet({
     flex: 1,
     paddingTop: 120,
   },
+  countryCodeContainer: {
+    flexDirection: 'row',
+    height: 72,
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  flag: {
+    width: 32,
+    height: 28
+  },
+  arrow: {
+    marginTop: 28.5,
+    marginBottom: 24.5,
+    width: 19,
+    height: 19
+  },
+  code: {
+    fontSize: 25,
+    color: 'white',
+    marginLeft: 4.5,
+    lineHeight: 29
+  },
   passContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -187,5 +209,13 @@ const styles = CustomStyleSheet({
     fontSize: 25,
     marginLeft: 10,
     color: 'white'
+  },
+  buttonsContainer: {
+    height: 61,
+    width: 360,
+    justifyContent: 'space-between',
+    flexDirection: 'row',
+    paddingLeft: 16,
+    paddingRight: 16
   },
 });
