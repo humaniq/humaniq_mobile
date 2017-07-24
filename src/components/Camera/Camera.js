@@ -11,7 +11,7 @@ import Camera from 'react-native-camera';
 import { NavigationActions } from 'react-navigation';
 import RNFetchBlob from 'react-native-fetch-blob';
 import { connect } from 'react-redux';
-import { validate, setAvatarLocalPath } from '../../actions';
+import { validate, setAvatarLocalPath, faceEmotionCreate, faceEmotionValidate } from '../../actions';
 
 // console.log('action types🔑', ActionTypes.setAvatarLocalPath());
 
@@ -218,6 +218,8 @@ const mapStateToProps = state => ({
 
 export default connect(mapStateToProps, {
   validate: validate.request,
+  emotionCreate: faceEmotionCreate.request,
+  emotionValidate: faceEmotion.request,
   setAvatarLocalPath,
 })(Cam);
 
