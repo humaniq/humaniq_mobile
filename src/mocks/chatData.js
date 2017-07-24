@@ -234,5 +234,32 @@ export const _messages = [
     text: 'Скоро Скоро )! Скоро Скоро )! Скоро Скоро )! Скоро Скоро )! Скоро Скоро )! Скоро Скоро )! ',
     time: new Date(),
   },
+  {
+    id: 15,
+    senderId: 1,
+    chatId: 7,
+    state: ACCEPTED,
+    type: 'text',
+    text: 'Ну Ну...',
+    time: new Date(),
+  },
+  {
+    id: 16,
+    senderId: 1,
+    chatId: 7,
+    state: ACCEPTED,
+    type: 'text',
+    text: 'Истина где-то рядом...',
+    time: new Date(),
+  },
+  {
+    id: 16,
+    senderId: 1,
+    chatId: 3,
+    state: ACCEPTED,
+    type: 'text',
+    text: 'Определенно!',
+    time: new Date(),
+  },
 
 ];

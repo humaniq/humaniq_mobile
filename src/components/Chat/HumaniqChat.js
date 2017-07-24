@@ -14,6 +14,7 @@ const clipWhite = require('./../../assets/icons/clip_white.png');
 const fabBlue = require('./../../assets/icons/fab_blue.png');
 const smile = require('./../../assets/icons/smile.png');
 const money = require('./../../assets/icons/money.png');
+const complete = require('./../../assets/icons/complete.png');
 
 export class Chat extends Component {
   constructor(props) {
@@ -33,26 +34,37 @@ export class Chat extends Component {
   }
 
   renderScrollViewContent() {
-    const { chats, messages, navigation } = this.props;
+    const { chats, messages, contacts, navigation } = this.props;
     const { state: { params: { id } } } = navigation;
+    const curChat = chats.find(ch => ch.id === id) || {}
     const allMessages = messages.filter(msg => msg.chatId === id)
+    const isGroup = curChat.contactIds.length > 2
 
     const myId = 1;
     return (
       <View style={styles.scrollViewContent}>
         {allMessages.map((child, childIndex) => {
           const isLeft = child.senderId !== myId;
+          const curContact = contacts.find(cnt => cnt.id === child.senderId)
+          const conatctName = curContact.name || curContact.phone;
           return (
             <View key={child.id}>
               <View style={isLeft ? styles.leftMessage : styles.rightMessage}>
                 {isLeft ? <View style={styles.leftTriangle} /> : null}
                 <View style={[styles.bubble, { backgroundColor: isLeft ? colors.white : colors.very_light_green }]}>
-                  <Text style={styles.messageText}>
-                    {child.text}
-                  </Text>
+                  <View style={{flexDirection:'column'}}>
+                    {isGroup ? <Text style={styles.nameText}> {conatctName} </Text> : null}
+                    <Text style={styles.messageText}>
+                      {child.text}
+                    </Text>
+                  </View>
                   <Text style={styles.messageTime}>
                     16.44
                   </Text>
+                  {
+                    isLeft ? null :
+                      <Image source={complete} style={{ width:15, height:15, alignSelf: 'flex-end', marginRight: 5, marginBottom: 5 }} />
+                  }
                 </View>
                 {isLeft ? null : <View style={styles.rightTriangle} />}
               </View>
@@ -65,7 +77,12 @@ export class Chat extends Component {
   }
 
   renderHeader() {
-    const { navigation: { dispatch } } = this.props;
+    const { navigation } = this.props;
+    const { chats, messages, contacts } = this.props;
+    const { dispatch, state: { params: { id } } } = navigation;
+    const curChat = chats.find(ch => ch.id === id) || {}
+    const curContacts = contacts.filter(cnt => curChat.contactIds.includes(cnt.id));
+    const chatName = curChat.groupName || curContacts.map(cnt => cnt.name || cnt.phone).join(', ');
     return (
       <View style={styles.header}>
         <View style={styles.headerInner}>
@@ -75,7 +92,7 @@ export class Chat extends Component {
           <Image source={{ uri: 'http://lorempixel.com/200/200/cats/2/' }} style={styles.headerAvatar} />
           <View style={styles.headerStatePart}>
             <View style={styles.headerFirstRow}>
-              <Text style={styles.numberText}> + 000 00 0000000 </Text>
+              <Text ellipsizeMode="tail" numberOfLines={1} style={styles.numberText}> {chatName} </Text>
             </View>
             <View style={styles.headerSecondRow}>
               <Text style={styles.onlineText}> online </Text>
@@ -307,7 +324,19 @@ const styles = CustomStyleSheet({
     paddingRight: 9,
     paddingTop: 8,
     paddingBottom: 8,
-    maxWidth: 250,
+    maxWidth: 240,
+  },
+  nameText: {
+    opacity: 0.5,
+    fontFamily: 'Roboto',
+    fontSize: 13,
+    fontWeight: '500',
+    lineHeight: 16,
+    textAlign: 'left',
+    color: colors.black,
+    paddingTop: 4,
+    paddingLeft: 6,
+    paddingRight: 6,
   },
   rightTriangle: {
     ...rightTriangle,
@@ -335,6 +364,7 @@ const styles = CustomStyleSheet({
 const mapStateToProps = state => ({
   chats: state.chats,
   messages: state.messages,
+  contacts: state.contacts,
 });
 
 export default connect(mapStateToProps)(Chat);

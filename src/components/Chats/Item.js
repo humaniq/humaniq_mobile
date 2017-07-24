@@ -59,7 +59,7 @@ class Item extends Component {
     ].map(e => e.toString().replace(/^([0-9])$/, '0$1')).join('.') : '';
     const isGroup = item.contactIds.length > 2;
     const chatAvatar = isGroup ? user1 : { uri: curContacts[0].avatar };
-    const chatName = item.groupName || curContacts.map(cnt => cnt.name || cnt.phone).join(',');
+    const chatName = item.groupName || curContacts.map(cnt => cnt.name || cnt.phone).join(', ');
     const isApproved = !isGroup && (curContacts.slice(-1)[0] || {}).approved;
 
     const statusImg = lastMessage.state === DELIVERED ? chats_complete :
