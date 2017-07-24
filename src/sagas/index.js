@@ -41,6 +41,16 @@ export const fetchPhoneNumberValidate = fetchEntity.bind(
   actions.phoneNumberValidate,
   api.phoneNumberValidate,
 );
+export const fetchFaceEmotionCreate = fetchEntity.bind(
+  null,
+  actions.faceEmotionCreate,
+  api.faceEmotionCreate,
+);
+export const fetchFaceEmotionValidate = fetchEntity.bind(
+  null,
+  actions.faceEmotionValidate,
+  api.faceEmotionValidate,
+);
 
 function* validate({ facial_image }) {
   const errorCodes = [3000, 3001, 6000];
@@ -110,6 +120,27 @@ function* phoneNumberValidate({ phone_number, validation_code, account_id }) {
   yield call(fetchPhoneNumberValidate, body, errorCodes);
 }
 
+function* faceEmotionCreate() {
+  const errorCodes = [3000, 6000, 3003];
+  /*
+  const body = {
+   "facial_image_id": "1563566707614680065"
+  };
+  yield call(fetchPhoneNumberValidate, body, errorCodes);
+  */
+}
+
+function* faceEmotionValidate() {
+  const errorCodes = [3000, 3011, 3009, 3007, 6000];
+  /*
+  const body = {
+   "facial_image_validation_id": "1563543113933259778",
+   "facial_image": "/9j/
+  };
+  yield call(fetchPhoneNumberValidate, body, errorCodes);
+  */
+}
+
 // WATCHERS
 
 function* watchValidate() {
@@ -132,6 +163,14 @@ function* watchPhoneNumberValidate() {
   yield takeLatest(actions.PHONE_NUMBER_VALIDATE.REQUEST, phoneNumberValidate);
 }
 
+function* watchFaceEmotionCreate() {
+  yield takeLatest(actions.PHONE_NUMBER_CREATE.REQUEST, faceEmotionCreate);
+}
+
+function* watchFaceEmotionValidate() {
+  yield takeLatest(actions.PHONE_NUMBER_VALIDATE.REQUEST, faceEmotionValidate);
+}
+
 export default function* root() {
   yield all([
     fork(watchValidate),
@@ -139,5 +178,7 @@ export default function* root() {
     fork(watchLogin),
     fork(watchPhoneNumberCreate),
     fork(watchPhoneNumberValidate),
+    fork(watchFaceEmotionCreate),
+    fork(watchFaceEmotionValidate),
   ]);
 }

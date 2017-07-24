@@ -31,3 +31,6 @@ export const login = body => callApi('authenticate/user', body);
 export const signup = body => callApi('registration', body);
 export const phoneNumberCreate = body => callApi('account/phone_number', body);
 export const phoneNumberValidate = body => callApi('account/phone_number/validate', body);
+export const faceEmotionCreate = body => callApi('facial_recognition/validation', body);
+export const faceEmotionValidate = body => callApi('facial_recognition/validate', body);
+

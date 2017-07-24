@@ -82,6 +82,20 @@ export const user = combineReducers({
       ActionTypes.PHONE_NUMBER_CREATE.FAILURE,
     ],
   }),
+  faceEmotionValidate: subroutineReducerCreator({
+    types: [
+      ActionTypes.PHONE_NUMBER_VALIDATE.REQUEST,
+      ActionTypes.PHONE_NUMBER_VALIDATE.SUCCESS,
+      ActionTypes.PHONE_NUMBER_VALIDATE.FAILURE,
+    ],
+  }),
+  faceEmotionCreate: subroutineReducerCreator({
+    types: [
+      ActionTypes.PHONE_NUMBER_CREATE.REQUEST,
+      ActionTypes.PHONE_NUMBER_CREATE.SUCCESS,
+      ActionTypes.PHONE_NUMBER_CREATE.FAILURE,
+    ],
+  }),
   account,
   photo,
   password,
