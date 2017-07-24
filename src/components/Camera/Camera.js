@@ -17,6 +17,7 @@ import { validate, setAvatarLocalPath } from '../../actions';
 // console.log('action typesрџ”‘', ActionTypes.setAvatarLocalPath());
 
 import CustomStyleSheet from '../../utils/customStylesheet';
+import Modal from '../Shared/Components/Modal';
 
 // assets
 
@@ -80,8 +81,12 @@ export class Cam extends Component {
         this.state.progress.setValue(0);
         switch (code) {
           case 6000:
-            this.setState({ path: '', animation: pressAnimation });
-            alert(nextProps.user.validate.payload.message);
+            this.setState({
+              error: true,
+              errorCode: nextProps.user.validate.payload.code,
+              path: '',
+              animation: pressAnimation
+            });
             break;
 
           case 3002:
@@ -102,14 +107,21 @@ export class Cam extends Component {
             break;
 
           case 3000:
-            this.setState({ path: '', animation: pressAnimation });
-            alert(nextProps.user.validate.payload.message);
-            // reset payload?
+            this.setState({
+              error: true,
+              errorCode: nextProps.user.validate.payload.code,
+              path: '',
+              animation: pressAnimation
+            });
             break;
 
           default:
-            this.setState({ path: '', animation: pressAnimation });
-            alert(`Unknown code ${nextProps.user.validate.payload.code}, no info in Postman`);
+            this.setState({
+              error: true,
+              errorCode: nextProps.user.validate.payload.code,
+              path: '',
+              animation: pressAnimation
+            });
         }
       }
     }
@@ -189,15 +201,25 @@ export class Cam extends Component {
         style={styles.camera}
         aspect={Camera.constants.Aspect.fill}
         captureQuality={Camera.constants.CaptureQuality.low}
-        // type={Camera.constants.Type.front}
+        type={Camera.constants.Type.front}
         captureTarget={Camera.constants.CaptureTarget.disk}
+        // captureTarget={Camera.constants.CaptureTarget.memory}
         />
     );
   }
 
+  handleDismissModal = () => {
+    this.setState({ error: false, errorCode: null });
+  };
+
   render() {
     return (
       <View style={styles.container}>
+        <Modal
+          onPress={this.handleDismissModal}
+          code={this.state.errorCode}
+          visible={this.state.error}
+          />
         <View style={styles.cameraImageContainer}>
           {this.state.path ? this.renderImage() : this.renderCamera() }
         </View>
