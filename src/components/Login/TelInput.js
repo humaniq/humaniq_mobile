@@ -90,14 +90,14 @@ export class TelInput extends Component {
     if (this.state.phone.length < this.state.maxPhoneLength) {
       let inputVal = this.state.phone;
       inputVal += number;
-      inputVal = VMasker.toPattern(VMasker.toNumber(inputVal), '(999) 999 9999');
+      inputVal = VMasker.toPattern(VMasker.toNumber(inputVal),  {pattern: "(999) 999-9999", placeholder: "0"});
       this.setState({ phone: inputVal });
     }
   };
 
   handleBackspacePress = () => {
-    let phone = this.state.phone.slice(0, -1);
-    phone = VMasker.toPattern(VMasker.toNumber(phone), '(999) 999 9999');
+    let phone = VMasker.toNumber(this.state.phone).slice(0, -1);
+    phone = VMasker.toPattern(VMasker.toNumber(phone), {pattern: "(999) 999-9999", placeholder: "0"});
     this.setState({ phone });
   };
 
@@ -141,7 +141,7 @@ export class TelInput extends Component {
         </View>
         <View style={styles.buttonsContainer}>
           <HelpButton onPress={this.handleHelpPress} />
-          <ConfirmButton onPress={this.handlePhoneConfirm} />
+          <ConfirmButton onPress={this.handleHelpPress} />
         </View>
         <PhoneKeyboard
           onNumberPress={this.handleNumberPress}
