@@ -15,6 +15,7 @@ const colors = {
   bluish: '#2586c6',
   apple_green: '#7ed321',
   pinkish_grey: '#cacaca',
+  pinkish_grey_03: '#cacaca4c',
 };
 
 

@@ -6,6 +6,7 @@ import { NavigationActions } from 'react-navigation'
 
 import { colors } from '../../utils/constants';
 import CustomStyleSheet from '../../utils/customStylesheet';
+import Swiper from './Swiper';
 
 const backWhite = require('./../../assets/icons/back_white.png');
 const callWhite = require('./../../assets/icons/call_white.png');
@@ -15,6 +16,8 @@ const fabBlue = require('./../../assets/icons/fab_blue.png');
 const smile = require('./../../assets/icons/smile.png');
 const money = require('./../../assets/icons/money.png');
 const complete = require('./../../assets/icons/complete.png');
+
+const myId = 1;
 
 export class Chat extends Component {
   constructor(props) {
@@ -40,7 +43,6 @@ export class Chat extends Component {
     const allMessages = messages.filter(msg => msg.chatId === id)
     const isGroup = curChat.contactIds.length > 2
 
-    const myId = 1;
     return (
       <View style={styles.scrollViewContent}>
         {allMessages.map((child, childIndex) => {
@@ -81,8 +83,11 @@ export class Chat extends Component {
     const { chats, messages, contacts } = this.props;
     const { dispatch, state: { params: { id } } } = navigation;
     const curChat = chats.find(ch => ch.id === id) || {}
-    const curContacts = contacts.filter(cnt => curChat.contactIds.includes(cnt.id));
+    const allContacts = contacts.filter(cnt => curChat.contactIds.includes(cnt.id));
+    const curContacts = allContacts.filter(cnt => cnt.id !== myId);
     const chatName = curChat.groupName || curContacts.map(cnt => cnt.name || cnt.phone).join(', ');
+    const isGroup = curChat.contactIds.length > 2
+
     return (
       <View style={styles.header}>
         <View style={styles.headerInner}>
@@ -99,9 +104,12 @@ export class Chat extends Component {
               <View style={[styles.onlineRound, { backgroundColor: colors.apple_green }]} />
             </View>
           </View>
-          <TouchableOpacity>
-            <Image source={callWhite} style={styles.headerImage} />
-          </TouchableOpacity>
+          {
+            isGroup ? null :
+            <TouchableOpacity>
+              <Image source={callWhite} style={styles.headerImage} />
+            </TouchableOpacity>
+          }
           <TouchableOpacity>
             <Image source={moreWhite} style={styles.headerImage} />
           </TouchableOpacity>
@@ -129,7 +137,9 @@ export class Chat extends Component {
             />
             <Image style={styles.moneyImage} source={money} />
           </View>
-          <Image source={fabBlue} style={styles.fabBlue} />
+          <Swiper onSwipeLeft={() => alert('Left')}>
+            <Image source={fabBlue} style={styles.fabBlue} />
+          </Swiper>
         </View>
       </View>
     );
@@ -267,6 +277,8 @@ const styles = CustomStyleSheet({
     backgroundColor: colors.white,
     alignItems: 'center',
     justifyContent: 'center',
+    borderWidth: 0.5,
+    borderColor: colors.pinkish_grey_03,
   },
   textInput: {
     flex: 1,

@@ -53,9 +53,9 @@ class Item extends Component {
     const lastMessageName = lastMessageContact.name || lastMessageContact.phone;
     const lastMessageTime = lastMessage.time;
     const lastMessageDate = lastMessageTime ? [
-      lastMessageTime.getFullYear(),
-      lastMessageTime.getMonth() + 1,
       lastMessageTime.getDate(),
+      lastMessageTime.getMonth() + 1,
+      lastMessageTime.getFullYear(),
     ].map(e => e.toString().replace(/^([0-9])$/, '0$1')).join('.') : '';
     const isGroup = item.contactIds.length > 2;
     const chatAvatar = isGroup ? user1 : { uri: curContacts[0].avatar };
@@ -80,7 +80,7 @@ class Item extends Component {
               <View style={styles.centerRow}>
                 {
                   isGroup ?
-                    <Image style={{ width: 18, height: 12 }} source={persons} /> :
+                    <Image style={{ width: 18, height: 18 }} source={persons} /> :
                     null
                 }
                 <Text ellipsizeMode="tail" numberOfLines={1} style={styles.contactName}> {chatName} </Text>
