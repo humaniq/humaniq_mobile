@@ -60,6 +60,8 @@ export class Cam extends Component {
     this.state = {
       path: '',
       base64: '',
+      errorCode: null,
+      error: false,
       progress: new Animated.Value(0),
       animation: pressAnimation,
     };
