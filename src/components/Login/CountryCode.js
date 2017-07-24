@@ -83,6 +83,7 @@ export class CountryCode extends Component {
             searchText: '',
             array: [],
             scrollY: new Animated.Value(0),
+            loadIndex: 100,
         };
     }
 
@@ -90,6 +91,12 @@ export class CountryCode extends Component {
         let res = [];
         let hashset = [];
         let letter = "";
+
+        this.state.scrollY.addListener(({value}) => {
+            if (value >= (this.state.loadIndex - this.state.loadIndex / 2) * vh(56)) {
+                //this.setState({ loadIndex: this.state.loadIndex +  this.state.loadIndex / 2 });
+            }
+        });
 
         // Array of countries grouped by letters
         countryArray.map((o, i) => {
@@ -111,76 +118,89 @@ export class CountryCode extends Component {
 
     // Render List of countries
     renderList = (array) => {
+        console.log(this.state.isSearchActive);
         return (
-            [
-                this.renderLetters(),
+            <View style={styles.row}>
+                {this.state.isSearchActive ? () => { return null} : this.renderLetters() }
                 <ScrollView
                     key={"countryColumn"}
-                    style={styles.scroll}
+                    style={[styles.scroll, this.state.isSearchActive ? {marginLeft: vw(56)} : null]}
                     scrollEventThrottle={16}
                     onScroll={ Animated.event([{ nativeEvent: { contentOffset: { y: this.state.scrollY } } }]) }>
                     {
-                        this.state.array.map((o, i) => {
-                            return this.renderSection(letterArray[i], o[letterArray[i]]);
-                        })
+                        this.state.isSearchActive ? this.renderSearchResult() : this.renderSection(array)
                     }
                 </ScrollView>
-            ]
+            </View>
         )
     }
 
-    renderSection = (letter, countryArray) => {
+    renderSection = (countryArray) => {
         return (
-            <View key={letter}>
-                {
-                    countryArray.map((o, i) => {
-                        let resname = "";
-                        // Some countries have no flag in android/src/main/res/ directory
-                        if (noFlagCountryArray.filter((e) => e == o.name).length > 0) {
-                            resname = "noflag";
-                        } else {
-                            // Assets are lower case and contain ascii symbols
-                            resname = o.name.toLowerCase().
-                                replace(/\s/g, "_").
-                                replace(/\(/g, "").
-                                replace(/\)/g, "").
-                                replace(/'/g, "").
-                                replace(/,/g, "").
-                                replace(/__/g, "_");
-                        }
-
-                        return (
-                            <TouchableOpacity key={i} style={{
-                                height: vh(56),
-                                justifyContent: 'space-between',
-                                alignItems: 'center',
-                                flexDirection: 'row'
-                            }}>
-                                <View style={styles.flagAndCountryName}>
-                                    <Image style={styles.flag} source={{ uri: resname }}/>
-                                    <Text style={styles.countryName}>
-                                        {o.name}
-                                    </Text>
-                                </View>
-                                <Text style={styles.dialCode}>
-                                    {o.dial_code}
-                                </Text>
-                            </TouchableOpacity>
-                        )
-                    })
+            countryArray.map((o, i) => {
+                let resname = "";
+                // Some countries have no flag in android/src/main/res/ directory
+                if (noFlagCountryArray.filter((e) => e == o.name).length > 0) {
+                    resname = "noflag";
+                } else {
+                    // Assets are lower case and contain ascii symbols
+                    resname = o.name.toLowerCase().
+                        replace(/\s/g, "_").
+                        replace(/\(/g, "").
+                        replace(/\)/g, "").
+                        replace(/'/g, "").
+                        replace(/,/g, "").
+                        replace(/__/g, "_");
                 }
-            </View>
+
+                return (
+                    <TouchableOpacity key={i} style={{
+                        height: vh(56),
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        flexDirection: 'row'
+                    }}
+                        onPress={() => this.onBackPress(o.dial_code, resname) }>
+                        <View style={styles.flagAndCountryName}>
+                            <Image style={styles.flag} source={{ uri: resname }}/>
+                            <Text style={styles.countryName}>
+                                {o.name}
+                            </Text>
+                        </View>
+                        <Text style={styles.dialCode}>
+                            {o.dial_code}
+                        </Text>
+                    </TouchableOpacity>
+                )
+            })
         );
     };
+
+    renderSearchResult = () => {
+        if (this.state.searchText == '') {
+            return;
+        }
+        let res = [];
+        countryArray.map((o, i) => {
+            if (o.name.toLowerCase().indexOf(this.state.searchText.toLowerCase()) > -1) {
+                res.push(o);
+            }
+        });
+        console.log(res);
+        return this.renderSection(res);
+    }
 
     toggleSearch = () => {
         this.state.isSearchActive ? this.setState({ isSearchActive: false, searchText: '' }) : this.setState({ isSearchActive: true });
     }
 
-    onBackPress = () => {
+    onBackPress = (t, flag) => {
         const backAction = NavigationActions.back({
             key: null,
         });
+        if (t != null) {
+            this.props.navigation.state.params.refresh(t, flag);
+        }
         this.props.navigation.dispatch(backAction);
     }
 
@@ -223,7 +243,7 @@ export class CountryCode extends Component {
             <View style={styles.container}>
                 <View style={styles.header}>
                     <View style={styles.headerLeftContainer}>
-                        <TouchableOpacity style={styles.backButton} onPress={this.onBackPress} >
+                        <TouchableOpacity style={styles.backButton} onPress={() => this.onBackPress() } >
                             <Image source={backWhite}/>
                         </TouchableOpacity>
                         {
@@ -240,17 +260,15 @@ export class CountryCode extends Component {
                     </View>
                     {
                         this.state.isSearchActive ?
-                            <TouchableOpacity style={styles.searchButton} onPress={this.toggleSearch}>
+                            <TouchableOpacity style={styles.searchButton} onPress={() => this.toggleSearch() }>
                                 <Image source={closeWhite}/>
                             </TouchableOpacity> :
-                            <TouchableOpacity style={styles.searchButton} onPress={this.toggleSearch}>
+                            <TouchableOpacity style={styles.searchButton} onPress={() => this.toggleSearch() }>
                                 <Image source={searchWhite}/>
                             </TouchableOpacity>
                     }
                 </View>
-                <View style={styles.row}>
-                    {this.renderList(countryArray) }
-                </View>
+                {this.renderList(countryArray) }
             </View>
         );
     }
@@ -272,7 +290,6 @@ const styles = CustomStyleSheet({
         height: 56,
         width: "100%",
         position: 'absolute',
-        zIndex: 1,
         justifyContent: 'space-between',
     },
     headerLeftContainer: {
@@ -307,7 +324,9 @@ const styles = CustomStyleSheet({
     row: {
         marginTop: 56,
         flex: 1,
-        flexDirection: "row"
+        flexDirection: "row",
+        
+        zIndex: -10
     },
     scroll: {
         width: 296,
@@ -345,9 +364,8 @@ const styles = CustomStyleSheet({
         textAlign: 'center',
         color: '$cPaper',
     },
-
     letterContainer: {
-        width: 56
+        width: 56,
     },
     letter: {
         marginLeft: 16,

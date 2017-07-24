@@ -46,10 +46,13 @@ export class TelInput extends Component {
   state = {
     maxPhoneLength: 19,
     phone: '',
+    code: '+1',
+    flag: 'united_states'
   };
 
   componentWillReceiveProps(nextProps) {
     // TODO: MOVE TO SAGA TO PREVENT LAG
+    console.log(nextProps);
     console.log('📞 nextProps', nextProps.user);
     if (nextProps.user.phoneCreate.payload) {
       const code = nextProps.user.phoneCreate.payload.code;
@@ -115,9 +118,12 @@ export class TelInput extends Component {
       <View style={styles.telInput}>
         <TouchableOpacity
           style={{ height: 72, flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}
-          onPress={() => { this.props.navigation.navigate('CountryCode') } }>
-          <Image style={{ width: 32, height: 28 }} source={{ uri: 'picture' }}/>
-          <Text style={{ fontSize: 25, color: 'white', marginLeft: 4.5, lineHeight: 29 }}>{"+1"}</Text>
+          onPress={() => { 
+            this.props.navigation.navigate('CountryCode', 
+            { refresh: (t, flag) => {t != null ? this.setState({code: t, flag: flag}) : null} }) 
+          }}>
+          <Image style={{ width: 32, height: 28 }} source={{ uri: this.state.flag }}/>
+          <Text style={{ fontSize: 25, color: 'white', marginLeft: 4.5, lineHeight: 29 }}>{this.state.code}</Text>
           <Image style={{ marginTop: 28.5, marginBottom: 24.5, width: 19, height: 19 }} source={arrowDownWhite}/>
         </TouchableOpacity>
         <Text style={styles.number}>{this.state.phone}</Text>
@@ -135,7 +141,7 @@ export class TelInput extends Component {
         </View>
         <View style={{ height: 61, width: 360, justifyContent: 'space-between', flexDirection: 'row', paddingLeft: 16, paddingRight: 16 }}>
           <HelpButton onPress={this.handleHelpPress} />
-          <ConfirmButton onPress={this.handleConfirmPress} />
+          <ConfirmButton onPress={this.handlePhoneConfirm} />
         </View>
         <PhoneKeyboard
           onNumberPress={this.handleNumberPress}
