@@ -141,7 +141,7 @@ export class Cam extends Component {
       this.camera.capture()
         .then((data) => {
           this.setState({ path: data.path });
-          setTimeout(() => this.handleImageUpload(data.path), 1000);
+          this.handleImageUpload(data.path);
           this.setState({ animation: scaleAnimation });
           this.state.progress.setValue(0);
           Animated.sequence([
