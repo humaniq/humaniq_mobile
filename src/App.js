@@ -38,11 +38,11 @@ const Dashboard = TabNavigator(
 
 const stack = {
   //Chat: { screen: Chat },  
-  TelInput: { screen: TelInput },
   Accounts: { screen: Accounts },
   Tutorial: { screen: Tutorial },
   Camera: { screen: Camera },
   Password: { screen: Password },
+  TelInput: { screen: TelInput },
   CountryCode: { screen: CountryCode },
   CodeInput: { screen: CodeInput },
   Dashboard: { screen: Dashboard },

@@ -46,6 +46,7 @@ export class TelInput extends Component {
   state = {
     maxPhoneLength: 19,
     phone: '',
+    maskedPhone: VMasker.toPattern(0, { pattern: "(999) 999-9999", placeholder: "0" }),
     code: '+1',
     flag: 'united_states'
   };
@@ -90,23 +91,23 @@ export class TelInput extends Component {
     if (this.state.phone.length < this.state.maxPhoneLength) {
       let inputVal = this.state.phone;
       inputVal += number;
-      inputVal = VMasker.toPattern(VMasker.toNumber(inputVal),  {pattern: "(999) 999-9999", placeholder: "0"});
-      this.setState({ phone: inputVal });
+      let m = VMasker.toPattern(inputVal, { pattern: "(999) 999-9999", placeholder: "0" });
+      this.setState({ phone: inputVal, maskedPhone: m });
     }
   };
 
   handleBackspacePress = () => {
-    let phone = VMasker.toNumber(this.state.phone).slice(0, -1);
-    phone = VMasker.toPattern(VMasker.toNumber(phone), {pattern: "(999) 999-9999", placeholder: "0"});
-    this.setState({ phone });
+    let inputVal = this.state.phone.slice(0, -1);
+    let m = VMasker.toPattern(inputVal, { pattern: "(999) 999-9999", placeholder: "0" });
+    this.setState({ phone: inputVal, maskedPhone: m });
   };
 
   handleHelpPress = () => {
-    alert('В шаббат у нас с мамой традиция — зажигать свечи и смотреть „Колесо фортуны“');
+    this.props.navigation.navigate('Instructions');
   };
 
   handlePhoneConfirm = () => {
-    const phone_number = VMasker.toNumber(this.state.phone);
+    const phone_number = this.state.phone;
     this.props.phoneNumberCreate({
       account_id: this.props.user.account.payload.payload.account_information.account_id,
       phone_number,
@@ -126,7 +127,7 @@ export class TelInput extends Component {
           <Text style={styles.code}>{this.state.code}</Text>
           <Image style={styles.arrow} source={arrowDownWhite}/>
         </TouchableOpacity>
-        <Text style={styles.number}>{this.state.phone}</Text>
+        <Text style={styles.number}>{this.state.maskedPhone}</Text>
       </View>
     );
   };
