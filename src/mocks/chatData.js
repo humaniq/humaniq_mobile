@@ -5,6 +5,9 @@ const DELIVERED = 2;
 const T_OK = 0;
 const T_WAIT = 1;
 
+const OFFLINE = 0;
+const ONLINE = 1;
+
 export const _contacts = [
   // humaniq contact
   {
@@ -12,6 +15,7 @@ export const _contacts = [
     approved: true,
     phone: '+000 00 0000000',
     name: 'Humaniq',
+    status: ONLINE,
     avatar: 'http://i.imgur.com/LaMu4xZ.png',
   },
   {
@@ -20,6 +24,7 @@ export const _contacts = [
     approved: false,
     phone: '+111 11 1111111',
     name: 'Neo',
+    status: ONLINE,
     avatar: 'http://lorempixel.com/200/200/cats/2/',
   },
   {
@@ -28,6 +33,7 @@ export const _contacts = [
     approved: false,
     phone: '+222 22 2222222',
     name: '',
+    status: ONLINE,
     avatar: 'http://lorempixel.com/200/200/cats/3/',
   },
   {
@@ -36,6 +42,7 @@ export const _contacts = [
     approved: false,
     phone: '+333 33 3333333',
     name: 'Fox Mulder',
+    status: ONLINE,
     avatar: 'http://lorempixel.com/200/200/cats/4/',
   },
   {
@@ -44,6 +51,7 @@ export const _contacts = [
     approved: false,
     phone: '+444 444 4444444',
     name: 'Dana Scully',
+    status: ONLINE,
     avatar: 'http://lorempixel.com/200/200/cats/5/',
   },
   {
@@ -52,6 +60,7 @@ export const _contacts = [
     approved: false,
     phone: '+555 555 5555555',
     name: 'John Smith',
+    status: ONLINE,
     avatar: 'http://lorempixel.com/200/200/cats/5/',
   },
 ];
@@ -259,6 +268,33 @@ export const _messages = [
     state: ACCEPTED,
     type: 'text',
     text: 'Определенно!',
+    time: new Date(),
+  },
+  {
+    id: 17,
+    senderId: 1,
+    chatId: 7,
+    state: ACCEPTED,
+    type: 'image',
+    uri: '',
+    time: new Date(),
+  },
+  {
+    id: 18,
+    senderId: 1,
+    chatId: 7,
+    state: ACCEPTED,
+    type: 'audio',
+    uri: '',
+    time: new Date(),
+  },
+  {
+    id: 18,
+    senderId: 1,
+    chatId: 7,
+    state: ACCEPTED,
+    type: 'video',
+    uri: '',
     time: new Date(),
   },
 
