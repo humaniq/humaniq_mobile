@@ -16,6 +16,7 @@ import Keyboard from '../Shared/Components/Keyboard';
 import CustomStyleSheet from '../../utils/customStylesheet';
 const spinner = require('../../assets/animations/s-spiner.json');
 import { login, signup, setPassword, addPrimaryAccount, addSecondaryAccount } from '../../actions';
+import Modal from "../Shared/Components/Modal";
 
 export class Password extends Component {
   static propTypes = {
@@ -53,6 +54,8 @@ export class Password extends Component {
     imei: Math.floor((10000000 + Math.random()) * 90000000).toString(),
     match: null,
     progress: new Animated.Value(0),
+    error: false,
+    errorCode: null,
   };
 
   componentDidMount() {
@@ -91,7 +94,10 @@ export class Password extends Component {
       if (!password) {
         switch (code) {
           case 6000:
-            alert(nextProps.user.account.payload.message);
+            this.setState({
+              error: true,
+              errorCode: nextProps.user.account.payload.code,
+            });
             break;
 
           case 1001:
@@ -134,15 +140,25 @@ export class Password extends Component {
 
           case 3003:
             // Facial Image Not Found
-            alert(nextProps.user.account.payload.message);
+            this.setState({
+              error: true,
+              errorCode: nextProps.user.account.payload.code,
+            });
             break;
 
           default:
-            alert(`Unknown code ${nextProps.user.account.payload.code}, no info in Postman`);
+            this.setState({
+              error: true,
+              errorCode: nextProps.user.account.payload.code,
+            });
         }
       }
     }
   }
+
+  handleDismissModal = () => {
+    this.setState({ error: false, errorCode: null });
+  };
 
   handleNumberPress = (number) => {
     const params = this.props.navigation.state.params;
@@ -258,6 +274,11 @@ export class Password extends Component {
   render() {
     return (
       <View style={styles.container}>
+        <Modal
+          onPress={this.handleDismissModal}
+          code={this.state.errorCode}
+          visible={this.state.error}
+        />
         <View style={styles.header}>
           <View style={styles.animationContainer}>
             <Animation
