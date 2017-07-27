@@ -81,10 +81,10 @@ export class Password extends Component {
     // console.log('next props for password', nextProps.user);
 
     if (nextProps.user.account.isFetching) {
-      console.log("fetch");
       this.animateCycle(2000, 0, 1);
     } else {
       this.state.progress.stopAnimation();
+      this.state.progress.setValue(0);
     }
 
     if (nextProps.user.account.payload) {
