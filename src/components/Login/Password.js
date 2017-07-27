@@ -14,6 +14,7 @@ import Keyboard from '../Shared/Components/Keyboard';
 import CustomStyleSheet from '../../utils/customStylesheet';
 import Confirm from '../Shared/Buttons/Confirm';
 import { login, signup, setPassword, addPrimaryAccount, addSecondaryAccount } from '../../actions';
+import Modal from "../Shared/Components/Modal";
 
 export class Password extends Component {
   static propTypes = {
@@ -47,6 +48,8 @@ export class Password extends Component {
     password: '',
     imei: Math.floor((10000000 + Math.random()) * 90000000).toString(),
     match: null,
+    error: false,
+    errorCode: null,
   };
 
   componentDidMount() {
@@ -62,7 +65,10 @@ export class Password extends Component {
       if (!password) {
         switch (code) {
           case 6000:
-            alert(nextProps.user.account.payload.message);
+            this.setState({
+              error: true,
+              errorCode: nextProps.user.account.payload.code,
+            });
             break;
 
           case 1001:
@@ -96,21 +102,34 @@ export class Password extends Component {
 
           case 2002:
             // Authentication Failed
-            this.setState({ password: '' });
-            alert(nextProps.user.account.payload.message);
+            this.setState({
+              password: '',
+              error: true,
+              errorCode: nextProps.user.account.payload.code,
+            });
             break;
 
           case 3003:
             // Facial Image Not Found
-            alert(nextProps.user.account.payload.message);
+            this.setState({
+              error: true,
+              errorCode: nextProps.user.account.payload.code,
+            });
             break;
 
           default:
-            alert(`Unknown code ${nextProps.user.account.payload.code}, no info in Postman`);
+            this.setState({
+              error: true,
+              errorCode: nextProps.user.account.payload.code,
+            });
         }
       }
     }
   }
+
+  handleDismissModal = () => {
+    this.setState({ error: false, errorCode: null });
+  };
 
   handleNumberPress = (number) => {
     const params = this.props.navigation.state.params;
@@ -229,6 +248,11 @@ export class Password extends Component {
   render() {
     return (
       <View style={styles.container}>
+        <Modal
+          onPress={this.handleDismissModal}
+          code={this.state.errorCode}
+          visible={this.state.error}
+        />
         <View style={styles.header}>
           <Image style={styles.userPhoto} source={{ uri: this.props.user.photo }} />
           {this.renderInputStep()}
