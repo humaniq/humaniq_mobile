@@ -130,7 +130,6 @@ const styles = CustomStyleSheet({
     alignSelf: 'center',
     height: 224,
     width: 270,
-    marginBottom: 113,
   },
   row: {
     flex: 1,
@@ -150,6 +149,7 @@ const styles = CustomStyleSheet({
     alignItems: 'center',
     justifyContent: 'center',
     width: 37.5,
+    height: 56,
   },
   help: {
     justifyContent: 'center',

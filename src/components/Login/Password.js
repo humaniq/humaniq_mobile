@@ -17,6 +17,7 @@ import CustomStyleSheet from '../../utils/customStylesheet';
 const spinner = require('../../assets/animations/s-spiner.json');
 import { login, signup, setPassword, addPrimaryAccount, addSecondaryAccount } from '../../actions';
 import Modal from "../Shared/Components/Modal";
+import { vw } from '../../utils/units';
 
 export class Password extends Component {
   static propTypes = {
@@ -54,6 +55,7 @@ export class Password extends Component {
     imei: Math.floor((10000000 + Math.random()) * 90000000).toString(),
     match: null,
     progress: new Animated.Value(0),
+    passwordError: new Animated.Value(0),
     error: false,
     errorCode: null,
   };
@@ -172,8 +174,10 @@ export class Password extends Component {
         // Registration step 2
         if (this.state.maxPasswordLength === res.length && params.password === res) {
           this.handlePasswordConfirm(true, res);
-        } else {
+        } else if (this.state.maxPasswordLength === res.length && params.password !== res) {
           // incorrect password
+          this.setState({error: true});
+          this.animatePasswordError();
         }
       } else if (res.length === this.state.maxPasswordLength) {
         // Registration step 1
@@ -241,19 +245,55 @@ export class Password extends Component {
   renderPassMask = () => {
     const { password, maxPasswordLength } = this.state;
     const digits = [];
+    let style = null;
 
     for (let i = 0; i < maxPasswordLength; i += 1) {
+      if (password[i]) {
+        if (this.state.error) {
+          style = styles.passError;
+        } else {
+          style = styles.passFilled;
+        }
+      } else {
+        style = styles.passEmpty;
+      }
       digits.push(
         <View key={i}>
-          {password[i] ?
-            <View style={styles.passFilled} />
-            : <View style={styles.passEmpty} />
-          }
-        </View>,
+          <View style={style} />
+        </View>
       );
     }
-    return digits;
+    return (
+      <Animated.View style={[{ marginRight: this.state.passwordError }, styles.passContainer]}>
+        {digits}
+      </Animated.View>
+    );
   };
+
+  animatePasswordError = () => {
+    Animated.sequence([
+      Animated.timing(this.state.passwordError, {
+        toValue: vw(-30),
+        duration: 50,
+      }),
+      Animated.timing(this.state.passwordError, {
+        toValue: vw(30),
+        duration: 100
+      }),
+      Animated.timing(this.state.passwordError, {
+        toValue: vw(-30),
+        duration: 100,
+      }),
+      Animated.timing(this.state.passwordError, {
+        toValue: vw(30),
+        duration: 100,
+      }),
+      Animated.timing(this.state.passwordError, {
+        toValue: vw(0),
+        duration: 50,
+      }),
+    ]).start(() => {this.setState({ error: null })});
+  }
 
   renderInputStep = () => {
     // 3002 - registered
@@ -264,7 +304,9 @@ export class Password extends Component {
       if (code === 3003 && !params.password) {
         return (<Text style={styles.stage}>{'1 / 2'}</Text>);
       } else if (params.password) {
-        return (<Text style={styles.stage}>{'2 / 2'}</Text>);
+        return (
+          <Text style={styles.stage}>{'2 / 2'}</Text>
+        );
       }
     }
 
@@ -277,8 +319,8 @@ export class Password extends Component {
         <Modal
           onPress={this.handleDismissModal}
           code={this.state.errorCode}
-          visible={this.state.error}
-        />
+          visible={this.state.error != null && this.state.errorCode != null}
+          />
         <View style={styles.header}>
           <View style={styles.animationContainer}>
             <Animation
@@ -289,17 +331,16 @@ export class Password extends Component {
           </View>
           <Image style={styles.userPhoto} source={{ uri: this.props.user.photo }} />
           {this.renderInputStep() }
-          <View style={styles.passContainer}>
-            {this.renderPassMask() }
-          </View>
+          {this.renderPassMask() }
         </View>
-
-        <Keyboard
-          isBackspaceEnabled={this.state.password !== ''}
-          onNumberPress={this.handleNumberPress}
-          onBackspacePress={this.handleBackspacePress}
-          onHelpPress={this.handleHelpPress}
-          />
+        <View style={styles.keyboardContainer}>
+          <Keyboard
+            isBackspaceEnabled={this.state.password !== ''}
+            onNumberPress={this.handleNumberPress}
+            onBackspacePress={this.handleBackspacePress}
+            onHelpPress={this.handleHelpPress}
+            />
+        </View>
       </View>
     );
   }
@@ -372,11 +413,21 @@ const styles = CustomStyleSheet({
     borderWidth: 6,
     borderColor: '$cPaper',
   },
+  passError: {
+    round: 12,
+    borderRadius: 50,
+    borderWidth: 6,
+    borderColor: '$cLipstick',
+  },
   error: {
     borderColor: 'tomato',
-
   },
   success: {
     borderColor: '#B8E986',
   },
+  keyboardContainer: {
+    flex: 1,
+    justifyContent: 'flex-end',
+    marginBottom: 113
+  }
 });
