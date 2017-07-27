@@ -88,12 +88,12 @@ const styles = CustomStyleSheet({
         height: 248,
         paddingLeft: 3,
         paddingRight: 3,
-        backgroundColor: 'white'
+        backgroundColor: '#D8D8D8'
     },
     row: {
         flex: 1,
         flexDirection: 'row',
-        backgroundColor: '#D8D8D8',
+        backgroundColor: 'transparent',
     },
     number: {
         fontSize: 35,
