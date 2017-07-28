@@ -19,6 +19,7 @@ import Dashboard from './components/Dashboard';
 import Tutorial from './components/Shared/Components/Tutorial';
 import Chat from './components/Chat';
 import { Instructions } from './components/Instructions/Instructions';
+import Choose from './components/Transactions/Choose';
 
 /*
 const Dashboard = TabNavigator(
@@ -37,6 +38,7 @@ const Dashboard = TabNavigator(
 
 const stack = {
   //Chat: { screen: Chat },
+  Choose: { screen: Choose },
   Loading: { screen: Loading },
   Accounts: { screen: Accounts },
   Tutorial: { screen: Tutorial },
