@@ -1,4 +1,4 @@
-export const colors = {
+const colors = {
   purpley_grey: '#9b9b9b',
   light_grey: '#ede6de',
   faded_blue: '#598fba',
@@ -11,9 +11,12 @@ export const colors = {
   warm_grey: '#757575',
   warm_grey_two: '#999999',
   leafy_green: '#45aa36',
+  white: '#ffffff',
   bluish: '#2586c6',
   apple_green: '#7ed321',
-  white: '#ffffff',
   pinkish_grey: '#cacaca',
-  lipstick_93: 'rgba(232, 32, 56, 0.93)',
+  pinkish_grey_03: '#cacaca4c',
 };
+
+
+export { colors };
