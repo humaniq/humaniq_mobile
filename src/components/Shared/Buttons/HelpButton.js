@@ -16,7 +16,7 @@ export default function HelpButton(props) {
   return (
     // using TouchH instead TouchO to disable pressing when prop active == false
     <TouchableHighlight style={styles.container} onPress={props.onPress}>
-      <Image source={ic_help} />
+      <Image source={props.source != null ? this.props.source : ic_help} />
     </TouchableHighlight>
   );
 }

@@ -88,6 +88,7 @@ const styles = CustomStyleSheet({
         height: 248,
         paddingLeft: 3,
         paddingRight: 3,
+        paddingBottom: 20,
         backgroundColor: '#D8D8D8'
     },
     row: {
