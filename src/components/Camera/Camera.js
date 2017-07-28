@@ -38,11 +38,22 @@ export class Cam extends Component {
         payload: PropTypes.object,
         isFetching: PropTypes.bool,
       }).isRequired,
+      faceEmotionCreate: PropTypes.shape({
+        payload: PropTypes.object,
+        isFetching: PropTypes.bool,
+      }).isRequired,
+      faceEmotionValidate: PropTypes.shape({
+        payload: PropTypes.object,
+        isFetching: PropTypes.bool,
+      }).isRequired,
       photo: PropTypes.string,
     }).isRequired,
 
     setAvatarLocalPath: PropTypes.func.isRequired,
     validate: PropTypes.func.isRequired,
+    emotionCreate: PropTypes.func.isRequired,
+    emotionValidate: PropTypes.func.isRequired,
+
     navigation: PropTypes.shape({
       navigate: PropTypes.func.isRequired,
       dispatch: PropTypes.func.isRequired,
@@ -58,6 +69,8 @@ export class Cam extends Component {
       count: 1,
       error: false,
       errorCode: null,
+      photoGoal: 'isRegistered',
+      requiredEmotions: [],
     };
   }
 
@@ -68,20 +81,15 @@ export class Cam extends Component {
   componentWillReceiveProps(nextProps) {
     // TODO: MOVE TO SAGA TO PREVENT LAG
     // console.log('📞 nextProps', nextProps.user.validate);
+    this[`${this.state.photoGoal}ReceiveProps`](nextProps);
+  }
+
+  isRegisteredReceiveProps = (nextProps) => {
     if (nextProps.user.validate.payload) {
       const code = nextProps.user.validate.payload.code;
-      const photo = nextProps.user.photo;
 
-      if (!photo) {
+      if (nextProps.user.validate.isFetching !== this.props.user.validate.isFetching) {
         switch (code) {
-          case 6000:
-            this.setState({
-              error: true,
-              errorCode: nextProps.user.validate.payload.code,
-              path: '',
-            });
-            break;
-
           case 3002:
             // registered user
             this.props.setAvatarLocalPath(this.state.path);
@@ -91,27 +99,67 @@ export class Cam extends Component {
           case 3003:
             // new user
             this.props.setAvatarLocalPath(this.state.path);
-            this.props.navigation.navigate('Tutorial', { nextScene: 'Password' });
+            if (nextProps.user.validate.payload.payload.facial_image_id) { // Emotions case
+              this.setState({ photoGoal: 'createFacialRecognitionValidation' });
+              this.props.emotionCreate({
+                facial_image_id: nextProps.user.validate.payload.payload.facial_image_id,
+              });
+            } else {
+              this.props.navigation.navigate('Tutorial', { nextScene: 'Password' });
+            }
             break;
 
           case 3000:
-            this.setState({
-              error: true,
-              errorCode: nextProps.user.validate.payload.code,
-              path: '',
-            });
-            break;
-
+          case 6000:
           default:
             this.setState({
               error: true,
-              errorCode: nextProps.user.validate.payload.code,
+              errorCode: code,
               path: '',
             });
         }
       }
     }
-  }
+  };
+
+  createFacialRecognitionValidationReceiveProps = (nextProps) => {
+    if (nextProps.user.faceEmotionCreate.payload) {
+      const code = nextProps.user.faceEmotionCreate.payload.code;
+      console.log('createFacialRecognitionValidationReceiveProps', code);
+      if (code === 3006) {
+        this.setState({
+          path: '',
+          photoGoal: 'validateFacialRecognitionValidation',
+          requiredEmotions: nextProps.user.faceEmotionCreate.payload.payload.required_emotions,
+        });
+      } else {
+        this.setState({
+          error: true,
+          errorCode: code,
+          path: '',
+        });
+      }
+    }
+  };
+
+  validateFacialRecognitionValidationReceiveProps = (nextProps) => {
+    if (nextProps.user.faceEmotionValidate.payload) {
+      const code = nextProps.user.faceEmotionValidate.payload.code;
+      if (nextProps.user.faceEmotionValidate.isFetching !== this.props.user.faceEmotionValidate.isFetching) {
+        console.log('validateFacialRecognitionValidationReceiveProps', code);
+        if (code === 3008) {
+          // reduce emotions there
+          this.props.navigation.navigate('Tutorial', { nextScene: 'Password' });
+        } else {
+          this.setState({
+            error: true,
+            errorCode: code,
+            path: '',
+          });
+        }
+      }
+    }
+  };
 
   handleCameraClose = () => {
     const backAction = NavigationActions.back({
@@ -121,8 +169,10 @@ export class Cam extends Component {
   };
 
   handleImageCapture = () => {
+    console.log('Camera::handleImageCapture BEGIN');
     this.camera.capture()
       .then((data) => {
+        console.log('Camera::handleImageCapture DONE');
         this.setState({ path: data.path });
         this.convertToBase64(data.path);
       })
@@ -135,6 +185,7 @@ export class Cam extends Component {
 
   // TODO: вынести
   convertToBase64 = (path) => {
+    console.log('Camera::convertToBase64', path);
     RNFetchBlob.fs.readFile(path, 'base64')
       .then((data) => {
         this.setState({ base64: data });
@@ -143,7 +194,15 @@ export class Cam extends Component {
   };
 
   handleImageUpload = () => {
-    this.props.validate(this.state.base64);
+    console.log('Camera::handleImageUpload', this.state.photoGoal);
+    if (this.state.photoGoal === 'isRegistered') {
+      this.props.validate(this.state.base64);
+    } else if (this.state.photoGoal === 'validateFacialRecognitionValidation') {
+      this.props.emotionValidate({
+        facial_image_validation_id: this.props.user.faceEmotionCreate.payload.payload.facial_image_validation_id,
+        facial_image: this.state.base64,
+      });
+    }
     // this.props.checkUserRegStatus(this.state.base64);
     // console.log('this.props.validate', this.props);
   };
@@ -179,6 +238,10 @@ export class Cam extends Component {
   };
 
   render() {
+    const isFetching =
+      this.props.user.validate.isFetching ||
+      this.props.user.faceEmotionCreate.isFetching ||
+      this.props.user.faceEmotionValidate.isFetching;
     return (
       <View style={styles.container}>
         <Modal
@@ -198,13 +261,18 @@ export class Cam extends Component {
           {this.state.path ? this.renderImage() : this.renderCamera()}
         </View>
         <View style={styles.captureContainer}>
-          {this.props.user.validate.isFetching ? <Text>Uploading</Text> :
-          <TouchableOpacity
-            style={[styles.captureBtn, this.state.path && styles.uploadBtn]}
-            onPress={this.state.path ? this.handleImageUpload : this.handleImageCapture}
-          >
-            {this.state.path ? <Image source={confirm} /> : null}
-          </TouchableOpacity>
+          {this.state.photoGoal === 'validateFacialRecognitionValidation' &&
+          <Text>.state.requiredEmotions: {this.state.requiredEmotions.join(', ')}</Text>
+          }
+          {isFetching ?
+            <Text>Uploading</Text>
+            :
+            <TouchableOpacity
+              style={[styles.captureBtn, this.state.path && styles.uploadBtn]}
+              onPress={this.state.path ? this.handleImageUpload : this.handleImageCapture}
+            >
+              {this.state.path ? <Image source={confirm} /> : null}
+            </TouchableOpacity>
           }
         </View>
       </View>
@@ -219,7 +287,7 @@ const mapStateToProps = state => ({
 export default connect(mapStateToProps, {
   validate: validate.request,
   emotionCreate: faceEmotionCreate.request,
-  emotionValidate: faceEmotion.request,
+  emotionValidate: faceEmotionValidate.request,
   setAvatarLocalPath,
 })(Cam);
 

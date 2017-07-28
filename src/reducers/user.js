@@ -84,16 +84,16 @@ export const user = combineReducers({
   }),
   faceEmotionValidate: subroutineReducerCreator({
     types: [
-      ActionTypes.PHONE_NUMBER_VALIDATE.REQUEST,
-      ActionTypes.PHONE_NUMBER_VALIDATE.SUCCESS,
-      ActionTypes.PHONE_NUMBER_VALIDATE.FAILURE,
+      ActionTypes.FACE_EMOTION_VALIDATE.REQUEST,
+      ActionTypes.FACE_EMOTION_VALIDATE.SUCCESS,
+      ActionTypes.FACE_EMOTION_VALIDATE.FAILURE,
     ],
   }),
   faceEmotionCreate: subroutineReducerCreator({
     types: [
-      ActionTypes.PHONE_NUMBER_CREATE.REQUEST,
-      ActionTypes.PHONE_NUMBER_CREATE.SUCCESS,
-      ActionTypes.PHONE_NUMBER_CREATE.FAILURE,
+      ActionTypes.FACE_EMOTION_CREATE.REQUEST,
+      ActionTypes.FACE_EMOTION_CREATE.SUCCESS,
+      ActionTypes.FACE_EMOTION_CREATE.FAILURE,
     ],
   }),
   account,
