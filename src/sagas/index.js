@@ -9,7 +9,7 @@ function* fetchEntity(entity, apiFn, body, errorCodes) {
   // const { response, error } = yield call(apiFn, body);
   const { response } = yield call(apiFn, body);
 
-  if (response.code) {
+  if (response && response.code) {
     const responseCode = parseInt(response.code, 10);
     const errorCode = errorCodes.find(errCode => errCode === responseCode);
 
@@ -40,6 +40,16 @@ export const fetchPhoneNumberValidate = fetchEntity.bind(
   null,
   actions.phoneNumberValidate,
   api.phoneNumberValidate,
+);
+export const fetchFaceEmotionCreate = fetchEntity.bind(
+  null,
+  actions.faceEmotionCreate,
+  api.faceEmotionCreate,
+);
+export const fetchFaceEmotionValidate = fetchEntity.bind(
+  null,
+  actions.faceEmotionValidate,
+  api.faceEmotionValidate,
 );
 
 function* validate({ facial_image }) {
@@ -110,6 +120,16 @@ function* phoneNumberValidate({ phone_number, validation_code, account_id }) {
   yield call(fetchPhoneNumberValidate, body, errorCodes);
 }
 
+function* faceEmotionCreate({ facial_image_id }) {
+  const errorCodes = [3000, 6000, 3003];
+  yield call(fetchFaceEmotionCreate, { facial_image_id }, errorCodes);
+}
+
+function* faceEmotionValidate({ facial_image_validation_id, facial_image }) {
+  const errorCodes = [3000, 3011, 3009, 3007, 6000];
+  yield call(fetchFaceEmotionValidate, { facial_image_validation_id, facial_image }, errorCodes);
+}
+
 // WATCHERS
 
 function* watchValidate() {
@@ -132,6 +152,14 @@ function* watchPhoneNumberValidate() {
   yield takeLatest(actions.PHONE_NUMBER_VALIDATE.REQUEST, phoneNumberValidate);
 }
 
+function* watchFaceEmotionCreate() {
+  yield takeLatest(actions.FACE_EMOTION_CREATE.REQUEST, faceEmotionCreate);
+}
+
+function* watchFaceEmotionValidate() {
+  yield takeLatest(actions.FACE_EMOTION_VALIDATE.REQUEST, faceEmotionValidate);
+}
+
 export default function* root() {
   yield all([
     fork(watchValidate),
@@ -139,5 +167,7 @@ export default function* root() {
     fork(watchLogin),
     fork(watchPhoneNumberCreate),
     fork(watchPhoneNumberValidate),
+    fork(watchFaceEmotionCreate),
+    fork(watchFaceEmotionValidate),
   ]);
 }
