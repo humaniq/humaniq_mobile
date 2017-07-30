@@ -1,6 +1,6 @@
 import { createStore, applyMiddleware, compose, combineReducers } from 'redux';
+import { composeWithDevTools } from 'remote-redux-devtools';
 // import thunkMiddleware from 'redux-thunk';
-import logger from 'redux-logger';
 import createSagaMiddleware from 'redux-saga';
 import filter from 'redux-localstorage-filter';
 import { AsyncStorage } from 'react-native';
@@ -19,9 +19,9 @@ const storage = compose(filter([
 ]))(adapter(AsyncStorage));
 
 function configureStore(initialState) {
-  const enhancer = compose(
+  const enhancer = (__DEV__ ? composeWithDevTools : compose)(
     applyMiddleware(
-      logger,
+      // logger,
       sagaMiddleware,
       // thunkMiddleware,
     ),
