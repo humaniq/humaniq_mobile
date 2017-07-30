@@ -83,14 +83,14 @@ export class TelInput extends Component {
     if (this.state.phone.length < this.state.maxPhoneLength) {
       let inputVal = this.state.phone;
       inputVal += number;
-      inputVal = VMasker.toPattern(VMasker.toNumber(inputVal), '+ 9 (999) 999-99-99');
+      inputVal = VMasker.toPattern(VMasker.toNumber(inputVal), '+ 9 (999) 999-99-999');
       this.setState({ phone: inputVal });
     }
   };
 
   handleBackspacePress = () => {
     let phone = this.state.phone.slice(0, -1);
-    phone = VMasker.toPattern(VMasker.toNumber(phone), '+ 9 (999) 999-99-99');
+    phone = VMasker.toPattern(VMasker.toNumber(phone), '+ 9 (999) 999-99-999');
     this.setState({ phone });
   };
 

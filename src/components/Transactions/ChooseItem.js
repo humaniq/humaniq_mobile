@@ -95,7 +95,7 @@ const styles = CustomStyleSheet({
   image: {
     height: 52,
     width: 52,
-    borderRadius: 26,
+    borderRadius: 100,
   },
   inOutHmq: {
     width: 18,

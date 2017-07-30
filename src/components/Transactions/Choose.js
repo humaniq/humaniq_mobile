@@ -19,6 +19,10 @@ const qr = require('./../../assets/icons/qr.png');
 const phoneNumber = require('./../../assets/icons/phone_number.png');
 const send = require('./../../assets/icons/send.png');
 
+const getName = (cnt) => cnt.name || cnt.phone || ' ';
+const nameSort = (a, b) => (a > b) ? 1 : (a < b) ? -1 : 0;
+const sort = (a, b) => nameSort(getName(a), getName(b))
+
 class Choose extends React.Component {
   constructor() {
     super();
@@ -30,12 +34,36 @@ class Choose extends React.Component {
   }
 
   renderContent() {
+    const { contacts } = this.props;
+    const { search, text } = this.state;
+
+    const filter = (cnt) => search && text ? getName(cnt).indexOf(text) > 0 : true
+    let groupLetter = '';
+
     return (
       <ScrollView
         style={{ backgroundColor: colors.white }}
         showsVerticalScrollIndicator={false}
       >
-        {this.renderScrollViewContent()}
+          <View style={styles.contactsHeader} />
+          {contacts.filter(filter).sort(sort).map((cnt) => {
+            const firstLetter = getName(cnt)[0];
+            let showLetter = '';
+            if (groupLetter !== firstLetter) {
+              groupLetter = firstLetter;
+              showLetter = groupLetter;
+            } else {
+              showLetter = '';
+            }
+            return (
+              <ChooseItem
+                onPress={this.selectItem}
+                letter={showLetter}
+                key={cnt.id}
+                contactID={cnt.id}
+              />
+            );
+          })}
       </ScrollView>
     );
   }
@@ -46,40 +74,6 @@ class Choose extends React.Component {
     }).catch((err) => {
       console.log('contacts.err--->', JSON.stringify(err));
     });
-  }
-
-  renderScrollViewContent() {
-    const { contacts } = this.props;
-    const { search, text } = this.state;
-    const getName = (cnt) => cnt.name || cnt.phone || ' ';
-    const nameSort = (a, b) => (a > b) ? 1 : (a < b) ? -1 : 0;
-    const sort = (a, b) => nameSort(getName(a), getName(b))
-
-    const filter = (cnt) => search && text ? getName(cnt).indexOf(text) > 0 : true
-    let groupLetter = '';
-    return (
-      <View style={styles.scrollViewContent}>
-        <View style={styles.contactsHeader} />
-        {contacts.filter(filter).sort(sort).map((cnt) => {
-          const firstLetter = getName(cnt)[0];
-          let showLetter = '';
-          if (groupLetter !== firstLetter) {
-            groupLetter = firstLetter;
-            showLetter = groupLetter;
-          } else {
-            showLetter = '';
-          }
-          return (
-            <ChooseItem
-              onPress={this.selectItem}
-              letter={showLetter}
-              key={cnt.id}
-              contactID={cnt.id}
-            />
-          );
-        })}
-      </View>
-    );
   }
 
   selectItem = (id) => {
@@ -103,7 +97,7 @@ class Choose extends React.Component {
   renderHeader() {
     const { selectedID, search } = this.state;
     const { contacts, navigation } = this.props;
-    const { dispatch, navigate } = navigation;
+    const { dispatch, navigate, state } = navigation;
 
     const curContact = contacts.find(cnt => cnt.id === selectedID) || {};
     const selName = curContact.name || curContact.phone || '';
@@ -153,7 +147,7 @@ class Choose extends React.Component {
           </View>
         )}
         <View style={styles.headerButtonsRow}>
-          <TouchableOpacity style={styles.headerButton} onPress={() => navigate('Camera')}>
+          <TouchableOpacity style={styles.headerButton} onPress={() => navigate('Camera', { mode: 'qr' })}>
             <Image source={qr} style={styles.headerImage} />
           </TouchableOpacity>
           <TouchableOpacity style={[styles.headerButton, styles.borderItem]}>
@@ -183,7 +177,7 @@ class Choose extends React.Component {
   }
 }
 
-const styles = CustomStyleSheet({
+const styles = ({
   container: {
     flex: 1,
     backgroundColor: 'white',
@@ -221,8 +215,8 @@ const styles = CustomStyleSheet({
     flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center',
-    borderTopColor: colors.pinkish_grey_03,
-    borderBottomColor: colors.pinkish_grey_03,
+    borderTopColor: colors.pinkish_grey,
+    borderBottomColor: colors.pinkish_grey,
     borderTopWidth: 1,
     borderBottomWidth: 1,
   },
@@ -243,8 +237,8 @@ const styles = CustomStyleSheet({
   },
   contactsHeader: {
     flex: 1,
-    height: 32,
     backgroundColor: 'transparent',
+    marginTop: 66 + 48,
   },
   selectedNum: {
     fontFamily: 'Roboto',
@@ -261,9 +255,6 @@ const styles = CustomStyleSheet({
     color: colors.white,
     height: 40,
     bottom: -5,
-  },
-  scrollViewContent: {
-    marginTop: 66 + 48,
   },
 });
 

@@ -208,6 +208,16 @@ export class Cam extends Component {
   };
 
   renderCamera() {
+    const { mode } = this.props.navigation.state.params;
+    alert(JSON.stringify(this.props.navigation))
+    const camtype = mode === 'qr' ? 'back' : Camera.constants.Type.front
+    const onBarCode = (code) => {
+      if (mode === 'qr') {
+        if (code.type === 'QR_CODE' && code.data) {
+          alert(code.data);
+        }
+      }
+    }
     return (
       <Camera
         ref={(cam) => {
@@ -216,10 +226,10 @@ export class Cam extends Component {
         style={styles.camera}
         aspect={Camera.constants.Aspect.fill}
         captureQuality={Camera.constants.CaptureQuality.low}
-        // type={Camera.constants.Type.front}
+        //type={camtype}
         captureTarget={Camera.constants.CaptureTarget.disk}
         // captureTarget={Camera.constants.CaptureTarget.memory}
-        onBarCodeRead={(code) => { alert(JSON.stringify(code)); }}
+        onBarCodeRead={onBarCode}
       />
     );
   }
@@ -243,6 +253,9 @@ export class Cam extends Component {
       this.props.user.validate.isFetching ||
       this.props.user.faceEmotionCreate.isFetching ||
       this.props.user.faceEmotionValidate.isFetching;
+
+    const { mode } = this.props.navigation.state.params;
+    const fn = ()=>null;
     return (
       <View style={styles.container}>
         <Modal
@@ -270,7 +283,7 @@ export class Cam extends Component {
             :
             <TouchableOpacity
               style={[styles.captureBtn, this.state.path && styles.uploadBtn]}
-              onPress={this.state.path ? this.handleImageUpload : this.handleImageCapture}
+              onPress={mode === 'qr' ? fn : this.state.path ? this.handleImageUpload : this.handleImageCapture}
             >
               {this.state.path ? <Image source={confirm} /> : null}
             </TouchableOpacity>
