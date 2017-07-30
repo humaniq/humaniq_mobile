@@ -70,6 +70,7 @@ export class Cam extends Component {
 
     this.state = {
       path: '',
+      qr: '',
       base64: '',
       error: false,
       errorCode: null,
@@ -283,13 +284,13 @@ export class Cam extends Component {
   }
 
   renderCamera() {
-    const { mode } = this.props.navigation.state.params;
-    alert(JSON.stringify(this.props.navigation))
+    const { qr, params: { mode } } = this.props.navigation.state;
     const camtype = mode === 'qr' ? 'back' : Camera.constants.Type.front
+    const { navigate } = this.props.navigation;
     const onBarCode = (code) => {
       if (mode === 'qr') {
         if (code.type === 'QR_CODE' && code.data) {
-          alert(code.data);
+          navigate('Dashboard')
         }
       }
     }
@@ -301,7 +302,7 @@ export class Cam extends Component {
         style={styles.camera}
         aspect={Camera.constants.Aspect.fill}
         captureQuality={Camera.constants.CaptureQuality.low}
-        //type={camtype}
+        type={camtype}
         captureTarget={Camera.constants.CaptureTarget.disk}
         onBarCodeRead={onBarCode}
         // captureTarget={Camera.constants.CaptureTarget.memory}
@@ -319,8 +320,8 @@ export class Cam extends Component {
       this.props.user.validate.isFetching ||
       this.props.user.faceEmotionCreate.isFetching ||
       this.props.user.faceEmotionValidate.isFetching;
-
     const { mode } = this.props.navigation.state.params;
+    const isQR = mode === 'qr'
     const fn = ()=>null;
     return (
       <View style={styles.container}>
@@ -339,7 +340,7 @@ export class Cam extends Component {
           <View style={styles.navbar}>
             <TouchableOpacity
               style={styles.closeBtn}
-              onPress={mode === 'qr' ? fn : this.state.path ? this.handleImageUpload : this.handleImageCapture}
+              onPress={this.state.path ? this.handleImageDelete : this.handleCameraClose}
               >
               <Image source={close} />
             </TouchableOpacity>
@@ -349,7 +350,7 @@ export class Cam extends Component {
               <TouchableWithoutFeedback
                 activeOpacity={1}
                 style={[styles.captureBtn, this.state.path && styles.uploadBtn]}
-                onPress={this.handleImageCapture}
+                onPress={isQR ? fn : this.handleImageCapture}
                 onPressIn={() => !this.state.path && this.animate(200, 0, 0.7) }
                 onPressOut={() => !this.state.path && this.animate(200, 0.7, 0) }
                 >
