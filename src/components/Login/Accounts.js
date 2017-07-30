@@ -11,6 +11,8 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import CustomStyleSheet from '../../utils/customStylesheet';
 
+// assets
+const authillustration = require('../../assets/icons/auth_illustration.png');
 const ic_chevrone_right = require('../../assets/icons/ic_chevrone_right.png');
 const ic_add_user = require('../../assets/icons/ic_add_user.png');
 
@@ -37,7 +39,9 @@ export class Accounts extends Component {
 
     return (
       <ScrollView contentContainerStyle={styles.container}>
-        <View style={styles.header} />
+        <View style={styles.header} >
+          <Image style={styles.illustration} source={authillustration} />
+        </View>
 
         <View style={styles.accountsContainer}>
           {allAccounts.map(acc => (
@@ -45,14 +49,14 @@ export class Accounts extends Component {
               style={styles.accountBtn}
               onPress={this.validateUser}
               key={acc.accountId}
-            >
+              >
               <View style={styles.accountInfoContainer}>
                 <Image style={styles.profilePhoto} source={{ uri: acc.photo }} />
                 <Text style={styles.id}>{acc.accountId}</Text>
               </View>
               <Image source={ic_chevrone_right} />
             </TouchableOpacity>
-          ))}
+          )) }
         </View>
         <TouchableOpacity style={styles.newUserBtn} onPress={this.validateUser}>
           <Image source={ic_add_user} />
@@ -79,6 +83,11 @@ const styles = CustomStyleSheet({
     backgroundColor: '$cBrand_dark',
     borderBottomWidth: 1,
     borderColor: 'lightgray',
+    elevation: 2
+  },
+  illustration: {
+    width: 360,
+    height: 147
   },
   accountBtn: {
     flexDirection: 'row',

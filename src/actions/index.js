@@ -14,6 +14,8 @@ export const LOGIN = createRequestTypes('LOGIN');
 export const SIGNUP = createRequestTypes('SIGNUP');
 export const PHONE_NUMBER_CREATE = createRequestTypes('PHONE_NUMBER_CREATE');
 export const PHONE_NUMBER_VALIDATE = createRequestTypes('PHONE_NUMBER_VALIDATE');
+export const FACE_EMOTION_CREATE = createRequestTypes('FACE_EMOTION_CREATE');
+export const FACE_EMOTION_VALIDATE = createRequestTypes('FACE_EMOTION_VALIDATE');
 
 export const SET_AVATAR_LOCAL_PATH = 'SET_AVATAR_LOCAL_PATH';
 export const SET_PASSWORD = 'SET_PASSWORD';
@@ -54,6 +56,18 @@ export const phoneNumberValidate = {
   request: request => action(PHONE_NUMBER_VALIDATE[REQUEST], request),
   success: response => action(PHONE_NUMBER_VALIDATE[SUCCESS], { response }),
   failure: error => action(PHONE_NUMBER_VALIDATE[FAILURE], { error }),
+};
+
+export const faceEmotionCreate = {
+  request: request => action(FACE_EMOTION_CREATE[REQUEST], request),
+  success: response => action(FACE_EMOTION_CREATE[SUCCESS], { response }),
+  failure: error => action(FACE_EMOTION_CREATE[FAILURE], { error }),
+};
+
+export const faceEmotionValidate = {
+  request: request => action(FACE_EMOTION_VALIDATE[REQUEST], request),
+  success: response => action(FACE_EMOTION_VALIDATE[SUCCESS], { response }),
+  failure: error => action(FACE_EMOTION_VALIDATE[FAILURE], { error }),
 };
 
 export const setAvatarLocalPath = path => action(SET_AVATAR_LOCAL_PATH, { path });

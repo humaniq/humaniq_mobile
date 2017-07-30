@@ -8,6 +8,8 @@ EStyleSheet.build({
   $cGray: '#9B9B9B',
   $cGrayLight: '#D8D8D8',
   $cPaper: '#fff',
+  $cPaperTransparent: '#FFFFFFB3',
+  $cLipstick: '#f01434'
 });
 
 const adjustableProperties = {
