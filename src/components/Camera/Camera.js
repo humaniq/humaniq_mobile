@@ -12,11 +12,12 @@ import Animation from 'lottie-react-native';
 import { NavigationActions } from 'react-navigation';
 import RNFetchBlob from 'react-native-fetch-blob';
 import { connect } from 'react-redux';
-import { validate, setAvatarLocalPath } from '../../actions';
+import { validate, setAvatarLocalPath, faceEmotionCreate, faceEmotionValidate } from '../../actions';
 
-// console.log('action types🔑', ActionTypes.setAvatarLocalPath());
+// console.log('action typesрџ”‘', ActionTypes.setAvatarLocalPath());
 
 import CustomStyleSheet from '../../utils/customStylesheet';
+import Modal from '../Shared/Components/Modal';
 
 // assets
 
@@ -42,11 +43,22 @@ export class Cam extends Component {
         payload: PropTypes.object,
         isFetching: PropTypes.bool,
       }).isRequired,
+      faceEmotionCreate: PropTypes.shape({
+        payload: PropTypes.object,
+        isFetching: PropTypes.bool,
+      }).isRequired,
+      faceEmotionValidate: PropTypes.shape({
+        payload: PropTypes.object,
+        isFetching: PropTypes.bool,
+      }).isRequired,
       photo: PropTypes.string,
     }).isRequired,
 
     setAvatarLocalPath: PropTypes.func.isRequired,
     validate: PropTypes.func.isRequired,
+    emotionCreate: PropTypes.func.isRequired,
+    emotionValidate: PropTypes.func.isRequired,
+
     navigation: PropTypes.shape({
       navigate: PropTypes.func.isRequired,
       dispatch: PropTypes.func.isRequired,
@@ -59,8 +71,12 @@ export class Cam extends Component {
     this.state = {
       path: '',
       base64: '',
+      error: false,
+      errorCode: null,
       progress: new Animated.Value(0),
       animation: pressAnimation,
+      photoGoal: 'isRegistered',
+      requiredEmotions: [],
     };
   }
 
@@ -71,64 +87,120 @@ export class Cam extends Component {
   componentWillReceiveProps(nextProps) {
     // TODO: MOVE TO SAGA TO PREVENT LAG
     // console.log('📞 nextProps', nextProps.user.validate);
+    this[`${this.state.photoGoal}ReceiveProps`](nextProps);
+  }
+
+  isRegisteredReceiveProps = (nextProps) => {
     if (nextProps.user.validate.payload) {
       const code = nextProps.user.validate.payload.code;
-      const photo = nextProps.user.photo;
 
-      if (!photo) {
-        this.state.progress.stopAnimation();
-        this.state.progress.setValue(0);
+      if (nextProps.user.validate.isFetching !== this.props.user.validate.isFetching) {
         switch (code) {
-          case 6000:
-            this.setState({ path: '', animation: pressAnimation });
-            alert(nextProps.user.validate.payload.message);
-            break;
-
           case 3002:
             // registered user
+            this.state.progress.stopAnimation();
+            this.state.progress.setValue(0);
             this.setState({ animation: doneAnimation });
-            this.animate(1000, 0, 1);
-            this.props.setAvatarLocalPath(this.state.path);
-            this.props.navigation.navigate('Password');
+            this.animate(1000, 0, 1, () => {
+              this.setState({ animation: pressAnimation });
+              this.props.setAvatarLocalPath(this.state.path);
+              this.props.navigation.navigate('Password');
+            });
             break;
 
           case 3003:
             // new user
-            this.setState({ animation: doneAnimation });
-            this.animate(1000, 0, 1, () => {
-              this.props.setAvatarLocalPath(this.state.path);
-              this.props.navigation.navigate('Tutorial', { nextScene: 'Password' });
-            });
-            break;
+            if (nextProps.user.validate.payload.payload.facial_image_id) { // Emotions case
+              this.setState({ photoGoal: 'createFacialRecognitionValidation' });
+              this.props.emotionCreate({
+                facial_image_id: nextProps.user.validate.payload.payload.facial_image_id,
+              });
+            } else {
+              this.state.progress.stopAnimation();
+              this.state.progress.setValue(0);
+              this.setState({ animation: doneAnimation });
+              this.animate(1000, 0, 1, () => {
+                this.setState({ animation: pressAnimation });
+                this.props.setAvatarLocalPath(this.state.path);
+                this.props.navigation.navigate('Tutorial', { nextScene: 'Password' });
+              });
+            }
 
-          case 3000:
-            this.setState({ path: '', animation: pressAnimation });
-            alert(nextProps.user.validate.payload.message);
-            // reset payload?
             break;
-
           default:
-            this.setState({ path: '', animation: pressAnimation });
-            alert(`Unknown code ${nextProps.user.validate.payload.code}, no info in Postman`);
+            this.state.progress.stopAnimation();
+            this.state.progress.setValue(0);
+            this.setState({
+              error: true,
+              errorCode: code,
+              path: '',
+              animation: pressAnimation
+            });
         }
       }
     }
-  }
+  };
 
-  handleCameraClose = () => {
-    const backAction = NavigationActions.back({
-      key: null,
-    });
-    this.props.navigation.dispatch(backAction);
+  createFacialRecognitionValidationReceiveProps = (nextProps) => {
+    if (nextProps.user.faceEmotionCreate.payload) {
+      const code = nextProps.user.faceEmotionCreate.payload.code;
+      console.log('createFacialRecognitionValidationReceiveProps', code);
+      if (code === 3006) {
+        this.state.progress.stopAnimation();
+        this.state.progress.setValue(0);
+        this.setState({ animation: doneAnimation });
+        this.animate(1000, 0, 1, () => {
+          this.setState({
+            path: '',
+            photoGoal: 'validateFacialRecognitionValidation',
+            requiredEmotions: nextProps.user.faceEmotionCreate.payload.payload.required_emotions,
+            animation: pressAnimation
+          });
+        });
+      } else {
+        this.setState({
+          error: true,
+          errorCode: code,
+          path: '',
+          animation: doneAnimation
+        });
+      }
+    }
+  };
+
+  validateFacialRecognitionValidationReceiveProps = (nextProps) => {
+    if (nextProps.user.faceEmotionValidate.payload) {
+      this.state.progress.stopAnimation();
+      this.state.progress.setValue(0);
+      const code = nextProps.user.faceEmotionValidate.payload.code;
+      if (nextProps.user.faceEmotionValidate.isFetching !== this.props.user.faceEmotionValidate.isFetching) {
+        console.log('validateFacialRecognitionValidationReceiveProps', code);
+        if (code === 3008) {
+          // reduce emotions there
+          this.setState({ animation: doneAnimation });
+          this.animate(1000, 0, 1, () => {
+            this.props.navigation.navigate('Tutorial', { nextScene: 'Password' });
+          });          
+        } else {
+          this.setState({
+            animation: pressAnimation,
+            error: true,
+            errorCode: code,
+            path: '',
+          });
+        }
+      }
+    }
   };
 
   handleImageCapture = () => {
+    console.log('Camera::handleImageCapture BEGIN');
     if (!this.state.path) {
       this.camera.capture()
         .then((data) => {
+          console.log('Camera::handleImageCapture DONE');
           this.setState({ path: data.path });
-          this.convertToBase64(data.path);
-
+          this.handleImageUpload(data.path);
           this.setState({ animation: scaleAnimation });
           this.state.progress.setValue(0);
           Animated.sequence([
@@ -141,10 +213,40 @@ export class Cam extends Component {
               duration: 10000,
             }),
           ]).start();
-          this.handleImageUpload();
         })
         .catch((err) => { console.error('error during image capture', err); });
     }
+  };
+
+  handleImageUpload = (path) => {
+    console.log('Camera::handleImageUpload', this.state.photoGoal);
+    console.log('Camera::convertToBase64', path);
+    RNFetchBlob.fs.readFile(path, 'base64')
+      .then((base64) => {
+        if (this.state.photoGoal === 'isRegistered') {
+          this.props.validate(base64);
+        } else if (this.state.photoGoal === 'validateFacialRecognitionValidation') {
+          this.props.emotionValidate({
+            facial_image_validation_id: this.props.user.faceEmotionCreate.payload.payload.facial_image_validation_id,
+            facial_image: base64,
+          });
+        }
+      })
+      .catch((err) => { console.log(err.message); });
+
+    // this.props.checkUserRegStatus(this.state.base64);
+    // console.log('this.props.validate', this.props);
+  };
+
+  // TODO: вынести
+  convertToBase64 = (path) => {
+    console.log('Camera::convertToBase64', path);
+    RNFetchBlob.fs.readFile(path, 'base64')
+      .then((data) => {
+        console.log(data);
+        return data;
+      })
+      .catch((err) => { console.log(err.message); });
   };
 
   handleImageDelete = () => {
@@ -152,21 +254,12 @@ export class Cam extends Component {
     this.setState({ path: '', animation: pressAnimation });
   };
 
-  // TODO: вынести
-  convertToBase64 = (path) => {
-    RNFetchBlob.fs.readFile(path, 'base64')
-      .then((data) => {
-        this.setState({ base64: data });
-      })
-      .catch((err) => { console.log(err.message); });
+  handleCameraClose = () => {
+    const backAction = NavigationActions.back({
+      key: null,
+    });
+    this.props.navigation.dispatch(backAction);
   };
-
-  handleImageUpload = () => {
-    this.props.validate(this.state.base64);
-    // this.props.checkUserRegStatus(this.state.base64);
-    // console.log('this.props.validate', this.props);
-  };
-
 
   // Animation
   animate = (time, fr = 0, to = 1, callback) => {
@@ -185,7 +278,7 @@ export class Cam extends Component {
         // resizeMode={'center'}
         source={{ uri: this.state.path }}
         style={styles.previewImage}
-      />
+        />
     );
   }
 
@@ -194,19 +287,34 @@ export class Cam extends Component {
       <Camera
         ref={(cam) => {
           this.camera = cam;
-        }}
+        } }
         style={styles.camera}
         aspect={Camera.constants.Aspect.fill}
         captureQuality={Camera.constants.CaptureQuality.low}
-        // type={Camera.constants.Type.front}
+        type={Camera.constants.Type.front}
         captureTarget={Camera.constants.CaptureTarget.disk}
-      />
+        // captureTarget={Camera.constants.CaptureTarget.memory}
+        />
     );
   }
 
+  handleDismissModal = () => {
+    this.state.progress.stopAnimation();
+    this.setState({ error: false, errorCode: null, animation: pressAnimation });
+  };
+
   render() {
+    const isFetching =
+      this.props.user.validate.isFetching ||
+      this.props.user.faceEmotionCreate.isFetching ||
+      this.props.user.faceEmotionValidate.isFetching;
     return (
       <View style={styles.container}>
+        <Modal
+          onPress={this.handleDismissModal}
+          code={this.state.errorCode}
+          visible={this.state.error}
+          />
         <View style={styles.cameraImageContainer}>
           {this.state.path ? this.renderImage() : this.renderCamera() }
         </View>
@@ -218,7 +326,7 @@ export class Cam extends Component {
             <TouchableOpacity
               style={styles.closeBtn}
               onPress={this.state.path ? this.handleImageDelete : this.handleCameraClose}
-            >
+              >
               <Image source={close} />
             </TouchableOpacity>
           </View>
@@ -228,15 +336,15 @@ export class Cam extends Component {
                 activeOpacity={1}
                 style={[styles.captureBtn, this.state.path && styles.uploadBtn]}
                 onPress={this.handleImageCapture}
-                onPressIn={() => !this.state.path && this.animate(200, 0, 0.7)}
-                onPressOut={() => !this.state.path && this.animate(200, 0.7, 0)}
-              >
+                onPressIn={() => !this.state.path && this.animate(200, 0, 0.7) }
+                onPressOut={() => !this.state.path && this.animate(200, 0.7, 0) }
+                >
                 {
                   <Animation
                     style={styles.animationStyle}
                     source={this.state.animation}
                     progress={this.state.progress}
-                  />
+                    />
                 }
               </TouchableWithoutFeedback>
             }
@@ -253,6 +361,8 @@ const mapStateToProps = state => ({
 
 export default connect(mapStateToProps, {
   validate: validate.request,
+  emotionCreate: faceEmotionCreate.request,
+  emotionValidate: faceEmotionValidate.request,
   setAvatarLocalPath,
 })(Cam);
 

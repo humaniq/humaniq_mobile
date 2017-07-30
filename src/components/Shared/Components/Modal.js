@@ -14,27 +14,44 @@ const ic_close = require('../../../assets/icons/ic_close_black.png');
 export default class Modal extends Component {
   static propTypes = {
     onPress: PropTypes.func.isRequired,
-    code: PropTypes.number.isRequired,
+    code: PropTypes.number,
+    visible: PropTypes.bool.isRequired,
+  };
+
+  renderErrorMessage = () => {
+    return this.props.code;
+    /*
+    switch(this.props.code) {
+      case 6000:
+        return 'Error in request';
+        break;
+        // case
+    }
+    */
   };
 
   render() {
-    return (
-      <View style={styles.container}>
-        <TouchableOpacity style={styles.closeBtn} onPress={this.props.onPress}>
-          <Image source={ic_close} />
-        </TouchableOpacity>
-        <View style={styles.modal}>
-          <View style={styles.content}>
-            <View style={{ width: 100, height: 100, backgroundColor: 'red', borderRadius: 50 }}>
-              <Text>{this.props.code}</Text>
-            </View>
-          </View>
-          <TouchableOpacity style={styles.button} onPress={this.props.onPress}>
-            <Image source={ic_confirm} />
+    if (this.props.visible) {
+      return (
+        <View style={styles.container}>
+          <TouchableOpacity style={styles.closeBtn} onPress={this.props.onPress}>
+            <Image source={ic_close} />
           </TouchableOpacity>
+          <View style={styles.modal}>
+            <View style={styles.content}>
+              {/* here should be image rendered based on status code in renderErrorMessage */}
+              <View style={{ width: 100, height: 100, backgroundColor: 'red', borderRadius: 50, justifyContent: 'center', alignItems: 'center' }}>
+                <Text>{this.renderErrorMessage()}</Text>
+              </View>
+            </View>
+            <TouchableOpacity style={styles.button} onPress={this.props.onPress}>
+              <Image source={ic_confirm} />
+            </TouchableOpacity>
+          </View>
         </View>
-      </View>
-    );
+      );
+    }
+    return <View/>;
   }
 }
 

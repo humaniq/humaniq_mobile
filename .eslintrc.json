@@ -12,6 +12,18 @@
     "react/require-default-props": 0,
     "no-console": 0,
     "camelcase": 0,
+    "max-len": [
+      "error",
+      120,
+      2,
+      {
+        "ignoreUrls": false,
+        "ignoreComments": false,
+        "ignoreRegExpLiterals": false,
+        "ignoreStrings": false,
+        "ignoreTemplateLiterals": false
+      }
+    ],
     "no-use-before-define": [
       2,
       {"functions": true, "classes": true, "variables": false}
