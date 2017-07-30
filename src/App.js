@@ -41,7 +41,7 @@ const stack = {
 
   //Chats: { screen: Chats },
   //Chat: { screen: Chat },
-  Choose: { screen: Choose },
+  //Choose: { screen: Choose },
   Loading: { screen: Loading },
   Accounts: { screen: Accounts },
   Tutorial: { screen: Tutorial },

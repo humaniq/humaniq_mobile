@@ -16,6 +16,10 @@ const colors = {
   apple_green: '#7ed321',
   pinkish_grey: '#cacaca',
   pinkish_grey_03: '#cacaca4c',
+  orangeish: '#ff8d4c',
+  battleship_grey: '#717274',
+  greyish: "#aaaaaa",
+  cerulean: "#0088cc",
 };
 
 

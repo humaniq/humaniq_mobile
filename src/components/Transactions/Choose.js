@@ -1,19 +1,38 @@
-import React from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, Image } from 'react-native';
+import React, { Component } from 'react';
+import { View, TouchableOpacity, Image, Text, ScrollView, TextInput, StatusBar } from 'react-native';
+
+import { HumaniqContactsApiLib } from 'react-native-android-library-humaniq-api';
+
 import { connect } from 'react-redux';
 import { NavigationActions } from 'react-navigation'
-import { colors } from '../../utils/constants';
 
+import { colors } from '../../utils/constants';
+import CustomStyleSheet from '../../utils/customStylesheet';
+import ChooseItem from './ChooseItem';
+
+const backWhite = require('./../../assets/icons/back_white.png');
+const paymentBig = require('./../../assets/icons/payment_big.png');
+const searchWhite = require('./../../assets/icons/search_white.png');
+const closeWhite = require('./../../assets/icons/close_white.png');
+const doneWhite = require('./../../assets/icons/done_white.png');
+const qr = require('./../../assets/icons/qr.png');
+const phoneNumber = require('./../../assets/icons/phone_number.png');
+const send = require('./../../assets/icons/send.png');
 
 class Choose extends React.Component {
   constructor() {
     super();
+    this.state = {
+      selectedID: null,
+      search: false,
+      text: '',
+    }
   }
 
   renderContent() {
     return (
       <ScrollView
-        style={{ backgroundColor: colors.light_grey }}
+        style={{ backgroundColor: colors.white }}
         showsVerticalScrollIndicator={false}
       >
         {this.renderScrollViewContent()}
@@ -21,121 +40,144 @@ class Choose extends React.Component {
     );
   }
 
-  renderScrollViewContent() {
-    const { chats, messages, contacts, navigation } = this.props;
-    const { state: { params: { id } } } = navigation;
-    const curChat = chats.find(ch => ch.id === id) || {}
-    const allMessages = messages.filter(msg => msg.chatId === id)
-    const isGroup = curChat.contactIds.length > 2
+  componentDidMount() {
+    HumaniqContactsApiLib.extractAllPhoneNumbers().then((response) => {
+      console.log('contacts.ok--->', JSON.stringify(response));
+    }).catch((err) => {
+      console.log('contacts.err--->', JSON.stringify(err));
+    });
+  }
 
+  renderScrollViewContent() {
+    const { contacts } = this.props;
+    const { search, text } = this.state;
+    const getName = (cnt) => cnt.name || cnt.phone || ' ';
+    const nameSort = (a, b) => (a > b) ? 1 : (a < b) ? -1 : 0;
+    const sort = (a, b) => nameSort(getName(a), getName(b))
+
+    const filter = (cnt) => search && text ? getName(cnt).indexOf(text) > 0 : true
+    let groupLetter = '';
     return (
       <View style={styles.scrollViewContent}>
-        {allMessages.map((child, childIndex) => {
-          const isLeft = child.senderId !== myId;
-          const curContact = contacts.find(cnt => cnt.id === child.senderId)
-          const conatctName = curContact.name || curContact.phone;
+        <View style={styles.contactsHeader} />
+        {contacts.filter(filter).sort(sort).map((cnt) => {
+          const firstLetter = getName(cnt)[0];
+          let showLetter = '';
+          if (groupLetter !== firstLetter) {
+            groupLetter = firstLetter;
+            showLetter = groupLetter;
+          } else {
+            showLetter = '';
+          }
           return (
-            <View key={child.id}>
-              <View style={isLeft ? styles.leftMessage : styles.rightMessage}>
-                {isLeft ? <View style={styles.leftTriangle} /> : null}
-                <View style={[styles.bubble, { backgroundColor: isLeft ? colors.white : colors.very_light_green }]}>
-                  <View style={{flexDirection:'column'}}>
-                    {isGroup ? <Text style={styles.nameText}> {conatctName} </Text> : null}
-                    <Text style={styles.messageText}>
-                      {child.text}
-                    </Text>
-                  </View>
-                  <Text style={styles.messageTime}>
-                    16.44
-                  </Text>
-                  {
-                    isLeft ? null :
-                      <Image source={complete} style={{ width:15, height:15, alignSelf: 'flex-end', marginRight: 5, marginBottom: 5 }} />
-                  }
-                </View>
-                {isLeft ? null : <View style={styles.rightTriangle} />}
-              </View>
-            </View>
-          )
-        }
-        )}
+            <ChooseItem
+              onPress={this.selectItem}
+              letter={showLetter}
+              key={cnt.id}
+              contactID={cnt.id}
+            />
+          );
+        })}
       </View>
     );
+  }
+
+  selectItem = (id) => {
+    const { selectedID } = this.state;
+    this.setState({
+      selectedID: selectedID === id ? null : id,
+      search: false,
+      text: '',
+    });
+  }
+
+  setSearch = () => {
+    const { search, text } = this.state;
+    const newValue = !search;
+    this.setState({
+      search: newValue,
+      text: newValue === false ? '' : text,
+    });
   }
 
   renderHeader() {
-    const { navigation } = this.props;
-    const { chats, messages, contacts } = this.props;
-    const { dispatch, state: { params: { id } } } = navigation;
-    const curChat = chats.find(ch => ch.id === id) || {}
-    const allContacts = contacts.filter(cnt => curChat.contactIds.includes(cnt.id));
-    const curContacts = allContacts.filter(cnt => cnt.id !== myId);
-    const chatName = curChat.groupName || curContacts.map(cnt => cnt.name || cnt.phone).join(', ');
-    const isGroup = curChat.contactIds.length > 2
+    const { selectedID, search } = this.state;
+    const { contacts, navigation } = this.props;
+    const { dispatch, navigate } = navigation;
+
+    const curContact = contacts.find(cnt => cnt.id === selectedID) || {};
+    const selName = curContact.name || curContact.phone || '';
 
     return (
       <View style={styles.header}>
-        <View style={styles.headerInner}>
-          <TouchableOpacity onPress={() => dispatch(NavigationActions.back())}>
-            <Image source={backWhite} style={styles.headerImage} />
-          </TouchableOpacity>
-          <Image source={{ uri: 'http://lorempixel.com/200/200/cats/2/' }} style={styles.headerAvatar} />
-          <View style={styles.headerStatePart}>
-            <View style={styles.headerFirstRow}>
-              <Text ellipsizeMode="tail" numberOfLines={1} style={styles.numberText}> {chatName} </Text>
-            </View>
-            <View style={styles.headerSecondRow}>
-              <Text style={styles.onlineText}> online </Text>
-              <View style={[styles.onlineRound, { backgroundColor: colors.apple_green }]} />
-            </View>
-          </View>
-          {
-            isGroup ? null :
-            <TouchableOpacity>
-              <Image source={callWhite} style={styles.headerImage} />
+        {search ? (
+          <View style={styles.headerInner}>
+            <TouchableOpacity onPress={() => dispatch(NavigationActions.back())}>
+              <Image source={backWhite} style={styles.headerImage} />
             </TouchableOpacity>
-          }
-          <TouchableOpacity>
-            <Image source={moreWhite} style={styles.headerImage} />
-          </TouchableOpacity>
-          <TouchableOpacity>
-            <Image source={clipWhite} style={styles.headerImage} />
-          </TouchableOpacity>
-        </View>
-      </View>
-    );
-  }
-
-  renderFooter() {
-    return (
-      <View style={styles.footer}>
-        <View style={styles.footerInner}>
-          <View style={styles.inputField}>
-            <Image style={styles.smileImage} source={smile} />
-            <TextInput
-              placeholderTextColor={colors.pinkish_grey}
-              placeholder="Type a message"
-              underlineColorAndroid="transparent"
-              style={styles.textInput}
-              onChangeText={(text) => this.setState({text})}
-              value={this.state.text}
-            />
-            <Image style={styles.moneyImage} source={money} />
+            <View style={{ flex: 1, alignItems: 'stretch' }}>
+              <TextInput
+                style={styles.inputText}
+                underlineColorAndroid="transparent"
+                placeholder="Search"
+                placeholderTextColor="white"
+                onChangeText={text => this.setState({ text })}
+                value={this.state.text}
+              />
+            </View>
+            <TouchableOpacity onPress={this.setSearch}>
+              <Image source={closeWhite} style={styles.headerImage} />
+            </TouchableOpacity>
           </View>
-          <Swiper onSwipeLeft={() => alert('Left')}>
-            <Image source={fabBlue} style={styles.fabBlue} />
-          </Swiper>
+        ) : (
+          <View style={styles.headerInner}>
+            <TouchableOpacity onPress={() => dispatch(NavigationActions.back())}>
+              <Image source={backWhite} style={styles.headerImage} />
+            </TouchableOpacity>
+            <View style={{ flex: 1, alignItems: 'center' }}>
+              <Image source={paymentBig} style={styles.paymentImage} />
+            </View>
+            { selectedID ? (
+              <View style={{ flex: 3, alignItems: 'flex-start' }}>
+                <Text style={styles.selectedNum}>{selName}</Text>
+              </View>
+            ) : null }
+            { selectedID ? (
+              <TouchableOpacity onPress={() => { this.selectItem(selectedID); }}>
+                <Image source={closeWhite} style={styles.headerImage} />
+              </TouchableOpacity>
+              ) : null }
+            <TouchableOpacity onPress={selectedID ? () => null : this.setSearch}>
+              <Image source={selectedID ? doneWhite : searchWhite} style={styles.headerImage} />
+            </TouchableOpacity>
+          </View>
+        )}
+        <View style={styles.headerButtonsRow}>
+          <TouchableOpacity style={styles.headerButton} onPress={() => navigate('Camera')}>
+            <Image source={qr} style={styles.headerImage} />
+          </TouchableOpacity>
+          <TouchableOpacity style={[styles.headerButton, styles.borderItem]}>
+            <Image source={send} style={styles.headerImage} />
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.headerButton}>
+            <Image source={phoneNumber} style={styles.headerImage} />
+          </TouchableOpacity>
         </View>
       </View>
     );
   }
 
   render() {
+    /*
+    <StatusBar
+      backgroundColor={colors.orangeish}
+      barStyle="light-content"
+    />
+    */
     return (
       <View style={styles.container}>
         {this.renderHeader()}
         {this.renderContent()}
-        {this.renderFooter()}
       </View>
     );
   }
@@ -148,12 +190,12 @@ const styles = CustomStyleSheet({
   },
   header: {
     position: 'absolute',
-    height: 66,
+    height: 66 + 48,
     left: 0,
     right: 0,
     top: 0,
-    backgroundColor: colors.faded_blue,
-    flexDirection: 'row',
+    backgroundColor: colors.orangeish,
+    flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center',
     zIndex: 2,
@@ -161,183 +203,67 @@ const styles = CustomStyleSheet({
   headerInner: {
     marginLeft: 12,
     marginRight: 12,
-    backgroundColor: colors.faded_blue,
+    height: 66,
+    backgroundColor: colors.orangeish,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  headerButtonsRow: {
+    backgroundColor: colors.white,
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
   },
+  headerButton: {
+    flex: 1,
+    height: 48,
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderTopColor: colors.pinkish_grey_03,
+    borderBottomColor: colors.pinkish_grey_03,
+    borderTopWidth: 1,
+    borderBottomWidth: 1,
+  },
+  borderItem: {
+    borderRightColor: colors.battleship_grey,
+    borderLeftColor: colors.battleship_grey,
+    borderRightWidth: 0.5,
+    borderLeftWidth: 0.5,
+  },
   headerImage: {
     height: 24,
     width: 24,
-    margin: 4,
+    margin: 7,
   },
-  headerAvatar: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    margin: 4,
+  paymentImage: {
+    width: 38,
+    height: 38,
   },
-  headerStatePart: {
-    flexDirection: 'column',
+  contactsHeader: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    margin: 4,
+    height: 32,
+    backgroundColor: 'transparent',
   },
-  numberText: {
+  selectedNum: {
     fontFamily: 'Roboto',
     fontSize: 16,
     lineHeight: 24,
     textAlign: 'left',
     color: colors.white,
   },
-  onlineText: {
-    opacity: 0.8,
-    fontFamily: 'Roboto',
-    fontSize: 14,
-    textAlign: 'left',
-    color: colors.white,
-  },
-  onlineRound: {
-    height: 8,
-    width: 8,
-    borderRadius: 4,
-    marginTop: 7,
-  },
-  headerFirstRow: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'flex-end',
-    alignSelf: 'flex-start',
-  },
-  headerSecondRow: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    alignSelf: 'flex-start',
-  },
-  footer: {
-    position: 'absolute',
-    height: 66,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'transparent',
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    zIndex: 2,
-  },
-  footerInner: {
-    marginLeft: 8,
-    marginRight: 8,
-    backgroundColor: 'transparent',
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  inputField: {
-    flex: 1,
-    flexDirection: 'row',
-    height: 48,
-    borderRadius: 60,
-    marginRight: 8,
-    backgroundColor: colors.white,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 0.5,
-    borderColor: colors.pinkish_grey_03,
-  },
-  textInput: {
-    flex: 1,
-    height: 40,
-    marginTop: 9,
+  inputText: {
     fontFamily: 'Roboto',
     fontSize: 16,
-    letterSpacing: 0,
-    color: colors.pinkish_grey,
-  },
-  smileImage: {
-    width: 24,
-    height: 24,
-    marginLeft: 11,
-    marginRight: 11,
-  },
-  moneyImage: {
-    width: 21,
-    height: 18.8,
-    marginLeft: 11,
-    marginRight: 11,
-  },
-  fabBlue: {
-    width: 56,
-    height: 56,
+    lineHeight: 24,
+    textAlign: 'left',
+    color: colors.white,
+    height: 40,
+    bottom: -5,
   },
   scrollViewContent: {
-    flex: 1,
-    marginTop: 66,
-    marginBottom: 66,
-    backgroundColor: colors.light_grey,
-  },
-  leftMessage: {
-    alignSelf: 'flex-start',
-    flexDirection: 'row',
-  },
-  rightMessage: {
-    alignSelf: 'flex-end',
-    flexDirection: 'row',
-  },
-  bubble: {
-    borderRadius: 4,
-    flexDirection: 'row',
-    alignItems: 'center',
-    maxWidth: 300,
-    margin: 6,
-  },
-  messageText: {
-    fontFamily: 'Roboto',
-    fontSize: 14,
-    lineHeight: 16,
-    textAlign: 'left',
-    color: colors.black,
-    paddingLeft: 9,
-    paddingRight: 9,
-    paddingTop: 8,
-    paddingBottom: 8,
-    maxWidth: 240,
-  },
-  nameText: {
-    opacity: 0.5,
-    fontFamily: 'Roboto',
-    fontSize: 13,
-    fontWeight: '500',
-    lineHeight: 16,
-    textAlign: 'left',
-    color: colors.black,
-    paddingTop: 4,
-    paddingLeft: 6,
-    paddingRight: 6,
-  },
-  rightTriangle: {
-    ...rightTriangle,
-    borderTopColor: colors.very_light_green,
-    top: 6,
-    right: 8,
-  },
-  leftTriangle: {
-    ...leftTriangle,
-    borderTopColor: colors.white,
-    top: 6,
-    right: -8,
-  },
-  messageTime: {
-    fontFamily: 'Roboto',
-    fontSize: 11,
-    lineHeight: 16,
-    textAlign: 'right',
-    color: 'rgba(0, 0, 0, 0.54)',
-    padding: 5,
-    alignSelf: 'flex-end',
+    marginTop: 66 + 48,
   },
 });
 
@@ -348,388 +274,3 @@ const mapStateToProps = state => ({
 });
 
 export default connect(mapStateToProps)(Choose);
-
-/*
-import React, { Component } from 'react';
-import { View, TouchableOpacity, Image, Text, ScrollView, TextInput } from 'react-native';
-
-import { connect } from 'react-redux';
-import { NavigationActions } from 'react-navigation'
-
-import { colors } from '../../utils/constants';
-import CustomStyleSheet from '../../utils/customStylesheet';
-import Swiper from './Swiper';
-
-const backWhite = require('./../../assets/icons/back_white.png');
-const callWhite = require('./../../assets/icons/call_white.png');
-const moreWhite = require('./../../assets/icons/more_white.png');
-const clipWhite = require('./../../assets/icons/clip_white.png');
-const fabBlue = require('./../../assets/icons/fab_blue.png');
-const smile = require('./../../assets/icons/smile.png');
-const money = require('./../../assets/icons/money.png');
-const complete = require('./../../assets/icons/complete.png');
-
-const myId = 1;
-
-export class Chat extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {};
-  }
-
-  renderContent() {
-    return (
-      <ScrollView
-        style={{ backgroundColor: colors.light_grey }}
-        showsVerticalScrollIndicator={false}
-      >
-        {this.renderScrollViewContent()}
-      </ScrollView>
-    );
-  }
-
-  renderScrollViewContent() {
-    const { chats, messages, contacts, navigation } = this.props;
-    const { state: { params: { id } } } = navigation;
-    const curChat = chats.find(ch => ch.id === id) || {}
-    const allMessages = messages.filter(msg => msg.chatId === id)
-    const isGroup = curChat.contactIds.length > 2
-
-    return (
-      <View style={styles.scrollViewContent}>
-        {allMessages.map((child, childIndex) => {
-          const isLeft = child.senderId !== myId;
-          const curContact = contacts.find(cnt => cnt.id === child.senderId)
-          const conatctName = curContact.name || curContact.phone;
-          return (
-            <View key={child.id}>
-              <View style={isLeft ? styles.leftMessage : styles.rightMessage}>
-                {isLeft ? <View style={styles.leftTriangle} /> : null}
-                <View style={[styles.bubble, { backgroundColor: isLeft ? colors.white : colors.very_light_green }]}>
-                  <View style={{flexDirection:'column'}}>
-                    {isGroup ? <Text style={styles.nameText}> {conatctName} </Text> : null}
-                    <Text style={styles.messageText}>
-                      {child.text}
-                    </Text>
-                  </View>
-                  <Text style={styles.messageTime}>
-                    16.44
-                  </Text>
-                  {
-                    isLeft ? null :
-                      <Image source={complete} style={{ width:15, height:15, alignSelf: 'flex-end', marginRight: 5, marginBottom: 5 }} />
-                  }
-                </View>
-                {isLeft ? null : <View style={styles.rightTriangle} />}
-              </View>
-            </View>
-          )
-        }
-        )}
-      </View>
-    );
-  }
-
-  renderHeader() {
-    const { navigation } = this.props;
-    const { chats, messages, contacts } = this.props;
-    const { dispatch, state: { params: { id } } } = navigation;
-    const curChat = chats.find(ch => ch.id === id) || {}
-    const allContacts = contacts.filter(cnt => curChat.contactIds.includes(cnt.id));
-    const curContacts = allContacts.filter(cnt => cnt.id !== myId);
-    const chatName = curChat.groupName || curContacts.map(cnt => cnt.name || cnt.phone).join(', ');
-    const isGroup = curChat.contactIds.length > 2
-
-    return (
-      <View style={styles.header}>
-        <View style={styles.headerInner}>
-          <TouchableOpacity onPress={() => dispatch(NavigationActions.back())}>
-            <Image source={backWhite} style={styles.headerImage} />
-          </TouchableOpacity>
-          <Image source={{ uri: 'http://lorempixel.com/200/200/cats/2/' }} style={styles.headerAvatar} />
-          <View style={styles.headerStatePart}>
-            <View style={styles.headerFirstRow}>
-              <Text ellipsizeMode="tail" numberOfLines={1} style={styles.numberText}> {chatName} </Text>
-            </View>
-            <View style={styles.headerSecondRow}>
-              <Text style={styles.onlineText}> online </Text>
-              <View style={[styles.onlineRound, { backgroundColor: colors.apple_green }]} />
-            </View>
-          </View>
-          {
-            isGroup ? null :
-            <TouchableOpacity>
-              <Image source={callWhite} style={styles.headerImage} />
-            </TouchableOpacity>
-          }
-          <TouchableOpacity>
-            <Image source={moreWhite} style={styles.headerImage} />
-          </TouchableOpacity>
-          <TouchableOpacity>
-            <Image source={clipWhite} style={styles.headerImage} />
-          </TouchableOpacity>
-        </View>
-      </View>
-    );
-  }
-
-  renderFooter() {
-    return (
-      <View style={styles.footer}>
-        <View style={styles.footerInner}>
-          <View style={styles.inputField}>
-            <Image style={styles.smileImage} source={smile} />
-            <TextInput
-              placeholderTextColor={colors.pinkish_grey}
-              placeholder="Type a message"
-              underlineColorAndroid="transparent"
-              style={styles.textInput}
-              onChangeText={(text) => this.setState({text})}
-              value={this.state.text}
-            />
-            <Image style={styles.moneyImage} source={money} />
-          </View>
-          <Swiper onSwipeLeft={() => alert('Left')}>
-            <Image source={fabBlue} style={styles.fabBlue} />
-          </Swiper>
-        </View>
-      </View>
-    );
-  }
-
-  render() {
-    return (
-      <View style={styles.container}>
-        {this.renderHeader()}
-        {this.renderContent()}
-        {this.renderFooter()}
-      </View>
-    );
-  }
-}
-
-const rightTriangle = {
-  width: 0,
-  height: 0,
-  backgroundColor: 'transparent',
-  borderStyle: 'solid',
-  borderRightWidth: 14,
-  borderTopWidth: 14,
-  borderRightColor: 'transparent',
-};
-
-const leftTriangle = {
-  ...rightTriangle,
-  transform: [
-    { rotate: '90deg' },
-  ],
-};
-
-const styles = CustomStyleSheet({
-  container: {
-    flex: 1,
-    backgroundColor: 'white',
-  },
-  header: {
-    position: 'absolute',
-    height: 66,
-    left: 0,
-    right: 0,
-    top: 0,
-    backgroundColor: colors.faded_blue,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    zIndex: 2,
-  },
-  headerInner: {
-    marginLeft: 12,
-    marginRight: 12,
-    backgroundColor: colors.faded_blue,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  headerImage: {
-    height: 24,
-    width: 24,
-    margin: 4,
-  },
-  headerAvatar: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    margin: 4,
-  },
-  headerStatePart: {
-    flexDirection: 'column',
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    margin: 4,
-  },
-  numberText: {
-    fontFamily: 'Roboto',
-    fontSize: 16,
-    lineHeight: 24,
-    textAlign: 'left',
-    color: colors.white,
-  },
-  onlineText: {
-    opacity: 0.8,
-    fontFamily: 'Roboto',
-    fontSize: 14,
-    textAlign: 'left',
-    color: colors.white,
-  },
-  onlineRound: {
-    height: 8,
-    width: 8,
-    borderRadius: 4,
-    marginTop: 7,
-  },
-  headerFirstRow: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'flex-end',
-    alignSelf: 'flex-start',
-  },
-  headerSecondRow: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    alignSelf: 'flex-start',
-  },
-  footer: {
-    position: 'absolute',
-    height: 66,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'transparent',
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    zIndex: 2,
-  },
-  footerInner: {
-    marginLeft: 8,
-    marginRight: 8,
-    backgroundColor: 'transparent',
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  inputField: {
-    flex: 1,
-    flexDirection: 'row',
-    height: 48,
-    borderRadius: 60,
-    marginRight: 8,
-    backgroundColor: colors.white,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 0.5,
-    borderColor: colors.pinkish_grey_03,
-  },
-  textInput: {
-    flex: 1,
-    height: 40,
-    marginTop: 9,
-    fontFamily: 'Roboto',
-    fontSize: 16,
-    letterSpacing: 0,
-    color: colors.pinkish_grey,
-  },
-  smileImage: {
-    width: 24,
-    height: 24,
-    marginLeft: 11,
-    marginRight: 11,
-  },
-  moneyImage: {
-    width: 21,
-    height: 18.8,
-    marginLeft: 11,
-    marginRight: 11,
-  },
-  fabBlue: {
-    width: 56,
-    height: 56,
-  },
-  scrollViewContent: {
-    flex: 1,
-    marginTop: 66,
-    marginBottom: 66,
-    backgroundColor: colors.light_grey,
-  },
-  leftMessage: {
-    alignSelf: 'flex-start',
-    flexDirection: 'row',
-  },
-  rightMessage: {
-    alignSelf: 'flex-end',
-    flexDirection: 'row',
-  },
-  bubble: {
-    borderRadius: 4,
-    flexDirection: 'row',
-    alignItems: 'center',
-    maxWidth: 300,
-    margin: 6,
-  },
-  messageText: {
-    fontFamily: 'Roboto',
-    fontSize: 14,
-    lineHeight: 16,
-    textAlign: 'left',
-    color: colors.black,
-    paddingLeft: 9,
-    paddingRight: 9,
-    paddingTop: 8,
-    paddingBottom: 8,
-    maxWidth: 240,
-  },
-  nameText: {
-    opacity: 0.5,
-    fontFamily: 'Roboto',
-    fontSize: 13,
-    fontWeight: '500',
-    lineHeight: 16,
-    textAlign: 'left',
-    color: colors.black,
-    paddingTop: 4,
-    paddingLeft: 6,
-    paddingRight: 6,
-  },
-  rightTriangle: {
-    ...rightTriangle,
-    borderTopColor: colors.very_light_green,
-    top: 6,
-    right: 8,
-  },
-  leftTriangle: {
-    ...leftTriangle,
-    borderTopColor: colors.white,
-    top: 6,
-    right: -8,
-  },
-  messageTime: {
-    fontFamily: 'Roboto',
-    fontSize: 11,
-    lineHeight: 16,
-    textAlign: 'right',
-    color: 'rgba(0, 0, 0, 0.54)',
-    padding: 5,
-    alignSelf: 'flex-end',
-  },
-});
-
-const mapStateToProps = state => ({
-  chats: state.chats,
-  messages: state.messages,
-  contacts: state.contacts,
-});
-
-export default connect(mapStateToProps)(Chat);
-*/

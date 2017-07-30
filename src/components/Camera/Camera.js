@@ -160,6 +160,7 @@ export class Cam extends Component {
         // type={Camera.constants.Type.front}
         captureTarget={Camera.constants.CaptureTarget.disk}
         // captureTarget={Camera.constants.CaptureTarget.memory}
+        onBarCodeRead={(code) => { alert(JSON.stringify(code)); }}
       />
     );
   }

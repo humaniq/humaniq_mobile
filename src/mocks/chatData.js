@@ -9,15 +9,6 @@ const OFFLINE = 0;
 const ONLINE = 1;
 
 export const _contacts = [
-  // humaniq contact
-  {
-    id: 0,
-    approved: true,
-    phone: '+000 00 0000000',
-    name: 'Humaniq',
-    status: ONLINE,
-    avatar: 'http://i.imgur.com/LaMu4xZ.png',
-  },
   {
     // self contact
     id: 1,
@@ -63,6 +54,33 @@ export const _contacts = [
     status: ONLINE,
     avatar: 'http://lorempixel.com/200/200/cats/5/',
   },
+  {
+    // phone only contact
+    id: 6,
+    approved: false,
+    phone: '+322 22 2222222',
+    name: '',
+    status: ONLINE,
+    avatar: 'http://lorempixel.com/200/200/cats/6/',
+  },
+  {
+    // phone only contact
+    id: 7,
+    approved: false,
+    phone: '+422 22 2222222',
+    name: '',
+    status: ONLINE,
+    avatar: 'http://lorempixel.com/200/200/cats/7/',
+  },
+  // humaniq contact
+  {
+    id: 8,
+    approved: true,
+    phone: '+000 00 0000000',
+    name: 'Humaniq',
+    status: ONLINE,
+    avatar: 'http://i.imgur.com/LaMu4xZ.png',
+  },
 ];
 
 export const _chats = [
@@ -89,7 +107,7 @@ export const _chats = [
   {
     // чат я и Humaniq
     id: 5,
-    contactIds: [1, 0],
+    contactIds: [1, 8],
   },
   {
     // чат я Малдер и Скалли
@@ -170,7 +188,7 @@ export const _messages = [
   // Чат я и Humaniq
   {
     id: 7,
-    senderId: 0,
+    senderId: 8,
     chatId: 5,
     state: DELIVERED,
     transaction: T_WAIT,

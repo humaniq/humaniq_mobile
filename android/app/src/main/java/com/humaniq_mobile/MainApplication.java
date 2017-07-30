@@ -3,6 +3,7 @@ package com.humaniq_mobile;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import com.humaniq.apilib.Package;
 import com.zmxv.RNSound.RNSoundPackage;
 import com.rnim.rn.audio.ReactNativeAudioPackage;
 import com.humaniq.libsignals.SignalReactPackage;
@@ -36,6 +37,7 @@ public class MainApplication extends MultiDexApplication implements ReactApplica
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
+            new Package(),
             new RNSoundPackage(),
             new ReactNativeAudioPackage(),
             new SignalReactPackage(),
