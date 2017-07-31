@@ -9,6 +9,7 @@ import { NavigationActions } from 'react-navigation'
 import { colors } from '../../utils/constants';
 import CustomStyleSheet from '../../utils/customStylesheet';
 import ChooseItem from './ChooseItem';
+import { newTransaction } from '../../actions';
 
 const backWhite = require('./../../assets/icons/back_white.png');
 const paymentBig = require('./../../assets/icons/payment_big.png');
@@ -27,7 +28,7 @@ class Choose extends React.Component {
   constructor() {
     super();
     this.state = {
-      selectedID: null,
+      selectedID: '',
       search: false,
       text: '',
     }
@@ -78,8 +79,11 @@ class Choose extends React.Component {
 
   selectItem = (id) => {
     const { selectedID } = this.state;
+    const newID = selectedID === id ? '' : id
+    const { setTrContact } = this.props;
+    setTrContact(newID);
     this.setState({
-      selectedID: selectedID === id ? null : id,
+      selectedID: newID,
       search: false,
       text: '',
     });
@@ -98,6 +102,7 @@ class Choose extends React.Component {
     const { selectedID, search } = this.state;
     const { contacts, navigation } = this.props;
     const { dispatch, navigate, state } = navigation;
+    const { key } = state
 
     const curContact = contacts.find(cnt => cnt.id === selectedID) || {};
     const selName = curContact.name || curContact.phone || '';
@@ -264,4 +269,7 @@ const mapStateToProps = state => ({
   contacts: state.contacts,
 });
 
-export default connect(mapStateToProps)(Choose);
+export default connect(mapStateToProps, {
+  setTrPhone: newTransaction.setTrPhone,
+  setTrContact: newTransaction.setTrContact,
+})(Choose);

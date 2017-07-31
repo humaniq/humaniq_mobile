@@ -12,11 +12,12 @@ import Animation from 'lottie-react-native';
 import { NavigationActions } from 'react-navigation';
 import RNFetchBlob from 'react-native-fetch-blob';
 import { connect } from 'react-redux';
-import { validate, setAvatarLocalPath, faceEmotionCreate, faceEmotionValidate } from '../../actions';
+import { validate, setAvatarLocalPath, faceEmotionCreate, faceEmotionValidate, newTransaction } from '../../actions';
 
 // console.log('action typesрџ”‘', ActionTypes.setAvatarLocalPath());
 
 import CustomStyleSheet from '../../utils/customStylesheet';
+import oncetrig from '../../utils/oncetrig';
 import Modal from '../Shared/Components/Modal';
 
 // assets
@@ -69,8 +70,8 @@ export class Cam extends Component {
     super(props);
 
     this.state = {
-      path: '',
       qr: '',
+      path: '',
       base64: '',
       error: false,
       errorCode: null,
@@ -256,6 +257,7 @@ export class Cam extends Component {
   };
 
   handleCameraClose = () => {
+
     const backAction = NavigationActions.back({
       key: null,
     });
@@ -284,13 +286,17 @@ export class Cam extends Component {
   }
 
   renderCamera() {
-    const { qr, params: { mode } } = this.props.navigation.state;
+    const { mode } = this.props.navigation.state.params;
+    const { qr } = this.state;
+    const { setQr } = this.props;
     const camtype = mode === 'qr' ? 'back' : Camera.constants.Type.front
     const { navigate } = this.props.navigation;
+    oncetrig.setFunction(() => { navigate('Dashboard'); });
     const onBarCode = (code) => {
       if (mode === 'qr') {
         if (code.type === 'QR_CODE' && code.data) {
-          navigate('Dashboard')
+          setQr(code.data);
+          oncetrig.callFunction();
         }
       }
     }
@@ -375,6 +381,7 @@ const mapStateToProps = state => ({
 });
 
 export default connect(mapStateToProps, {
+  setQr: newTransaction.setQr,
   validate: validate.request,
   emotionCreate: faceEmotionCreate.request,
   emotionValidate: faceEmotionValidate.request,

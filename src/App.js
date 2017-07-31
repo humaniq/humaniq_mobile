@@ -6,6 +6,8 @@ import {
 } from 'react-navigation';
 import { Provider } from 'react-redux';
 import store from './utils/store';
+import oncetrig from './utils/oncetrig';
+import { newTransaction } from './actions';
 
 import Camera from './components/Camera';
 import {
@@ -62,9 +64,29 @@ const LoginStack = StackNavigator(
   },
 );
 
+const getCurrentRouteName = (navigationState) => {
+  if (!navigationState) {
+    return null;
+  }
+  const route = navigationState.routes[navigationState.index];
+  // dive into nested navigators
+  if (route.routes) {
+    return getCurrentRouteName(route);
+  }
+
+  return { routeName: route.routeName, routeParams: route.params || {} };
+};
+
 const App = () => (
   <Provider store={store}>
-    <LoginStack />
+    <LoginStack onNavigationStateChange={(prevState, currentState) => {
+      const { routeName, routeParams } = getCurrentRouteName(currentState);
+      if (routeName === 'Camera' && routeParams.mode === 'qr') {
+        oncetrig.blockCall(false);
+        newTransaction.setQr('');
+      }
+    }}
+    />
   </Provider>
 );
 

@@ -22,6 +22,9 @@ export const SET_PASSWORD = 'SET_PASSWORD';
 export const SAVE_PHONE = 'SAVE_PHONE';
 export const ADD_PRIMARY_ACCOUNT = 'ADD_PRIMARY_ACCOUNT';
 export const ADD_SECONDARY_ACCOUNT = 'ADD_SECONDARY_ACCOUNT';
+export const SET_QR = 'SET_QR';
+export const SET_TR_PHONE = 'SET_TR_PHONE';
+export const SET_TR_CONTACT = 'SET_TR_CONTACT';
 
 function action(type, payload = {}) {
   return { type, ...payload };
@@ -75,3 +78,9 @@ export const setPassword = password => action(SET_PASSWORD, { password });
 export const savePhone = number => action(SAVE_PHONE, { number });
 export const addPrimaryAccount = account => action(ADD_PRIMARY_ACCOUNT, { account });
 export const addSecondaryAccount = account => action(ADD_SECONDARY_ACCOUNT, { account });
+
+export const newTransaction = {
+  setQr: qr => action(SET_QR, { qr }),
+  setTrPhone: phone => action(SET_TR_PHONE, { phone }),
+  setTrContact: contactID => action(SET_TR_CONTACT, { contactID }),
+};
