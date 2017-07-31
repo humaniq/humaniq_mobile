@@ -65,7 +65,7 @@ class Loading extends Component {
     return (
       <View style={styles.container}>
         <Image source={logo_face} />
-        <Image style={styles.logo} source={logo_text} />
+        <Image source={logo_text} />
       </View>
     );
   }
@@ -85,11 +85,5 @@ const styles = CustomStyleSheet({
     backgroundColor: '$cPaper',
     justifyContent: 'space-between',
     alignItems: 'center',
-    borderWidth: 8,
-    borderColor: 'tomato',
-  },
-  logo: {
-    width: 85,
-    height: 20,
   },
 });
