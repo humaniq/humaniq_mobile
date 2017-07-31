@@ -20,6 +20,7 @@ const colors = {
   battleship_grey: '#717274',
   greyish: "#aaaaaa",
   cerulean: "#0088cc",
+  white_two: "#d8d8d8",
 };
 
 

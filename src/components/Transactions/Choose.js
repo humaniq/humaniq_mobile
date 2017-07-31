@@ -9,6 +9,7 @@ import { NavigationActions } from 'react-navigation'
 import { colors } from '../../utils/constants';
 import CustomStyleSheet from '../../utils/customStylesheet';
 import ChooseItem from './ChooseItem';
+import SelectAmount from './SelectAmount';
 import { newTransaction } from '../../actions';
 
 const backWhite = require('./../../assets/icons/back_white.png');
@@ -75,7 +76,7 @@ class Choose extends React.Component {
       const accs = response.map(acc => acc.accountId);
       console.log(JSON.stringify(accs));
       try {
-        HumaniqProfileApiLib.getAccountProfile(accs[0]).then((profiles) => {
+        HumaniqProfileApiLib.getAccountProfiles(accs).then((profiles) => {
           console.log('profiles.ok--->', JSON.stringify(profiles));
         }).catch((err) => {
           console.log('profiles.err--->', JSON.stringify(err));
@@ -106,11 +107,11 @@ class Choose extends React.Component {
   selectItem = (id) => {
     const { setTrContact, navigation: { navigate } } = this.props;
     setTrContact(id);
-    navigate('Input');
     this.setState({
       search: false,
       text: '',
     });
+    navigate('SelectAmount');
   }
 
 
@@ -180,10 +181,10 @@ class Choose extends React.Component {
           <TouchableOpacity style={styles.headerButton} onPress={() => navigate('Camera', { mode: 'qr' })}>
             <Image source={qr} style={styles.headerImage} />
           </TouchableOpacity>
-          <TouchableOpacity style={[styles.headerButton, styles.borderItem]}>
+          <TouchableOpacity onPress={() => navigate('Input', { mode: 'adress' })} style={[styles.headerButton, styles.borderItem]}>
             <Image source={send} style={styles.headerImage} />
           </TouchableOpacity>
-          <TouchableOpacity style={styles.headerButton}>
+          <TouchableOpacity onPress={() => navigate('Input', { mode: 'phone' })} style={styles.headerButton}>
             <Image source={phoneNumber} style={styles.headerImage} />
           </TouchableOpacity>
         </View>

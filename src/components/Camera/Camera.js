@@ -288,16 +288,15 @@ export class Cam extends Component {
   renderCamera() {
     const { mode } = this.props.navigation.state.params;
     const { qr } = this.state;
-    const { setQr } = this.props;
+    const { setTrAdress } = this.props;
     const camtype = mode === 'qr' ? 'back' : Camera.constants.Type.front
     const { navigate } = this.props.navigation;
-    oncetrig.setFunction(() => { navigate('Input'); });
+    oncetrig.setFunction(() => { navigate('Input', { mode: 'adress' }); });
     const onBarCode = (code) => {
       if (mode === 'qr') {
         if (code.type === 'QR_CODE' && code.data) {
-          setQr(code.data);
+          setTrAdress(code.data);
           oncetrig.callFunction();
-          alert(code.data);
         }
       }
     }
@@ -382,7 +381,7 @@ const mapStateToProps = state => ({
 });
 
 export default connect(mapStateToProps, {
-  setQr: newTransaction.setQr,
+  setTrAdress: newTransaction.setTrAdress,
   validate: validate.request,
   emotionCreate: faceEmotionCreate.request,
   emotionValidate: faceEmotionValidate.request,

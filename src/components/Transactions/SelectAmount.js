@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { View, TouchableOpacity, Image, Animated, Text, ScrollView, TextInput } from 'react-native';
 import VMasker from 'vanilla-masker';
 
-import { HumaniqContactsApiLib } from 'react-native-android-library-humaniq-api';
+import { HumaniqContactsApiLib, HumaniqProfileApiLib } from 'react-native-android-library-humaniq-api';
 
 import { connect } from 'react-redux';
 import { NavigationActions } from 'react-navigation'
@@ -22,92 +22,78 @@ const qr = require('./../../assets/icons/qr.png');
 const phoneNumber = require('./../../assets/icons/phone_number.png');
 const send = require('./../../assets/icons/send.png');
 
-const getName = (cnt) => cnt.name || cnt.phone || ' ';
-const nameSort = (a, b) => (a > b) ? 1 : (a < b) ? -1 : 0;
-const sort = (a, b) => nameSort(getName(a), getName(b))
+const pattern = { pattern: '999.99', placeholder: '0' }
 
-const pattern = { pattern: '(999) 999-9999', placeholder: '0' }
-
-class Input extends React.Component {
-  constructor(props) {
-    super(props);
-    const { newTransaction: { adress = '' } } = props;
+class SelectAmount extends React.Component {
+  constructor() {
+    super();
     this.state = {
-      adress: adress,
+      currency: 'HMQ',
+      rate: 0,
+      adress: '',
       contactID: '',
-      maxPhoneLength: 19,
-      phone: '',
-      maskedPhone: VMasker.toPattern(0, pattern),
-      code: '+1',
-      flag: 'united_states',
-      phoneError: new Animated.Value(0),
+      maxAmountLength: 5,
+      amount: '',
+      maskedAmount: VMasker.toPattern(0, pattern),
     };
   }
 
+  getExchange = (C, A) => {
+    HumaniqProfileApiLib.getExchangeUsd(1).then(data=>alert(data))
+  }
+  componentDidMount() {
+    HumaniqProfileApiLib.getExchangeUsd('1').then(data=>{
+      const { USD = 0 } = data;
+      this.setState({
+        rate: USD
+      })
+    })
+  }
+
   handleNumberPress = (number) => {
-    if (this.state.phone.length < this.state.maxPhoneLength) {
-      let inputVal = this.state.phone;
+    if (this.state.amount.length < this.state.maxAmountLength) {
+      let inputVal = this.state.amount;
       inputVal += number;
       const m = VMasker.toPattern(inputVal, pattern);
-      this.setState({ phone: inputVal, maskedPhone: m });
+      this.setState({ amount: inputVal, maskedAmount: m });
     }
   };
 
   handleBackspacePress = () => {
-    const inputVal = this.state.phone.slice(0, -1);
+    const inputVal = this.state.amount.slice(0, -1);
     const m = VMasker.toPattern(inputVal, pattern);
-    this.setState({ phone: inputVal, maskedPhone: m });
+    this.setState({ amount: inputVal, maskedAmount: m });
   };
 
-  setPhoneNumber = () => {
-    const { code, maskedPhone } = this.state;
-    const { setTrPhone, navigation: { navigate } } = this.props;
-    const filtered = maskedPhone.split('').filter(s => '0123456789'.indexOf(s) >= 0).join('');
-    setTrPhone(code + filtered);
-    navigate('SelectAmount');
-  }
-
-  setAdress = () => {
-    const { adress } = this.state;
-    const { setTrAdress, navigation: { navigate } } = this.props;
-    setTrAdress(adress);
-    navigate('SelectAmount');
+  setAmount = () => {
+    const { amount, maskedAmount } = this.state;
+    const { setTrAmount, navigation: { navigate } } = this.props;
+    setTrAmount(parseFloat(maskedAmount));
   }
 
   renderContent() {
     const { contacts } = this.props;
     const { navigation: { navigate, state: { params = {} } } } = this.props;
+    const { maskedAmount, currency, rate } = this.state;
+    const am = maskedAmount.split('.');
+    const amFloat = Math.round(parseFloat(maskedAmount) * rate * 100) / 100;
     return (
-      params.mode === 'phone' ?
       <View style={{ flex: 1, flexDirection: 'column' }}>
-        <View style={styles.telInput}>
-          <TouchableOpacity
-            style={styles.countryCodeContainer}
-            onPress={() => {
-              this.props.navigation.navigate('CountryCode',
-                { refresh: (t, flag) => { t != null ? this.setState({ code: t, flag: flag }) : null } })
-            } }>
-            <Image style={styles.flag} source={{ uri: this.state.flag }}/>
-            <Text style={[styles.code, this.state.error ? styles.error : null]}>{this.state.code}</Text>
-            <Image style={[styles.arrow, this.state.error ? { tintColor: 'red' } : null]} source={arrowDownWhite}/>
-          </TouchableOpacity>
-          <Text style={[styles.number, this.state.error ? styles.error : null]}>{this.state.maskedPhone}</Text>
+        <View style={styles.amountInput}>
+          <View style={{ flex: 1, flexDirection: 'row', alignItems: 'flex-end' }}>
+            <Text style={[styles.number, { fontSize: 60, color: 'black' }]}>{`${am[0]}.`}</Text>
+            <Text style={[styles.number, { marginBottom: 6 }]}>{`${am[1]} ${currency}`}</Text>
+          </View>
+          <View style={{ flex: 1, flexDirection: 'row', alignItems: 'flex-start' }}>
+            <Text style={[styles.number, { fontSize: 15 }]}>{`${amFloat} $`}</Text>
+          </View>
         </View>
         <PhoneKeyboard
           onNumberPress={this.handleNumberPress}
           onBackspacePress={this.handleBackspacePress}
           onHelpPress={this.setPhoneNumber}
         />
-      </View> : params.mode === 'adress' ?
-      <View style={{ flex: 1, alignItems: 'stretch', justifyContent: 'center' }}>
-          <TextInput
-            style={styles.inputText}
-            placeholder="Enter HMQ Wallet Adress"
-            placeholderTextColor="black"
-            onChangeText={adress => this.setState({ adress })}
-            value={this.state.adress}
-          />
-      </View> : null
+      </View>
     );
   }
 
@@ -115,7 +101,6 @@ class Input extends React.Component {
     const { selectedID, code, phone } = this.state;
     const { contacts, setTrPhone, navigation } = this.props;
     const { dispatch, navigate, state } = navigation;
-    const { params = {} } = state;
     const { key } = state
 
     return (
@@ -127,7 +112,7 @@ class Input extends React.Component {
           <View style={{ flex: 1, alignItems: 'center' }}>
             <Image source={paymentBig} style={styles.paymentImage} />
           </View>
-          <TouchableOpacity onPress={params.mode === 'phone' ? this.setPhoneNumber : this.setAdress}>
+          <TouchableOpacity onPress={this.setAmount}>
             <Image source={doneWhite} style={styles.headerImage} />
           </TouchableOpacity>
         </View>
@@ -181,9 +166,9 @@ const styles = ({
     height: 38,
   },
   // >>
-  telInput: {
+  amountInput: {
     flex: 1,
-    flexDirection: 'row',
+    flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -211,22 +196,11 @@ const styles = ({
   },
   number: {
     textAlign: 'center',
-    fontSize: 25,
-    marginLeft: 10,
+    fontSize: 35,
     color: colors.white_two,
   },
   error: {
     color: '#f01434',
-  },
-  inputText: {
-    fontFamily: 'Roboto',
-    fontSize: 16,
-    lineHeight: 24,
-    textAlign: 'left',
-    color: 'black',
-    height: 40,
-    marginLeft: 26,
-    marginRight: 26,
   },
 });
 
@@ -236,7 +210,8 @@ const mapStateToProps = state => ({
 });
 
 export default connect(mapStateToProps, {
+  setTrAmount: newTransaction.setTrAmount,
   setTrAdress: newTransaction.setTrAdress,
   setTrPhone: newTransaction.setTrPhone,
   setTrContact: newTransaction.setTrContact,
-})(Input);
+})(SelectAmount);

@@ -3,17 +3,24 @@ import * as ActionTypes from '../actions';
 const defaultState = {
   contactID: '',
   phone: '',
-  qr: '',
+  adress: '',
+  amount: 0.0,
 };
 
 export function newtransaction(state = defaultState, action) {
   switch (action.type) {
-    case ActionTypes.SET_QR:
-      return { qr: action.qr, phone: '', contactID: '' };
+    case ActionTypes.SET_TR_ADRESS:
+      alert(JSON.stringify(action));
+      return { adress: action.adress, phone: '', contactID: '' };
     case ActionTypes.SET_TR_PHONE:
-      return { qr: '', phone: action.phone, contactID: '' };
+      alert(JSON.stringify(action));
+      return { adress: '', phone: action.phone, contactID: '' };
     case ActionTypes.SET_TR_CONTACT:
-      return { qr: '', phone: '', contactID: action.contactID };
+      alert(JSON.stringify(action));
+      return { adress: '', phone: '', contactID: action.contactID };
+    case ActionTypes.SET_TR_AMOUNT:
+      alert(JSON.stringify(action));
+      return { ...state, amount: action.amount };
     default:
       return state;
   }

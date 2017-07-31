@@ -26,6 +26,7 @@ import { Instructions } from './components/Instructions/Instructions';
 import Choose from './components/Transactions/Choose';
 import Temp from './components/Transactions/Temp';
 import Input from './components/Transactions/Input';
+import SelectAmount from './components/Transactions/SelectAmount';
 
 /*
 const Dashboard = TabNavigator(
@@ -58,7 +59,8 @@ const stack = {
   CodeInput: { screen: CodeInput },
   Dashboard: { screen: Dashboard },
   Instructions: { screen: Instructions },
-  Input: {screen: Input},
+  Input: { screen: Input },
+  SelectAmount: { screen: SelectAmount },
 };
 
 const LoginStack = StackNavigator(
@@ -87,7 +89,7 @@ const App = () => (
       const { routeName, routeParams } = getCurrentRouteName(currentState);
       if (routeName === 'Camera' && routeParams.mode === 'qr') {
         oncetrig.blockCall(false);
-        newTransaction.setQr('');
+        newTransaction.setTrAdress('');
       }
     }}
     />
