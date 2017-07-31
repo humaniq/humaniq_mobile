@@ -51,7 +51,7 @@ export default class Modal extends Component {
         </View>
       );
     }
-    return <View />;
+    return <View/>;
   }
 }
 

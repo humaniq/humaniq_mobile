@@ -3,6 +3,8 @@ import {
   View,
   Image,
   Text,
+  TouchableOpacity,
+  Animated
 } from 'react-native';
 
 import PropTypes from 'prop-types';
@@ -11,10 +13,14 @@ import VMasker from 'vanilla-masker';
 
 import CustomStyleSheet from '../../utils/customStylesheet';
 import Confirm from '../Shared/Buttons/Confirm';
-import Keyboard from '../Shared/Components/Keyboard';
+import PhoneKeyboard from '../Shared/Components/PhoneKeyboard';
+import ConfirmButton from '../Shared/Buttons/ConfirmButton';
+import HelpButton from '../Shared/Buttons/HelpButton';
 import { phoneNumberCreate, savePhone } from '../../actions';
+import { vw } from '../../utils/units';
 
 const ic_user = require('../../assets/icons/ic_user.png');
+const arrowDownWhite = require('../../assets/icons/arrow_down_white.png');
 
 export class TelInput extends Component {
   static propTypes = {
@@ -42,10 +48,15 @@ export class TelInput extends Component {
   state = {
     maxPhoneLength: 19,
     phone: '',
+    maskedPhone: VMasker.toPattern(0, { pattern: "(999) 999-9999", placeholder: "0" }),
+    code: '+1',
+    flag: 'united_states',
+    phoneError: new Animated.Value(0)
   };
 
   componentWillReceiveProps(nextProps) {
     // TODO: MOVE TO SAGA TO PREVENT LAG
+    console.log(nextProps);
     console.log('📞 nextProps', nextProps.user);
     if (nextProps.user.phoneCreate.payload) {
       const code = nextProps.user.phoneCreate.payload.code;
@@ -83,33 +94,83 @@ export class TelInput extends Component {
     if (this.state.phone.length < this.state.maxPhoneLength) {
       let inputVal = this.state.phone;
       inputVal += number;
-      inputVal = VMasker.toPattern(VMasker.toNumber(inputVal), '+ 9 (999) 999-99-999');
-      this.setState({ phone: inputVal });
+      let m = VMasker.toPattern(inputVal, { pattern: "(999) 999-9999", placeholder: "0" });
+      this.setState({ phone: inputVal, maskedPhone: m });
     }
   };
 
   handleBackspacePress = () => {
-    let phone = this.state.phone.slice(0, -1);
-    phone = VMasker.toPattern(VMasker.toNumber(phone), '+ 9 (999) 999-99-999');
-    this.setState({ phone });
+    let inputVal = this.state.phone.slice(0, -1);
+    let m = VMasker.toPattern(inputVal, { pattern: "(999) 999-9999", placeholder: "0" });
+    this.setState({ phone: inputVal, maskedPhone: m });
   };
 
   handleHelpPress = () => {
-    alert('В шаббат у нас с мамой традиция — зажигать свечи и смотреть „Колесо фортуны“');
+    this.props.navigation.navigate('Instructions');
   };
 
   handlePhoneConfirm = () => {
-    const phone_number = VMasker.toNumber(this.state.phone);
-    this.props.phoneNumberCreate({
-      account_id: this.props.user.account.payload.payload.account_information.account_id,
-      phone_number,
-    });
+    const phone_number = this.state.phone;
+    if (this.phonenumber(phone_number)) {
+      this.props.phoneNumberCreate({
+        account_id: this.props.user.account.payload.payload.account_information.account_id,
+        phone_number,
+      });
+    } else {
+      this.setState({ error: true });
+      this.animatePasswordError();
+    }
   };
+
+  phonenumber = (inputtxt) => {
+    let phoneno = /^\+?([0-9]{2})\)?[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/;
+    if (phoneno.test(phoneno)) {
+      return true;
+    }
+    else {
+      return false;
+    }
+  }
+
+  animatePasswordError = () => {
+    Animated.sequence([
+      Animated.timing(this.state.phoneError, {
+        toValue: vw(30),
+        duration: 50,
+      }),
+      Animated.timing(this.state.phoneError, {
+        toValue: vw(-30),
+        duration: 100
+      }),
+      Animated.timing(this.state.phoneError, {
+        toValue: vw(30),
+        duration: 100,
+      }),
+      Animated.timing(this.state.phoneError, {
+        toValue: vw(-30),
+        duration: 100,
+      }),
+      Animated.timing(this.state.phoneError, {
+        toValue: vw(0),
+        duration: 50,
+      }),
+    ]).start(() => { this.setState({ error: null }) });
+  }
 
   renderInput = () => {
     return (
       <View style={styles.telInput}>
-        <Text style={styles.number}>{this.state.phone}</Text>
+        <TouchableOpacity
+          style={styles.countryCodeContainer}
+          onPress={() => {
+            this.props.navigation.navigate('CountryCode',
+              { refresh: (t, flag) => { t != null ? this.setState({ code: t, flag: flag }) : null } })
+          } }>
+          <Image style={styles.flag} source={{ uri: this.state.flag }}/>
+          <Text style={[styles.code, this.state.error ? styles.error : null]}>{this.state.code}</Text>
+          <Image style={[styles.arrow, this.state.error ? { tintColor: 'red' } : null]} source={arrowDownWhite}/>
+        </TouchableOpacity>
+        <Text style={[styles.number, this.state.error ? styles.error : null]}>{this.state.maskedPhone}</Text>
       </View>
     );
   };
@@ -118,23 +179,19 @@ export class TelInput extends Component {
     return (
       <View style={styles.container}>
         <View style={styles.header}>
-          <Image style={styles.userPhoto} source={ic_user} />
-          <Text>{this.state.password}</Text>
-          <View style={styles.passContainer}>
-            {this.renderInput()}
-          </View>
+          <Animated.View style={[styles.passContainer, { marginLeft: this.state.phoneError }]}>
+            {this.renderInput() }
+          </Animated.View>
         </View>
-        {!this.props.user.phoneCreate.isFetching ?
-          <Confirm
-            active={this.state.phone.length === this.state.maxPhoneLength}
-            onPress={this.handlePhoneConfirm}
-          /> : <Text>uploading</Text>
-        }
-        <Keyboard
+        <View style={styles.buttonsContainer}>
+          <HelpButton onPress={this.handleHelpPress} />
+          <ConfirmButton onPress={this.handlePhoneConfirm} />
+        </View>
+        <PhoneKeyboard
           onNumberPress={this.handleNumberPress}
           onBackspacePress={this.handleBackspacePress}
           onHelpPress={this.handleHelpPress}
-        />
+          />
       </View>
     );
   }
@@ -152,31 +209,60 @@ export default connect(mapStateToProps, {
 const styles = CustomStyleSheet({
   container: {
     flex: 1,
-    backgroundColor: 'white',
+    backgroundColor: '#439fe0',
   },
   header: {
     flex: 1,
-    justifyContent: 'space-between',
-    paddingVertical: 20,
+    paddingTop: 120,
   },
-  userPhoto: {
-    alignSelf: 'center',
+  countryCodeContainer: {
+    flexDirection: 'row',
+    height: 72,
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  flag: {
+    width: 32,
+    height: 28
+  },
+  arrow: {
+    marginTop: 28.5,
+    marginBottom: 24.5,
+    width: 19,
+    height: 19
+  },
+  code: {
+    fontSize: 25,
+    color: 'white',
+    marginLeft: 4.5,
+    lineHeight: 29
   },
   passContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginHorizontal: 18,
+    width: 328,
+    marginLeft: 16
   },
   telInput: {
-    flex: 1,
-    height: 30,
-    backgroundColor: '$cGray',
-    borderRadius: 10,
+    flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
   },
   number: {
     textAlign: 'center',
-    fontSize: 30,
+    fontSize: 25,
+    marginLeft: 10,
+    color: 'white'
   },
+  buttonsContainer: {
+    height: 61,
+    width: 360,
+    justifyContent: 'space-between',
+    flexDirection: 'row',
+    paddingLeft: 16,
+    paddingRight: 16
+  },
+  error: {
+    color: "#f01434"
+  }
 });

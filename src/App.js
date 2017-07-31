@@ -16,6 +16,7 @@ import {
   CodeInput,
   Accounts,
   Loading,
+  CountryCode
 } from './components/Login';
 import Dashboard from './components/Dashboard';
 import Tutorial from './components/Shared/Components/Tutorial';
@@ -53,6 +54,7 @@ const stack = {
   Camera: { screen: Camera },
   Password: { screen: Password },
   TelInput: { screen: TelInput },
+  CountryCode: { screen: CountryCode },
   CodeInput: { screen: CodeInput },
   Dashboard: { screen: Dashboard },
   Instructions: { screen: Instructions },
