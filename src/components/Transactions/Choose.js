@@ -10,7 +10,7 @@ import { colors } from '../../utils/constants';
 import CustomStyleSheet from '../../utils/customStylesheet';
 import ChooseItem from './ChooseItem';
 import SelectAmount from './SelectAmount';
-import { newTransaction } from '../../actions';
+import { newTransaction, addContact } from '../../actions';
 
 const backWhite = require('./../../assets/icons/back_white.png');
 const paymentBig = require('./../../assets/icons/payment_big.png');
@@ -71,6 +71,7 @@ class Choose extends React.Component {
   }
 
   componentDidMount() {
+    const { newContact } = this.props;
     HumaniqContactsApiLib.extractAllPhoneNumbers().then((response) => {
       console.log('contacts.ok--->', JSON.stringify(response));
       const accs = response.map(acc => acc.accountId);
@@ -78,6 +79,27 @@ class Choose extends React.Component {
       try {
         HumaniqProfileApiLib.getAccountProfiles(accs).then((profiles) => {
           console.log('profiles.ok--->', JSON.stringify(profiles));
+          /*
+          id: 1,
+          approved: false,
+          phone: '+111 11 1111111',
+          name: 'Neo',
+          status: ONLINE,
+          avatar: 'http://lorempixel.com/200/200/cats/2/',
+          */
+          profiles.forEach(p => {
+            const { phone_number = {} } = p;
+            const { person = {} } = p;
+            const { avatar = {} } = p;
+            newContact({
+              id: p.account_id,
+              approved: false,
+              phone: phone_number.country_code ? `+${phone_number.country_code}` : '',
+              name: person.first_name + ' ' + person.last_name,
+              status: 1,
+              avatar: avatar.url,
+            })
+          })
         }).catch((err) => {
           console.log('profiles.err--->', JSON.stringify(err));
         });
@@ -297,6 +319,7 @@ const mapStateToProps = state => ({
 });
 
 export default connect(mapStateToProps, {
+  newContact: addContact,
   setTrPhone: newTransaction.setTrPhone,
   setTrContact: newTransaction.setTrContact,
 })(Choose);

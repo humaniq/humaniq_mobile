@@ -26,6 +26,7 @@ export const SET_TR_ADRESS = 'SET_TR_ADRESS';
 export const SET_TR_PHONE = 'SET_TR_PHONE';
 export const SET_TR_CONTACT = 'SET_TR_CONTACT';
 export const SET_TR_AMOUNT = 'SET_TR_AMOUNT';
+export const ADD_CONTACT = 'ADD_CONTACT';
 
 function action(type, payload = {}) {
   return { type, ...payload };
@@ -79,6 +80,8 @@ export const setPassword = password => action(SET_PASSWORD, { password });
 export const savePhone = number => action(SAVE_PHONE, { number });
 export const addPrimaryAccount = account => action(ADD_PRIMARY_ACCOUNT, { account });
 export const addSecondaryAccount = account => action(ADD_SECONDARY_ACCOUNT, { account });
+export const addContact = contact => action(ADD_CONTACT, { contact });
+
 
 export const newTransaction = {
   setTrAdress: adress => action(SET_TR_ADRESS, { adress }),

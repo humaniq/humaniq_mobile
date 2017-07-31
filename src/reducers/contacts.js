@@ -1,7 +1,7 @@
 import * as ActionTypes from '../actions';
 import { _contacts } from '../mocks/chatData';
 
-const defaultState = _contacts;
+const defaultState = [];
 const addContact = (all, contact) => {
   const finded = all.find(cnt => cnt.id === contact.id);
   const filtered = all.filter(cnt => cnt.id !== contact.id);

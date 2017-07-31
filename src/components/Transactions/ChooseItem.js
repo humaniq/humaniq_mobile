@@ -33,7 +33,7 @@ class ChooseItem extends Component {
           </View>
           <TouchableOpacity onPress={() => { onPress(contactID); }} style={styles.itemRightContainer}>
             <View style={styles.imageContainer}>
-              <Image resizeMode="contain" style={styles.image} source={contactAvatar} />
+              <Image resizeMode="cover" style={styles.image} source={contactAvatar} />
             </View>
             <View style={styles.centerPart}>
               <View style={styles.centerRow}>
