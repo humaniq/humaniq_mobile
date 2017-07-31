@@ -24,7 +24,14 @@ import Modal from '../Shared/Components/Modal';
 // eslint-disable-next-line import/no-unresolved
 const close = require('../../assets/icons/close_dark.png');
 const whiteMask = require('../../assets/icons/white_mask.png');
+const repeat = require('../../assets/icons/repeat.png');
 // eslint-disable-next-line import/no-unresolved
+
+//Emoji assetss
+const emojiHappy = require('../../assets/icons/emojiHappy.png');
+
+//Button animations
+const emergeAnimation = require('../../assets/animations/emerge.json');
 const pressAnimation = require('../../assets/animations/press.json');
 const scaleAnimation = require('../../assets/animations/scale.json');
 const doneAnimation = require('../../assets/animations/done.json');
@@ -75,13 +82,37 @@ export class Cam extends Component {
       errorCode: null,
       progress: new Animated.Value(0),
       animation: pressAnimation,
+      emojiAnimation: new Animated.Value(0),
       photoGoal: 'isRegistered',
       requiredEmotions: [],
+      isButtonVisible: true
     };
   }
 
   componentWillMount() {
     // console.log('props camera', this.props);
+  }
+
+  componentDidMount() {
+  }
+
+  animateEmoji = (callback) => {
+    Animated.timing(this.state.emojiAnimation, {
+      toValue: 1,
+      duration: 2000,
+    }).start(callback);
+  }
+
+  replayEmoji = () => {
+    this.setState({ isButtonVisible: false });
+    this.state.emojiAnimation.setValue(0);
+    this.animateEmoji(() => {
+      this.setState({ isButtonVisible: true, animation: emergeAnimation });
+      this.animate(1000, 0, 1, () => {
+        this.state.progress.setValue(0);
+        this.setState({ animation: pressAnimation })
+      });
+    })
   }
 
   componentWillReceiveProps(nextProps) {
@@ -149,13 +180,16 @@ export class Cam extends Component {
         this.state.progress.stopAnimation();
         this.state.progress.setValue(0);
         this.setState({ animation: doneAnimation });
+        // Emotions received, need to animate them there
         this.animate(1000, 0, 1, () => {
           this.setState({
             path: '',
             photoGoal: 'validateFacialRecognitionValidation',
             requiredEmotions: nextProps.user.faceEmotionCreate.payload.payload.required_emotions,
-            animation: pressAnimation
+            isButtonVisible: false
           });
+          // After state is updated, need to animate emoji there
+          this.replayEmoji();
         });
       } else {
         this.setState({
@@ -180,7 +214,7 @@ export class Cam extends Component {
           this.setState({ animation: doneAnimation });
           this.animate(1000, 0, 1, () => {
             this.props.navigation.navigate('Tutorial', { nextScene: 'Password' });
-          });          
+          });
         } else {
           this.setState({
             animation: pressAnimation,
@@ -255,6 +289,7 @@ export class Cam extends Component {
   };
 
   handleCameraClose = () => {
+    this.handleImageDelete();
     const backAction = NavigationActions.back({
       key: null,
     });
@@ -325,14 +360,22 @@ export class Cam extends Component {
           <View style={styles.navbar}>
             <TouchableOpacity
               style={styles.closeBtn}
-              onPress={this.state.path ? this.handleImageDelete : this.handleCameraClose}
-              >
+              onPress={this.handleCameraClose}>
               <Image source={close} />
             </TouchableOpacity>
           </View>
+          {
+            this.state.isButtonVisible ? <View/> :
+              <Animated.Image
+                source={ emojiHappy }
+                style={[styles.emojiImage, {
+                  transform: [{ scale: this.state.emojiAnimation }],
+                  opacity: this.state.emojiAnimation
+                }]}/>
+          }
           <View style={styles.captureContainer}>
             {
-              <TouchableWithoutFeedback
+              this.state.isButtonVisible ? <TouchableWithoutFeedback
                 activeOpacity={1}
                 style={[styles.captureBtn, this.state.path && styles.uploadBtn]}
                 onPress={this.handleImageCapture}
@@ -343,10 +386,16 @@ export class Cam extends Component {
                   <Animation
                     style={styles.animationStyle}
                     source={this.state.animation}
-                    progress={this.state.progress}
-                    />
+                    progress={this.state.progress}/>
                 }
-              </TouchableWithoutFeedback>
+              </TouchableWithoutFeedback> : <View/>
+
+            }
+            {
+              this.state.requiredEmotions.length != 0 && this.state.isButtonVisible ?
+                <TouchableOpacity style={styles.repeat} onPress={this.replayEmoji}>
+                  <Image source={repeat}/>
+                </TouchableOpacity> : <View/>
             }
           </View>
         </View>
@@ -398,16 +447,13 @@ const styles = CustomStyleSheet({
     flexDirection: 'row',
     justifyContent: 'flex-end',
     alignItems: 'flex-start',
-    backgroundColor: 'transparent',
+    backgroundColor: 'white',
   },
   camera: {
     height: 640,
     width: 360,
   },
   cameraImageContainer: {
-    flex: 1,
-    marginTop: 56,
-    marginBottom: 224,
     alignItems: 'center',
     backgroundColor: 'white',
   },
@@ -415,20 +461,30 @@ const styles = CustomStyleSheet({
     height: 640,
     width: 360,
   },
+  emojiImage: {
+    alignSelf: 'center'
+  },
   captureContainer: {
-    backgroundColor: 'transparent',
-    justifyContent: 'flex-end',
+    backgroundColor: 'white',
+    justifyContent: 'center',
     alignItems: 'center',
+    flexDirection: 'row',
     height: 224,
-    paddingBottom: 29.5,
+    width: 360,
   },
   captureBtn: {
     width: 79,
     height: 79,
+    alignSelf: 'center'
   },
   uploadBtn: {
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  repeat: {
+    position: 'absolute',
+    right: 68,
+    alignSelf: 'center'
   },
   closeBtn: {
     marginTop: 16,
