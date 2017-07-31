@@ -45,9 +45,9 @@ const Dashboard = TabNavigator(
 
 const stack = {
 
-  //Chats: { screen: Chats },
-  //Chat: { screen: Chat },
-  Temp: { screen: Temp },
+  // Chats: { screen: Chats },
+  // Chat: { screen: Chat },
+  // Temp: { screen: Temp },
   Loading: { screen: Loading },
   Accounts: { screen: Accounts },
   Tutorial: { screen: Tutorial },
