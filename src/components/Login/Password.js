@@ -10,6 +10,7 @@ import PropTypes from 'prop-types';
 import Animation from 'lottie-react-native';
 import { connect } from 'react-redux';
 import DeviceInfo from 'react-native-device-info';
+import IMEI from 'react-native-imei';
 
 import Keyboard from '../Shared/Components/Keyboard';
 import CustomStyleSheet from '../../utils/customStylesheet';
@@ -229,7 +230,8 @@ export class Password extends Component {
     // DEV
     // TODO: set real ID;
     const isEmulator = DeviceInfo.isEmulator();
-    const imei = Math.floor((10000000 + Math.random()) * 90000000).toString();
+    const randomImei = Math.floor((10000000 + Math.random()) * 90000000).toString();
+    const imei = isEmulator ? randomImei : IMEI.getImei();
     // const imei = randomImei.toString();
     // const imei = '1111111111925';
 
