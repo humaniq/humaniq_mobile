@@ -27,6 +27,7 @@ export const SET_TR_PHONE = 'SET_TR_PHONE';
 export const SET_TR_CONTACT = 'SET_TR_CONTACT';
 export const SET_TR_AMOUNT = 'SET_TR_AMOUNT';
 export const ADD_CONTACT = 'ADD_CONTACT';
+export const SET_TR_ROOT_SCREEN = 'SET_TR_ROOT_SCREEN';
 
 function action(type, payload = {}) {
   return { type, ...payload };
@@ -88,4 +89,5 @@ export const newTransaction = {
   setTrPhone: phone => action(SET_TR_PHONE, { phone }),
   setTrContact: contactID => action(SET_TR_CONTACT, { contactID }),
   setTrAmount: amount => action(SET_TR_AMOUNT, { amount }),
+  setRootScreen: rootScreen => action(SET_TR_ROOT_SCREEN, { rootScreen }),
 };

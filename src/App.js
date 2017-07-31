@@ -48,7 +48,6 @@ const stack = {
   //Chats: { screen: Chats },
   //Chat: { screen: Chat },
   Temp: { screen: Temp },
-  Choose: { screen: Choose },
   Loading: { screen: Loading },
   Accounts: { screen: Accounts },
   Tutorial: { screen: Tutorial },
@@ -59,6 +58,7 @@ const stack = {
   CodeInput: { screen: CodeInput },
   Dashboard: { screen: Dashboard },
   Instructions: { screen: Instructions },
+  Choose: { screen: Choose },
   Input: { screen: Input },
   SelectAmount: { screen: SelectAmount },
 };

@@ -67,8 +67,12 @@ class SelectAmount extends React.Component {
 
   setAmount = () => {
     const { amount, maskedAmount } = this.state;
-    const { setTrAmount, navigation: { navigate } } = this.props;
+    const { newTransaction, setTrAmount, navigation: { navigate, dispatch } } = this.props;
+    const { rootScreen } = newTransaction;
     setTrAmount(parseFloat(maskedAmount));
+    dispatch(NavigationActions.back({
+      key: rootScreen,
+    }))
   }
 
   renderContent() {

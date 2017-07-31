@@ -71,7 +71,11 @@ class Choose extends React.Component {
   }
 
   componentDidMount() {
-    const { newContact } = this.props;
+    const { contacts, navigation, setRootScreen, newContact } = this.props;
+    const { dispatch, navigate, state } = navigation;
+    const { key } = state
+    setRootScreen(key);
+
     HumaniqContactsApiLib.extractAllPhoneNumbers().then((response) => {
       console.log('contacts.ok--->', JSON.stringify(response));
       const accs = response.map(acc => acc.accountId);
@@ -148,9 +152,10 @@ class Choose extends React.Component {
 
   renderHeader() {
     const { selectedID, search } = this.state;
-    const { contacts, navigation } = this.props;
+    const { contacts, navigation, setRootScreen } = this.props;
     const { dispatch, navigate, state } = navigation;
     const { key } = state
+    setRootScreen(key);
 
     const curContact = contacts.find(cnt => cnt.id === selectedID) || {};
     const selName = curContact.name || curContact.phone || '';
@@ -322,4 +327,5 @@ export default connect(mapStateToProps, {
   newContact: addContact,
   setTrPhone: newTransaction.setTrPhone,
   setTrContact: newTransaction.setTrContact,
+  setRootScreen: newTransaction.setRootScreen,
 })(Choose);
