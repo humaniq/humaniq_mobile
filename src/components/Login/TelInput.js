@@ -4,7 +4,7 @@ import {
   Image,
   Text,
   TouchableOpacity,
-  Animated
+  Animated,
 } from 'react-native';
 
 import PropTypes from 'prop-types';
@@ -191,7 +191,7 @@ export class TelInput extends Component {
           onNumberPress={this.handleNumberPress}
           onBackspacePress={this.handleBackspacePress}
           onHelpPress={this.handleHelpPress}
-          />
+        />
       </View>
     );
   }
