@@ -38,7 +38,7 @@ class Choose extends React.Component {
     const { contacts } = this.props;
     const { search, text } = this.state;
 
-    const filter = (cnt) => search && text ? getName(cnt).indexOf(text) > 0 : true
+    const filter = (cnt) => search && text ? getName(cnt).toUpperCase().indexOf(text.toUpperCase()) >= 0 : true
     let groupLetter = '';
 
     return (
