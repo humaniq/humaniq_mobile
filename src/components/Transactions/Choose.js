@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
-import { View, TouchableOpacity, Image, Text, ScrollView, TextInput, StatusBar } from 'react-native';
+import { View, TouchableOpacity, Image, Text, ScrollView, TextInput } from 'react-native';
 
-import { HumaniqContactsApiLib } from 'react-native-android-library-humaniq-api';
+import { HumaniqContactsApiLib, HumaniqProfileApiLib } from 'react-native-android-library-humaniq-api';
 
 import { connect } from 'react-redux';
 import { NavigationActions } from 'react-navigation'
@@ -72,22 +72,47 @@ class Choose extends React.Component {
   componentDidMount() {
     HumaniqContactsApiLib.extractAllPhoneNumbers().then((response) => {
       console.log('contacts.ok--->', JSON.stringify(response));
+      const accs = response.map(acc => acc.accountId);
+      console.log(JSON.stringify(accs));
+      try {
+        HumaniqProfileApiLib.getAccountProfile(accs[0]).then((profiles) => {
+          console.log('profiles.ok--->', JSON.stringify(profiles));
+        }).catch((err) => {
+          console.log('profiles.err--->', JSON.stringify(err));
+        });
+      } catch (e) {
+        console.log(e);
+      }
     }).catch((err) => {
       console.log('contacts.err--->', JSON.stringify(err));
     });
   }
 
+  /*
   selectItem = (id) => {
     const { selectedID } = this.state;
     const newID = selectedID === id ? '' : id
-    const { setTrContact } = this.props;
+    const { setTrContact, navigation: { navigate } } = this.props;
     setTrContact(newID);
+
     this.setState({
       selectedID: newID,
       search: false,
       text: '',
     });
   }
+  */
+
+  selectItem = (id) => {
+    const { setTrContact, navigation: { navigate } } = this.props;
+    setTrContact(id);
+    navigate('Input');
+    this.setState({
+      search: false,
+      text: '',
+    });
+  }
+
 
   setSearch = () => {
     const { search, text } = this.state;
@@ -172,6 +197,7 @@ class Choose extends React.Component {
       backgroundColor={colors.orangeish}
       barStyle="light-content"
     />
+
     */
     return (
       <View style={styles.container}>

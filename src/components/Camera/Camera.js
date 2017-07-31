@@ -291,12 +291,13 @@ export class Cam extends Component {
     const { setQr } = this.props;
     const camtype = mode === 'qr' ? 'back' : Camera.constants.Type.front
     const { navigate } = this.props.navigation;
-    oncetrig.setFunction(() => { navigate('Dashboard'); });
+    oncetrig.setFunction(() => { navigate('Input'); });
     const onBarCode = (code) => {
       if (mode === 'qr') {
         if (code.type === 'QR_CODE' && code.data) {
           setQr(code.data);
           oncetrig.callFunction();
+          alert(code.data);
         }
       }
     }

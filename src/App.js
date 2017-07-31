@@ -24,6 +24,7 @@ import Chats from './components/Chats';
 import { Instructions } from './components/Instructions/Instructions';
 import Choose from './components/Transactions/Choose';
 import Temp from './components/Transactions/Temp';
+import Input from './components/Transactions/Input';
 
 /*
 const Dashboard = TabNavigator(
@@ -55,6 +56,7 @@ const stack = {
   CodeInput: { screen: CodeInput },
   Dashboard: { screen: Dashboard },
   Instructions: { screen: Instructions },
+  Input: {screen: Input},
 };
 
 const LoginStack = StackNavigator(
