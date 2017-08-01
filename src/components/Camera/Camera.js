@@ -320,7 +320,8 @@ export class Cam extends Component {
   }
 
   renderCamera() {
-    const { mode } = this.props.navigation.state.params;
+    const { params = {} } = this.props.navigation.state;
+    const { mode } = params;
     const { qr } = this.state;
     const { setTrAdress } = this.props;
     const camtype = mode === 'qr' ? 'back' : Camera.constants.Type.front
@@ -360,7 +361,8 @@ export class Cam extends Component {
       this.props.user.validate.isFetching ||
       this.props.user.faceEmotionCreate.isFetching ||
       this.props.user.faceEmotionValidate.isFetching;
-    const { mode } = this.props.navigation.state.params;
+    const { params = {} } = this.props.navigation.state;
+    const { mode } = params;
     const isQR = mode === 'qr'
     const fn = ()=>null;
     return (
