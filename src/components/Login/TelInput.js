@@ -58,8 +58,8 @@ export class TelInput extends Component {
 
   componentWillReceiveProps(nextProps) {
     // TODO: MOVE TO SAGA TO PREVENT LAG
-    console.log(nextProps);
-    console.log('📞 nextProps', nextProps.user);
+    // console.log(nextProps);
+    // console.log('📞 nextProps > Telinput', nextProps.user);
     if (nextProps.user.phoneCreate.payload) {
       const code = nextProps.user.phoneCreate.payload.code;
       const phone = nextProps.user.phoneNumber;
@@ -73,7 +73,7 @@ export class TelInput extends Component {
           case 4005:
             // registered user
             // Account Phone Number Created Successfully. Validation Code Sent
-            this.props.savePhone(VMasker.toNumber(this.state.phone));
+            this.props.savePhone(VMasker.toNumber(`${this.state.code}${this.state.phone}`));
             this.props.navigation.navigate('CodeInput');
             // alert('Proceed to codeInput');
             break;
@@ -113,15 +113,11 @@ export class TelInput extends Component {
 
   handlePhoneConfirm = () => {
     const phone_number = this.state.phone;
-    // *************************************
-    // temp to debug accounts layout (preview number);
-    // *************************************
-    this.props.savePhone(VMasker.toNumber(`${this.state.code}${phone_number}`));
 
     if (this.phonenumber(this.state.phone, this.state.countryCode)) {
       this.props.phoneNumberCreate({
         account_id: this.props.user.account.payload.payload.account_information.account_id,
-        phone_number,
+        phone_number: VMasker.toNumber(`${this.state.code}${phone_number}`),
       });
     } else {
       this.setState({ error: true });
