@@ -18,6 +18,7 @@ export default class AudioView extends React.Component {
       position: 0,
     };
 
+    /*
     this.sound = new Sound(this.props.currentMessage.audio, null, (error) => {
       if (error) {
         console.log('failed to load the sound', error);
@@ -34,7 +35,9 @@ export default class AudioView extends React.Component {
         duration: Math.round(this.sound.getDuration() * 1000) / 1000,
       });
     });
+    */
     this.play = () => {
+      /*
       this.setState({
         playing: true,
       });
@@ -57,7 +60,7 @@ export default class AudioView extends React.Component {
           position: 0,
         });
       });
-    };
+    */ };
   }
   componentDidMount() {}
   render() {

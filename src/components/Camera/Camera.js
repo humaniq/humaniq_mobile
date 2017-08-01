@@ -12,11 +12,12 @@ import Animation from 'lottie-react-native';
 import { NavigationActions } from 'react-navigation';
 import RNFetchBlob from 'react-native-fetch-blob';
 import { connect } from 'react-redux';
-import { validate, setAvatarLocalPath, faceEmotionCreate, faceEmotionValidate } from '../../actions';
+import { validate, setAvatarLocalPath, faceEmotionCreate, faceEmotionValidate, newTransaction } from '../../actions';
 
 // console.log('action typesрџ”‘', ActionTypes.setAvatarLocalPath());
 
 import CustomStyleSheet from '../../utils/customStylesheet';
+import oncetrig from '../../utils/oncetrig';
 import Modal from '../Shared/Components/Modal';
 
 // assets
@@ -76,6 +77,7 @@ export class Cam extends Component {
     super(props);
 
     this.state = {
+      qr: '',
       path: '',
       base64: '',
       error: false,
@@ -318,6 +320,20 @@ export class Cam extends Component {
   }
 
   renderCamera() {
+    const { mode } = this.props.navigation.state.params;
+    const { qr } = this.state;
+    const { setTrAdress } = this.props;
+    const camtype = mode === 'qr' ? 'back' : Camera.constants.Type.front
+    const { navigate } = this.props.navigation;
+    oncetrig.setFunction(() => { navigate('Input', { mode: 'adress' }); });
+    const onBarCode = (code) => {
+      if (mode === 'qr') {
+        if (code.type === 'QR_CODE' && code.data) {
+          setTrAdress(code.data);
+          oncetrig.callFunction();
+        }
+      }
+    }
     return (
       <Camera
         ref={(cam) => {
@@ -326,8 +342,9 @@ export class Cam extends Component {
         style={styles.camera}
         aspect={Camera.constants.Aspect.fill}
         captureQuality={Camera.constants.CaptureQuality.low}
-        type={Camera.constants.Type.front}
+        type={camtype}
         captureTarget={Camera.constants.CaptureTarget.disk}
+        onBarCodeRead={onBarCode}
         // captureTarget={Camera.constants.CaptureTarget.memory}
         />
     );
@@ -343,6 +360,9 @@ export class Cam extends Component {
       this.props.user.validate.isFetching ||
       this.props.user.faceEmotionCreate.isFetching ||
       this.props.user.faceEmotionValidate.isFetching;
+    const { mode } = this.props.navigation.state.params;
+    const isQR = mode === 'qr'
+    const fn = ()=>null;
     return (
       <View style={styles.container}>
         <Modal
@@ -378,7 +398,7 @@ export class Cam extends Component {
               this.state.isButtonVisible ? <TouchableWithoutFeedback
                 activeOpacity={1}
                 style={[styles.captureBtn, this.state.path && styles.uploadBtn]}
-                onPress={this.handleImageCapture}
+                onPress={isQR ? fn : this.handleImageCapture}
                 onPressIn={() => !this.state.path && this.animate(200, 0, 0.7) }
                 onPressOut={() => !this.state.path && this.animate(200, 0.7, 0) }
                 >
@@ -409,6 +429,7 @@ const mapStateToProps = state => ({
 });
 
 export default connect(mapStateToProps, {
+  setTrAdress: newTransaction.setTrAdress,
   validate: validate.request,
   emotionCreate: faceEmotionCreate.request,
   emotionValidate: faceEmotionValidate.request,

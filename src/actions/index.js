@@ -22,6 +22,12 @@ export const SET_PASSWORD = 'SET_PASSWORD';
 export const SAVE_PHONE = 'SAVE_PHONE';
 export const ADD_PRIMARY_ACCOUNT = 'ADD_PRIMARY_ACCOUNT';
 export const ADD_SECONDARY_ACCOUNT = 'ADD_SECONDARY_ACCOUNT';
+export const SET_TR_ADRESS = 'SET_TR_ADRESS';
+export const SET_TR_PHONE = 'SET_TR_PHONE';
+export const SET_TR_CONTACT = 'SET_TR_CONTACT';
+export const SET_TR_AMOUNT = 'SET_TR_AMOUNT';
+export const ADD_CONTACT = 'ADD_CONTACT';
+export const SET_TR_ROOT_SCREEN = 'SET_TR_ROOT_SCREEN';
 
 function action(type, payload = {}) {
   return { type, ...payload };
@@ -75,3 +81,13 @@ export const setPassword = password => action(SET_PASSWORD, { password });
 export const savePhone = number => action(SAVE_PHONE, { number });
 export const addPrimaryAccount = account => action(ADD_PRIMARY_ACCOUNT, { account });
 export const addSecondaryAccount = account => action(ADD_SECONDARY_ACCOUNT, { account });
+export const addContact = contact => action(ADD_CONTACT, { contact });
+
+
+export const newTransaction = {
+  setTrAdress: adress => action(SET_TR_ADRESS, { adress }),
+  setTrPhone: phone => action(SET_TR_PHONE, { phone }),
+  setTrContact: contactID => action(SET_TR_CONTACT, { contactID }),
+  setTrAmount: amount => action(SET_TR_AMOUNT, { amount }),
+  setRootScreen: rootScreen => action(SET_TR_ROOT_SCREEN, { rootScreen }),
+};
