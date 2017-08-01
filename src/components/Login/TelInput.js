@@ -10,6 +10,7 @@ import {
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import VMasker from 'vanilla-masker';
+import phoneFormat from 'phoneformat-react-native';
 
 import CustomStyleSheet from '../../utils/customStylesheet';
 import Confirm from '../Shared/Buttons/Confirm';
@@ -46,10 +47,11 @@ export class TelInput extends Component {
   };
 
   state = {
-    maxPhoneLength: 19,
+    maxPhoneLength: 10,
     phone: '',
     maskedPhone: VMasker.toPattern(0, { pattern: "(999) 999-9999", placeholder: "0" }),
     code: '+1',
+    countryCode: "US",
     flag: 'united_states',
     phoneError: new Animated.Value(0)
   };
@@ -116,7 +118,7 @@ export class TelInput extends Component {
     // *************************************
     this.props.savePhone(VMasker.toNumber(`${this.state.code}${phone_number}`));
 
-    if (this.phonenumber(phone_number)) {
+    if (this.phonenumber(this.state.phone, this.state.countryCode)) {
       this.props.phoneNumberCreate({
         account_id: this.props.user.account.payload.payload.account_information.account_id,
         phone_number,
@@ -127,14 +129,9 @@ export class TelInput extends Component {
     }
   };
 
-  phonenumber = (inputtxt) => {
-    let phoneno = /^\+?([0-9]{2})\)?[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/;
-    if (phoneno.test(phoneno)) {
-      return true;
-    }
-    else {
-      return false;
-    }
+  phonenumber = (inputtxt, code) => {
+    //let phoneno = /^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/;
+    return phoneFormat.isValidNumber(inputtxt, code);
   }
 
   animatePasswordError = () => {
@@ -169,7 +166,7 @@ export class TelInput extends Component {
           style={styles.countryCodeContainer}
           onPress={() => {
             this.props.navigation.navigate('CountryCode',
-              { refresh: (t, flag) => { t != null ? this.setState({ code: t, flag: flag }) : null } })
+              { refresh: (dialCode, code, flag) => { dialCode != null ? this.setState({ code: dialCode, countryCode: code, flag: flag }) : null } })
           } }>
           <Image style={styles.flag} source={{ uri: this.state.flag }}/>
           <Text style={[styles.code, this.state.error ? styles.error : null]}>{this.state.code}</Text>
@@ -219,6 +216,7 @@ const styles = CustomStyleSheet({
   header: {
     flex: 1,
     paddingTop: 120,
+    paddingLeft: 16
   },
   countryCodeContainer: {
     flexDirection: 'row',
@@ -246,7 +244,6 @@ const styles = CustomStyleSheet({
     flexDirection: 'row',
     justifyContent: 'space-between',
     width: 328,
-    marginLeft: 16
   },
   telInput: {
     flexDirection: 'row',

@@ -160,7 +160,7 @@ export class CountryCode extends Component {
                         alignItems: 'center',
                         flexDirection: 'row'
                     }}
-                        onPress={() => this.onBackPress(o.dial_code, resname) }>
+                        onPress={() => this.onBackPress(o.dial_code, o.code, resname) }>
                         <View style={styles.flagAndCountryName}>
                             <Image style={styles.flag} source={{ uri: resname }}/>
                             <Text style={styles.countryName}>
@@ -194,12 +194,12 @@ export class CountryCode extends Component {
         this.state.isSearchActive ? this.setState({ isSearchActive: false, searchText: '' }) : this.setState({ isSearchActive: true });
     }
 
-    onBackPress = (t, flag) => {
+    onBackPress = (dialCode, code, flag) => {
         const backAction = NavigationActions.back({
             key: null,
         });
-        if (t != null) {
-            this.props.navigation.state.params.refresh(t, flag);
+        if (dialCode != null) {
+            this.props.navigation.state.params.refresh(dialCode, code, flag);
         }
         this.props.navigation.dispatch(backAction);
     }

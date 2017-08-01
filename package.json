@@ -48,7 +48,8 @@
     "shallowequal": "0.2.2",
     "underscore": "1.8.3",
     "uuid": "3.0.1",
-    "vanilla-masker": "1.2.0"
+    "vanilla-masker": "1.2.0",
+    "phoneformat-react-native" : "1.0.3"
   },
   "devDependencies": {
     "babel-eslint": "^6.1.2",
