@@ -49,10 +49,10 @@ export class Accounts extends Component {
               style={styles.accountBtn}
               onPress={this.validateUser}
               key={acc.accountId}
-              >
+            >
               <View style={styles.accountInfoContainer}>
                 <Image style={styles.profilePhoto} source={{ uri: acc.photo }} />
-                <Text style={styles.id}>{acc.accountId}</Text>
+                <Text style={styles.id}>{`${acc.accountId} / phone: ${acc.phone}`}</Text>
               </View>
               <Image source={ic_chevrone_right} />
             </TouchableOpacity>
@@ -105,6 +105,7 @@ const styles = CustomStyleSheet({
     round: 41,
     marginRight: 11,
     borderRadius: 20,
+    backgroundColor: '$cBrand',
   },
   id: {
     fontSize: 15,

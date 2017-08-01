@@ -34,6 +34,22 @@ function secondaryAccounts(state, action) {
   }
 }
 
+function savePrimaryPhoneNumber(state, action) {
+  switch (action.type) {
+    case ActionTypes.SAVE_PHONE:
+      return {
+        ...state,
+        primaryAccount: {
+          ...state.primaryAccount,
+          phone: action.number,
+        },
+      };
+    default:
+      return state;
+  }
+}
+
+
 const defaultState = {
   primaryAccount: {},
   secondaryAccounts: [],
@@ -53,6 +69,8 @@ export function accounts(state = defaultState, action) {
         ...state,
         secondaryAccounts: secondaryAccounts(state.secondaryAccounts, action),
       };
+    case ActionTypes.SAVE_PHONE:
+      return savePrimaryPhoneNumber(state, action);
     default:
       return state;
   }
