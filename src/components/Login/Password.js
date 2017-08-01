@@ -79,17 +79,16 @@ export class Password extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    // TODO: MOVE TO SAGA TO PREVENT LAG
-    // console.log('next props for password', nextProps.user);
-
-    if (nextProps.user.account.isFetching) {
+    if (!this.props.user.account.isFetching && nextProps.user.account.isFetching) {
       this.animateCycle(2000, 0, 1);
-    } else {
+    } else if (this.props.user.account.isFetching && !nextProps.user.account.isFetching) {
       this.state.progress.stopAnimation();
       this.state.progress.setValue(0);
-    }
 
-    if (nextProps.user.account.payload) {
+      if (!nextProps.user.account.payload) {
+        return;
+      }
+
       const code = nextProps.user.account.payload.code;
       const password = nextProps.user.password;
 
@@ -336,7 +335,7 @@ export class Password extends Component {
         </View>
         <View style={styles.keyboardContainer}>
           <Keyboard
-            isBackspaceEnabled={this.state.password !== ''}
+            isBackspaceEnabled={(this.state.password.length > 0) && !this.props.user.account.isFetching}
             onNumberPress={this.handleNumberPress}
             onBackspacePress={this.handleBackspacePress}
             onHelpPress={this.handleHelpPress}

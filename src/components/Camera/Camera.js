@@ -79,7 +79,7 @@ export class Cam extends Component {
     this.state = {
       qr: '',
       path: '',
-      base64: '',
+      capturing: false,
       error: false,
       errorCode: null,
       progress: new Animated.Value(0),
@@ -87,7 +87,7 @@ export class Cam extends Component {
       emojiAnimation: new Animated.Value(0),
       photoGoal: 'isRegistered',
       requiredEmotions: [],
-      isButtonVisible: true
+      isButtonVisible: true,
     };
   }
 
@@ -131,12 +131,12 @@ export class Cam extends Component {
         switch (code) {
           case 3002:
             // registered user
+            this.props.setAvatarLocalPath(this.state.path);
             this.state.progress.stopAnimation();
             this.state.progress.setValue(0);
             this.setState({ animation: doneAnimation });
             this.animate(1000, 0, 1, () => {
               this.setState({ animation: pressAnimation });
-              this.props.setAvatarLocalPath(this.state.path);
               this.props.navigation.navigate('Password');
             });
             break;
@@ -149,12 +149,12 @@ export class Cam extends Component {
                 facial_image_id: nextProps.user.validate.payload.payload.facial_image_id,
               });
             } else {
+              this.props.setAvatarLocalPath(this.state.path);
               this.state.progress.stopAnimation();
               this.state.progress.setValue(0);
               this.setState({ animation: doneAnimation });
               this.animate(1000, 0, 1, () => {
                 this.setState({ animation: pressAnimation });
-                this.props.setAvatarLocalPath(this.state.path);
                 this.props.navigation.navigate('Tutorial', { nextScene: 'Password' });
               });
             }
@@ -231,11 +231,13 @@ export class Cam extends Component {
 
   handleImageCapture = () => {
     console.log('Camera::handleImageCapture BEGIN');
-    if (!this.state.path) {
-      this.camera.capture()
+    if (!this.state.path && !this.state.capturing) {
+      this.setState({ capturing: true });
+      console.log('Camera::handleImageCapture BEGIN!!!');
+      this.camera.capture({ fixOrientation: true })
         .then((data) => {
           console.log('Camera::handleImageCapture DONE');
-          this.setState({ path: data.path });
+          this.setState({ capturing: false, path: data.path });
           this.handleImageUpload(data.path);
           this.setState({ animation: scaleAnimation });
           this.state.progress.setValue(0);
@@ -250,7 +252,10 @@ export class Cam extends Component {
             }),
           ]).start();
         })
-        .catch((err) => { console.error('error during image capture', err); });
+        .catch((err) => {
+          this.setState({ capturing: false });
+          console.error('error during image capture', err);
+        });
     }
   };
 
@@ -300,7 +305,6 @@ export class Cam extends Component {
 
   // Animation
   animate = (time, fr = 0, to = 1, callback) => {
-    console.log('press in');
     this.state.progress.setValue(fr);
     const animationref = Animated.timing(this.state.progress, {
       toValue: to,
