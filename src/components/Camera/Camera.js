@@ -87,7 +87,8 @@ export class Cam extends Component {
       emojiAnimation: new Animated.Value(0),
       photoGoal: 'isRegistered',
       requiredEmotions: [],
-      isButtonVisible: true
+      isButtonVisible: true,
+      captureButtonEnabled: true
     };
   }
 
@@ -106,15 +107,17 @@ export class Cam extends Component {
   }
 
   replayEmoji = () => {
-    this.setState({ isButtonVisible: false });
-    this.state.emojiAnimation.setValue(0);
-    this.animateEmoji(() => {
-      this.setState({ isButtonVisible: true, animation: emergeAnimation });
-      this.animate(1000, 0, 1, () => {
-        this.state.progress.setValue(0);
-        this.setState({ animation: pressAnimation })
-      });
-    })
+    if (this.state.captureButtonEnabled) {
+      this.setState({ isButtonVisible: false });
+      this.state.emojiAnimation.setValue(0);
+      this.animateEmoji(() => {
+        this.setState({ isButtonVisible: true, animation: emergeAnimation });
+        this.animate(1000, 0, 1, () => {
+          this.state.progress.setValue(0);
+          this.setState({ animation: pressAnimation })
+        });
+      })
+    }
   }
 
   componentWillReceiveProps(nextProps) {
@@ -134,8 +137,9 @@ export class Cam extends Component {
             this.state.progress.stopAnimation();
             this.state.progress.setValue(0);
             this.setState({ animation: doneAnimation });
+            // Done animation, enable button, go to password screen
             this.animate(1000, 0, 1, () => {
-              this.setState({ animation: pressAnimation });
+              this.setState({ animation: pressAnimation, captureButtonEnabled: true });
               this.props.setAvatarLocalPath(this.state.path);
               this.props.navigation.navigate('Password');
             });
@@ -143,7 +147,8 @@ export class Cam extends Component {
 
           case 3003:
             // new user
-            if (nextProps.user.validate.payload.payload.facial_image_id) { // Emotions case
+            if (nextProps.user.validate.payload.payload.facial_image_id) {
+              // Emotions case
               this.setState({ photoGoal: 'createFacialRecognitionValidation' });
               this.props.emotionCreate({
                 facial_image_id: nextProps.user.validate.payload.payload.facial_image_id,
@@ -153,7 +158,7 @@ export class Cam extends Component {
               this.state.progress.setValue(0);
               this.setState({ animation: doneAnimation });
               this.animate(1000, 0, 1, () => {
-                this.setState({ animation: pressAnimation });
+                this.setState({ animation: pressAnimation, captureButtonEnabled: true });
                 this.props.setAvatarLocalPath(this.state.path);
                 this.props.navigation.navigate('Tutorial', { nextScene: 'Password' });
               });
@@ -188,7 +193,8 @@ export class Cam extends Component {
             path: '',
             photoGoal: 'validateFacialRecognitionValidation',
             requiredEmotions: nextProps.user.faceEmotionCreate.payload.payload.required_emotions,
-            isButtonVisible: false
+            isButtonVisible: false,
+            captureButtonEnabled: true
           });
           // After state is updated, need to animate emoji there
           this.replayEmoji();
@@ -198,7 +204,8 @@ export class Cam extends Component {
           error: true,
           errorCode: code,
           path: '',
-          animation: doneAnimation
+          animation: pressAnimation,
+          captureButtonEnabled: true
         });
       }
     }
@@ -208,13 +215,20 @@ export class Cam extends Component {
     if (nextProps.user.faceEmotionValidate.payload) {
       this.state.progress.stopAnimation();
       this.state.progress.setValue(0);
-      const code = nextProps.user.faceEmotionValidate.payload.code;
+      let code = 0;
+      if (nextProps.user.faceEmotionValidate.payload.errors) {
+        code = Number(nextProps.user.faceEmotionValidate.payload.errors[0].code);
+      } else {
+        code = nextProps.user.faceEmotionValidate.payload.code;
+      }
       if (nextProps.user.faceEmotionValidate.isFetching !== this.props.user.faceEmotionValidate.isFetching) {
+        console.log(nextProps.user.faceEmotionValidate);
         console.log('validateFacialRecognitionValidationReceiveProps', code);
         if (code === 3008) {
           // reduce emotions there
           this.setState({ animation: doneAnimation });
           this.animate(1000, 0, 1, () => {
+            this.setState({ captureButtonEnabled: true });
             this.props.navigation.navigate('Tutorial', { nextScene: 'Password' });
           });
         } else {
@@ -222,6 +236,7 @@ export class Cam extends Component {
             animation: pressAnimation,
             error: true,
             errorCode: code,
+            captureButtonEnabled: true,
             path: '',
           });
         }
@@ -231,7 +246,8 @@ export class Cam extends Component {
 
   handleImageCapture = () => {
     console.log('Camera::handleImageCapture BEGIN');
-    if (!this.state.path) {
+    if (this.state.captureButtonEnabled) {
+      this.setState({ captureButtonEnabled: false });
       this.camera.capture()
         .then((data) => {
           console.log('Camera::handleImageCapture DONE');
@@ -353,7 +369,7 @@ export class Cam extends Component {
 
   handleDismissModal = () => {
     this.state.progress.stopAnimation();
-    this.setState({ error: false, errorCode: null, animation: pressAnimation });
+    this.setState({ error: false, errorCode: null, animation: pressAnimation, captureButtonEnabled: true });
   };
 
   render() {
@@ -364,7 +380,7 @@ export class Cam extends Component {
     const { params = {} } = this.props.navigation.state;
     const { mode } = params;
     const isQR = mode === 'qr'
-    const fn = ()=>null;
+    const fn = () => null;
     return (
       <View style={styles.container}>
         <Modal
@@ -401,8 +417,8 @@ export class Cam extends Component {
                 activeOpacity={1}
                 style={[styles.captureBtn, this.state.path && styles.uploadBtn]}
                 onPress={isQR ? fn : this.handleImageCapture}
-                onPressIn={() => !this.state.path && this.animate(200, 0, 0.7) }
-                onPressOut={() => !this.state.path && this.animate(200, 0.7, 0) }
+                onPressIn={() => { this.state.captureButtonEnabled && this.animate(200, 0, 0.7) } }
+                onPressOut={() => { this.state.captureButtonEnabled && this.animate(200, 0.7, 0) } }
                 >
                 {
                   <Animation
