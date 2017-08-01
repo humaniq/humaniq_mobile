@@ -149,9 +149,9 @@ android {
 }
 
 dependencies {
+    compile (project(':react-native-android-library-humaniq-api')) {exclude module: 'okhttp'}
     compile project(':react-native-sound')
     compile project(':react-native-audio')
-    compile project(':humaniq-libsignals')
     compile project(':react-native-android-sms-listener')
     compile project(':react-native-network-info')
     compile project(':react-native-imei')
@@ -165,6 +165,7 @@ dependencies {
     compile "com.android.support:appcompat-v7:23.0.1"
     compile "com.facebook.react:react-native:+"  // From node_modules
     compile 'com.android.support:multidex:1.0.1'
+    compile 'com.google.firebase:firebase-core:11.0.2'
 }
 
 // Run this once to be able to run the application with BUCK

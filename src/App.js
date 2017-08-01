@@ -6,6 +6,8 @@ import {
 } from 'react-navigation';
 import { Provider } from 'react-redux';
 import store from './utils/store';
+import oncetrig from './utils/oncetrig';
+import { newTransaction } from './actions';
 
 import Camera from './components/Camera';
 import {
@@ -19,7 +21,12 @@ import {
 import Dashboard from './components/Dashboard';
 import Tutorial from './components/Shared/Components/Tutorial';
 import Chat from './components/Chat';
+import Chats from './components/Chats';
 import { Instructions } from './components/Instructions/Instructions';
+import Choose from './components/Transactions/Choose';
+import Temp from './components/Transactions/Temp';
+import Input from './components/Transactions/Input';
+import SelectAmount from './components/Transactions/SelectAmount';
 
 /*
 const Dashboard = TabNavigator(
@@ -37,7 +44,10 @@ const Dashboard = TabNavigator(
 */
 
 const stack = {
-  //Chat: { screen: Chat },
+
+  // Chats: { screen: Chats },
+  // Chat: { screen: Chat },
+  // Temp: { screen: Temp },
   Loading: { screen: Loading },
   Accounts: { screen: Accounts },
   Tutorial: { screen: Tutorial },
@@ -48,6 +58,9 @@ const stack = {
   CodeInput: { screen: CodeInput },
   Dashboard: { screen: Dashboard },
   Instructions: { screen: Instructions },
+  Choose: { screen: Choose },
+  Input: { screen: Input },
+  SelectAmount: { screen: SelectAmount },
 };
 
 const LoginStack = StackNavigator(
@@ -57,9 +70,29 @@ const LoginStack = StackNavigator(
   },
 );
 
+const getCurrentRouteName = (navigationState) => {
+  if (!navigationState) {
+    return null;
+  }
+  const route = navigationState.routes[navigationState.index];
+  // dive into nested navigators
+  if (route.routes) {
+    return getCurrentRouteName(route);
+  }
+
+  return { routeName: route.routeName, routeParams: route.params || {} };
+};
+
 const App = () => (
   <Provider store={store}>
-    <LoginStack />
+    <LoginStack onNavigationStateChange={(prevState, currentState) => {
+      const { routeName, routeParams } = getCurrentRouteName(currentState);
+      if (routeName === 'Camera' && routeParams.mode === 'qr') {
+        oncetrig.blockCall(false);
+        newTransaction.setTrAdress('');
+      }
+    }}
+    />
   </Provider>
 );
 

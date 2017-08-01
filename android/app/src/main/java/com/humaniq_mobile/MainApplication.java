@@ -3,9 +3,9 @@ package com.humaniq_mobile;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import com.humaniq.apilib.Package;
 import com.zmxv.RNSound.RNSoundPackage;
 import com.rnim.rn.audio.ReactNativeAudioPackage;
-import com.humaniq.libsignals.SignalReactPackage;
 import com.airbnb.android.react.lottie.LottiePackage;
 import com.centaurwarchief.smslistener.SmsListenerPackage;
 import com.pusherman.networkinfo.RNNetworkInfoPackage;
@@ -20,7 +20,7 @@ import com.facebook.react.ReactPackage;
 import com.facebook.react.shell.MainReactPackage;
 import com.facebook.soloader.SoLoader;
 import android.support.multidex.MultiDexApplication;
-import com.humaniq.libsignals.GreenDaoDatabase;
+//import com.humaniq.libsignals.GreenDaoDatabase;
 
 import java.util.Arrays;
 import java.util.List;
@@ -37,9 +37,9 @@ public class MainApplication extends MultiDexApplication implements ReactApplica
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
+            new Package(),
             new RNSoundPackage(),
             new ReactNativeAudioPackage(),
-            new SignalReactPackage(),
             new SmsListenerPackage(),
             new RNNetworkInfoPackage(),
             new IMEI(),
@@ -62,6 +62,6 @@ public class MainApplication extends MultiDexApplication implements ReactApplica
   public void onCreate() {
     super.onCreate();
     SoLoader.init(this, /* native exopackage */ false);
-    GreenDaoDatabase.createEncryptedInstance(this, "super-secret");
+    //GreenDaoDatabase.createEncryptedInstance(this, "super-secret");
   }
 }
