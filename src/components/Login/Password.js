@@ -113,6 +113,7 @@ export class Password extends Component {
               this.props.addSecondaryAccount({
                 accountId: registeredAcc.account_id,
                 photo: this.props.user.photo,
+                number: `${registeredAcc.phone_number.country_code}${registeredAcc.phone_number.phone_number}`,
               });
               this.props.navigation.navigate('Dashboard');
             } else {
@@ -320,14 +321,14 @@ export class Password extends Component {
           onPress={this.handleDismissModal}
           code={this.state.errorCode}
           visible={this.state.error != null && this.state.errorCode != null}
-          />
+        />
         <View style={styles.header}>
           <View style={styles.animationContainer}>
             <Animation
               style={styles.animation}
               source={spinner}
               progress={this.state.progress}
-              />
+            />
           </View>
           <Image style={styles.userPhoto} source={{ uri: this.props.user.photo }} />
           {this.renderInputStep() }
@@ -339,7 +340,7 @@ export class Password extends Component {
             onNumberPress={this.handleNumberPress}
             onBackspacePress={this.handleBackspacePress}
             onHelpPress={this.handleHelpPress}
-            />
+          />
         </View>
       </View>
     );
@@ -428,6 +429,6 @@ const styles = CustomStyleSheet({
   keyboardContainer: {
     flex: 1,
     justifyContent: 'flex-end',
-    marginBottom: 113
-  }
+    marginBottom: 113,
+  },
 });

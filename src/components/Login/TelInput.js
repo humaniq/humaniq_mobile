@@ -4,7 +4,7 @@ import {
   Image,
   Text,
   TouchableOpacity,
-  Animated
+  Animated,
 } from 'react-native';
 
 import PropTypes from 'prop-types';
@@ -112,11 +112,17 @@ export class TelInput extends Component {
   };
 
   handlePhoneConfirm = () => {
+    const phone_number = this.state.phone;
+    // *************************************
+    // temp to debug accounts layout (preview number);
+    // *************************************
+    this.props.savePhone(VMasker.toNumber(`${this.state.code}${phone_number}`));
+
     if (this.phonenumber(this.state.phone, this.state.countryCode)) {
-      /*this.props.phoneNumberCreate({
+      this.props.phoneNumberCreate({
         account_id: this.props.user.account.payload.payload.account_information.account_id,
         phone_number,
-      });*/
+      });
     } else {
       this.setState({ error: true });
       this.animatePasswordError();
@@ -187,7 +193,7 @@ export class TelInput extends Component {
           onNumberPress={this.handleNumberPress}
           onBackspacePress={this.handleBackspacePress}
           onHelpPress={this.handleHelpPress}
-          />
+        />
       </View>
     );
   }
