@@ -1,11 +1,13 @@
-import React, { Component } from 'react';
-import { View, TouchableOpacity, Image, Animated, Text, ScrollView, TextInput } from 'react-native';
+/* eslint-disable import/no-unresolved */
+import React from 'react';
+import { View, TouchableOpacity, Image, Text } from 'react-native';
 import VMasker from 'vanilla-masker';
+import PropTypes from 'prop-types';
 
-import { HumaniqContactsApiLib, HumaniqProfileApiLib } from 'react-native-android-library-humaniq-api';
+import { HumaniqProfileApiLib } from 'react-native-android-library-humaniq-api';
 
 import { connect } from 'react-redux';
-import { NavigationActions } from 'react-navigation'
+import { NavigationActions } from 'react-navigation';
 
 import { colors } from '../../utils/constants';
 import { newTransaction } from '../../actions';
@@ -14,17 +16,22 @@ import PhoneKeyboard from '../Shared/Components/PhoneKeyboard';
 
 const backWhite = require('./../../assets/icons/back_white.png');
 const paymentBig = require('./../../assets/icons/payment_big.png');
-const arrowDownWhite = require('../../assets/icons/arrow_down_white.png');
-const searchWhite = require('./../../assets/icons/search_white.png');
-const closeWhite = require('./../../assets/icons/close_white.png');
 const doneWhite = require('./../../assets/icons/done_white.png');
-const qr = require('./../../assets/icons/qr.png');
-const phoneNumber = require('./../../assets/icons/phone_number.png');
-const send = require('./../../assets/icons/send.png');
 
-const pattern = { pattern: '999.99', placeholder: '0' }
+const pattern = { pattern: '999.99', placeholder: '0' };
 
 class SelectAmount extends React.Component {
+  static propTypes = {
+    newTransaction: PropTypes.shape({
+      rootScreen: PropTypes.string.isRequired,
+    }),
+    navigation: PropTypes.shape({
+      navigate: PropTypes.func.isRequired,
+      dispatch: PropTypes.func.isRequired,
+    }),
+    setTrAmount: PropTypes.func,
+  };
+
   constructor() {
     super();
     this.state = {
@@ -38,17 +45,31 @@ class SelectAmount extends React.Component {
     };
   }
 
-  getExchange = (C, A) => {
-    HumaniqProfileApiLib.getExchangeUsd(1).then(data=>alert(data))
-  }
   componentDidMount() {
-    HumaniqProfileApiLib.getExchangeUsd('1').then(data=>{
+    HumaniqProfileApiLib.getExchangeUsd('1').then((data) => {
       const { USD = 0 } = data;
       this.setState({
-        rate: USD
-      })
-    })
+        rate: USD,
+      });
+    });
   }
+
+  setAmount = () => {
+    const { maskedAmount } = this.state;
+    const { newTransaction: { rootScreen }, setTrAmount, navigation: { dispatch } } = this.props;
+    setTrAmount(parseFloat(maskedAmount));
+    dispatch(
+      NavigationActions.back({
+        key: rootScreen,
+      }),
+    );
+  };
+
+  handleBackspacePress = () => {
+    const inputVal = this.state.amount.slice(0, -1);
+    const m = VMasker.toPattern(inputVal, pattern);
+    this.setState({ amount: inputVal, maskedAmount: m });
+  };
 
   handleNumberPress = (number) => {
     if (this.state.amount.length < this.state.maxAmountLength) {
@@ -59,25 +80,7 @@ class SelectAmount extends React.Component {
     }
   };
 
-  handleBackspacePress = () => {
-    const inputVal = this.state.amount.slice(0, -1);
-    const m = VMasker.toPattern(inputVal, pattern);
-    this.setState({ amount: inputVal, maskedAmount: m });
-  };
-
-  setAmount = () => {
-    const { amount, maskedAmount } = this.state;
-    const { newTransaction, setTrAmount, navigation: { navigate, dispatch } } = this.props;
-    const { rootScreen } = newTransaction;
-    setTrAmount(parseFloat(maskedAmount));
-    dispatch(NavigationActions.back({
-      key: rootScreen,
-    }))
-  }
-
   renderContent() {
-    const { contacts } = this.props;
-    const { navigation: { navigate, state: { params = {} } } } = this.props;
     const { maskedAmount, currency, rate } = this.state;
     const am = maskedAmount.split('.');
     const amFloat = Math.round(parseFloat(maskedAmount) * rate * 100) / 100;
@@ -95,17 +98,15 @@ class SelectAmount extends React.Component {
         <PhoneKeyboard
           onNumberPress={this.handleNumberPress}
           onBackspacePress={this.handleBackspacePress}
-          onHelpPress={this.setPhoneNumber}
+          onHelpPress={this.setAmount}
         />
       </View>
     );
   }
 
   renderHeader() {
-    const { selectedID, code, phone } = this.state;
-    const { contacts, setTrPhone, navigation } = this.props;
-    const { dispatch, navigate, state } = navigation;
-    const { key } = state
+    const { navigation } = this.props;
+    const { dispatch } = navigation;
 
     return (
       <View style={styles.header}>
@@ -134,13 +135,12 @@ class SelectAmount extends React.Component {
   }
 }
 
-const styles = ({
+const styles = {
   container: {
     flex: 1,
     backgroundColor: 'white',
   },
   header: {
-    //position: 'absolute',
     height: 66,
     left: 0,
     right: 0,
@@ -206,11 +206,10 @@ const styles = ({
   error: {
     color: '#f01434',
   },
-});
+};
 
 const mapStateToProps = state => ({
   newTransaction: state.newtransaction,
-  contacts: state.contacts,
 });
 
 export default connect(mapStateToProps, {

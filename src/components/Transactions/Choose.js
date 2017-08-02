@@ -1,15 +1,17 @@
-import React, { Component } from 'react';
+/* eslint-disable import/no-unresolved */
+/* eslint-disable react/forbid-prop-types */
+
+import React from 'react';
 import { View, TouchableOpacity, Image, Text, ScrollView, TextInput } from 'react-native';
 
 import { HumaniqContactsApiLib, HumaniqProfileApiLib } from 'react-native-android-library-humaniq-api';
 
 import { connect } from 'react-redux';
-import { NavigationActions } from 'react-navigation'
+import { NavigationActions } from 'react-navigation';
+import PropTypes from 'prop-types';
 
 import { colors } from '../../utils/constants';
-import CustomStyleSheet from '../../utils/customStylesheet';
 import ChooseItem from './ChooseItem';
-import SelectAmount from './SelectAmount';
 import { newTransaction, addContact } from '../../actions';
 
 const backWhite = require('./../../assets/icons/back_white.png');
@@ -21,98 +23,75 @@ const qr = require('./../../assets/icons/qr.png');
 const phoneNumber = require('./../../assets/icons/phone_number.png');
 const send = require('./../../assets/icons/send.png');
 
-const getName = (cnt) => cnt.name || cnt.phone || ' ';
-const nameSort = (a, b) => (a > b) ? 1 : (a < b) ? -1 : 0;
-const sort = (a, b) => nameSort(getName(a), getName(b))
+const getName = cnt => cnt.name || cnt.phone || ' ';
+const nameSort = (a, b) => {
+  if (a > b) return 1;
+  if (a < b) return -1;
+  return 0;
+};
+const sort = (a, b) => nameSort(getName(a), getName(b));
 
 class Choose extends React.Component {
+
+  static propTypes = {
+    contacts: PropTypes.array,
+    navigation: PropTypes.shape({
+      navigate: PropTypes.func.isRequired,
+      dispatch: PropTypes.func.isRequired,
+      state: PropTypes.object,
+    }),
+    setRootScreen: PropTypes.func,
+    newContact: PropTypes.func,
+    setTrContact: PropTypes.func,
+  };
+
   constructor() {
     super();
     this.state = {
       selectedID: '',
       search: false,
       text: '',
-    }
-  }
-
-  renderContent() {
-    const { contacts } = this.props;
-    const { search, text } = this.state;
-
-    const filter = (cnt) => search && text ? getName(cnt).toUpperCase().indexOf(text.toUpperCase()) >= 0 : true
-    let groupLetter = '';
-
-    return (
-      <ScrollView
-        style={{ backgroundColor: colors.white }}
-        showsVerticalScrollIndicator={false}
-      >
-          <View style={styles.contactsHeader} />
-          {contacts.filter(filter).sort(sort).map((cnt) => {
-            const firstLetter = getName(cnt)[0];
-            let showLetter = '';
-            if (groupLetter !== firstLetter) {
-              groupLetter = firstLetter;
-              showLetter = groupLetter;
-            } else {
-              showLetter = '';
-            }
-            return (
-              <ChooseItem
-                onPress={this.selectItem}
-                letter={showLetter}
-                key={cnt.id}
-                contactID={cnt.id}
-              />
-            );
-          })}
-      </ScrollView>
-    );
+    };
   }
 
   componentDidMount() {
-    const { contacts, navigation, setRootScreen, newContact } = this.props;
-    const { dispatch, navigate, state } = navigation;
-    const { key } = state
+    const { navigation: { state }, setRootScreen, newContact } = this.props;
+    const { key = '' } = state;
     setRootScreen(key);
 
-    HumaniqContactsApiLib.extractAllPhoneNumbers().then((response) => {
-      console.log('contacts.ok--->', JSON.stringify(response));
-      const accs = response.map(acc => acc.accountId);
-      console.log(JSON.stringify(accs));
-      try {
-        HumaniqProfileApiLib.getAccountProfiles(accs).then((profiles) => {
-          console.log('profiles.ok--->', JSON.stringify(profiles));
-          /*
-          id: 1,
-          approved: false,
-          phone: '+111 11 1111111',
-          name: 'Neo',
-          status: ONLINE,
-          avatar: 'http://lorempixel.com/200/200/cats/2/',
-          */
-          profiles.forEach(p => {
-            const { phone_number = {} } = p;
-            const { person = {} } = p;
-            const { avatar = {} } = p;
-            newContact({
-              id: p.account_id,
-              approved: false,
-              phone: phone_number.country_code ? `+${phone_number.country_code}` : '',
-              name: person.first_name + ' ' + person.last_name,
-              status: 1,
-              avatar: avatar.url,
+    HumaniqContactsApiLib.extractAllPhoneNumbers()
+      .then((response) => {
+        // console.log('contacts.ok--->', JSON.stringify(response));
+        const accs = response.map(acc => acc.accountId);
+        // console.log(JSON.stringify(accs));
+        try {
+          HumaniqProfileApiLib.getAccountProfiles(accs)
+            .then((profiles) => {
+              // console.log('profiles.ok--->', JSON.stringify(profiles));
+              profiles.forEach((p) => {
+                const { phone_number = {} } = p;
+                const { person = {} } = p;
+                const { avatar = {} } = p;
+                newContact({
+                  id: p.account_id,
+                  approved: false,
+                  phone: phone_number.country_code ? `+${phone_number.country_code}` : '',
+                  name: `${person.first_name} ${person.last_name}`,
+                  status: 1,
+                  avatar: avatar.url,
+                });
+              });
             })
-          })
-        }).catch((err) => {
-          console.log('profiles.err--->', JSON.stringify(err));
-        });
-      } catch (e) {
-        console.log(e);
-      }
-    }).catch((err) => {
-      console.log('contacts.err--->', JSON.stringify(err));
-    });
+            .catch((/* err */) => {
+              // console.log('profiles.err--->', JSON.stringify(err));
+            });
+        } catch (e) {
+          // console.log(e);
+        }
+      })
+      .catch((/* err */) => {
+        // console.log('contacts.err--->', JSON.stringify(err));
+      });
   }
 
   /*
@@ -129,6 +108,14 @@ class Choose extends React.Component {
     });
   }
   */
+  setSearch = () => {
+    const { search, text } = this.state;
+    const newValue = !search;
+    this.setState({
+      search: newValue,
+      text: newValue === false ? '' : text,
+    });
+  };
 
   selectItem = (id) => {
     const { setTrContact, navigation: { navigate } } = this.props;
@@ -138,32 +125,45 @@ class Choose extends React.Component {
       text: '',
     });
     navigate('SelectAmount');
-  }
+  };
 
-
-  setSearch = () => {
+  renderContent() {
+    const { contacts } = this.props;
     const { search, text } = this.state;
-    const newValue = !search;
-    this.setState({
-      search: newValue,
-      text: newValue === false ? '' : text,
-    });
+
+    const filter = cnt => (search && text ? getName(cnt).toUpperCase().indexOf(text.toUpperCase()) >= 0 : true);
+    let groupLetter = '';
+
+    return (
+      <ScrollView style={{ backgroundColor: colors.white }} showsVerticalScrollIndicator={false}>
+        <View style={styles.contactsHeader} />
+        {contacts.filter(filter).sort(sort).map((cnt) => {
+          const firstLetter = getName(cnt)[0];
+          let showLetter = '';
+          if (groupLetter !== firstLetter) {
+            groupLetter = firstLetter;
+            showLetter = groupLetter;
+          } else {
+            showLetter = '';
+          }
+          return <ChooseItem onPress={this.selectItem} letter={showLetter} key={cnt.id} contactID={cnt.id} />;
+        })}
+      </ScrollView>
+    );
   }
 
   renderHeader() {
     const { selectedID, search } = this.state;
-    const { contacts, navigation, setRootScreen } = this.props;
-    const { dispatch, navigate, state } = navigation;
-    const { key } = state
-    setRootScreen(key);
+    const { contacts, navigation } = this.props;
+    const { dispatch, navigate } = navigation;
 
     const curContact = contacts.find(cnt => cnt.id === selectedID) || {};
     const selName = curContact.name || curContact.phone || '';
 
     return (
       <View style={styles.header}>
-        {search ? (
-          <View style={styles.headerInner}>
+        {search
+          ? <View style={styles.headerInner}>
             <TouchableOpacity onPress={() => dispatch(NavigationActions.back())}>
               <Image source={backWhite} style={styles.headerImage} />
             </TouchableOpacity>
@@ -181,34 +181,41 @@ class Choose extends React.Component {
               <Image source={closeWhite} style={styles.headerImage} />
             </TouchableOpacity>
           </View>
-        ) : (
-          <View style={styles.headerInner}>
+          : <View style={styles.headerInner}>
             <TouchableOpacity onPress={() => dispatch(NavigationActions.back())}>
               <Image source={backWhite} style={styles.headerImage} />
             </TouchableOpacity>
             <View style={{ flex: 1, alignItems: 'center' }}>
               <Image source={paymentBig} style={styles.paymentImage} />
             </View>
-            { selectedID ? (
-              <View style={{ flex: 3, alignItems: 'flex-start' }}>
-                <Text style={styles.selectedNum}>{selName}</Text>
-              </View>
-            ) : null }
-            { selectedID ? (
-              <TouchableOpacity onPress={() => { this.selectItem(selectedID); }}>
-                <Image source={closeWhite} style={styles.headerImage} />
-              </TouchableOpacity>
-              ) : null }
+            {selectedID
+                ? <View style={{ flex: 3, alignItems: 'flex-start' }}>
+                  <Text style={styles.selectedNum}>
+                    {selName}
+                  </Text>
+                </View>
+                : null}
+            {selectedID
+                ? <TouchableOpacity
+                  onPress={() => {
+                    this.selectItem(selectedID);
+                  }}
+                >
+                  <Image source={closeWhite} style={styles.headerImage} />
+                </TouchableOpacity>
+                : null}
             <TouchableOpacity onPress={selectedID ? () => null : this.setSearch}>
               <Image source={selectedID ? doneWhite : searchWhite} style={styles.headerImage} />
             </TouchableOpacity>
-          </View>
-        )}
+          </View>}
         <View style={styles.headerButtonsRow}>
           <TouchableOpacity style={styles.headerButton} onPress={() => navigate('Camera', { mode: 'qr' })}>
             <Image source={qr} style={styles.headerImage} />
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => navigate('Input', { mode: 'adress' })} style={[styles.headerButton, styles.borderItem]}>
+          <TouchableOpacity
+            onPress={() => navigate('Input', { mode: 'adress' })}
+            style={[styles.headerButton, styles.borderItem]}
+          >
             <Image source={send} style={styles.headerImage} />
           </TouchableOpacity>
           <TouchableOpacity onPress={() => navigate('Input', { mode: 'phone' })} style={styles.headerButton}>
@@ -236,7 +243,7 @@ class Choose extends React.Component {
   }
 }
 
-const styles = ({
+const styles = {
   container: {
     flex: 1,
     backgroundColor: 'white',
@@ -315,7 +322,7 @@ const styles = ({
     height: 40,
     bottom: -5,
   },
-});
+};
 
 const mapStateToProps = state => ({
   chats: state.chats,
