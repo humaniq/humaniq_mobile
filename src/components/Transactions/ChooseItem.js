@@ -1,4 +1,5 @@
 /* eslint-disable no-nested-ternary */
+/* eslint-disable react/forbid-prop-types */
 
 import React, { Component } from 'react';
 import {
@@ -8,6 +9,7 @@ import {
   Text,
 } from 'react-native';
 import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
 
 import { colors } from '../../utils/constants';
 import CustomStyleSheet from '../../utils/customStylesheet';
@@ -17,13 +19,22 @@ const ROW_HEIGHT = 64;
 
 class ChooseItem extends Component {
 
+  static propTypes = {
+    contacts: PropTypes.array,
+    contactID: PropTypes.string,
+    letter: PropTypes.string,
+    onPress: PropTypes.func,
+  };
+
+  componentDidMount() {}
+
   render() {
     const { contactID, letter, contacts, onPress } = this.props;
 
-    const curContact = contacts.find(cnt => cnt.id === contactID)
+    const curContact = contacts.find(cnt => cnt.id === contactID);
     const contactAvatar = { uri: curContact.avatar };
-    const name = curContact.name || curContact.phone
-    const offline = curContact.status === 0
+    const name = curContact.name || curContact.phone;
+    const offline = curContact.status === 0;
 
     return (
       <View style={styles.container}>

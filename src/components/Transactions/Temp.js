@@ -1,23 +1,21 @@
-import React, { Component } from 'react';
-import { View, TouchableOpacity, Image, Text, ScrollView, TextInput, StatusBar } from 'react-native';
+import React from 'react';
+import { View, TouchableOpacity, Text } from 'react-native';
 import { connect } from 'react-redux';
-import { NavigationActions } from 'react-navigation';
+import PropTypes from 'prop-types';
 
-class Temp extends React.Component {
+const Temp = ({ navigation: { navigate } }) => (
+  <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+    <TouchableOpacity style={{ backgroundColor: 'red', margin: 30 }} onPress={() => navigate('Choose')}>
+      <Text> TRANSACTION </Text>
+    </TouchableOpacity>
+  </View>
+);
+Temp.propTypes = {
+  navigation: PropTypes.shape({
+    navigate: PropTypes.func.isRequired,
+  }),
+};
 
-  render(){
-    const { navigation } = this.props;
-    const { dispatch, navigate, state } = navigation;
-
-    return (
-      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-        <TouchableOpacity style={{ backgroundColor: 'red', margin: 30 }} onPress={() => navigate('Choose')}>
-          <Text> TRANSACTION </Text>
-        </TouchableOpacity>
-      </View>
-    )
-  }
-}
 
 const mapStateToProps = state => ({
   chats: state.chats,
