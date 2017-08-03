@@ -51,7 +51,9 @@ export class Accounts extends Component {
               key={acc.accountId}
             >
               <View style={styles.accountInfoContainer}>
-                <Image style={styles.profilePhoto} source={{ uri: acc.photo }} />
+                {acc.photo.length > 0 &&
+                <Image style={styles.profilePhoto} source={{ uri: acc.photo }}/>
+                }
                 <Text style={styles.id}>{`${acc.accountId} / phone: ${acc.phone}`}</Text>
               </View>
               <Image source={ic_chevrone_right} />
