@@ -16,12 +16,12 @@ const mockStore = configureMockStore();
 
 /** *
  * Testing Login Components
- ***/
+ ** */
 
 describe('<Login />', () => {
     /** *
      * Testing Keyboard component
-     ***/
+     ** */
 
     // it('should render Keyboard correctly', () => {
     //     const wrapper = shallow(<Keyboard/>)
@@ -93,7 +93,7 @@ describe('<Login />', () => {
 
     /** *
      * Testing Password component
-     ***/
+     ** */
 
   const user = {
     account: {
@@ -150,44 +150,6 @@ describe('<Login />', () => {
         );
     expect(wrapper).toMatchSnapshot();
     expect(wrapper.length).toBe(1);
-  });
-    //
-  it('Password component should handle states', () => {
-    initialState = {
-      maxPasswordLength: 4,
-      password: '',
-      imei: 'some imei',
-      match: null,
-    };
-    expectedState = {
-      maxPasswordLength: 0,
-      password: 'djamik123',
-      imei: 'new imei',
-      match: true,
-    };
-    const wrapper = shallow(
-      <Password
-        signup={() => {
-        }}
-        login={() => {
-        }}
-        setPassword={() => {
-        }}
-        store={store}
-        user={user}
-        navigation={navigation}
-      />,
-        );
-    expect(wrapper.state().password).toEqual('');
-    expect(wrapper.state().match).toEqual(null);
-        // will change state of the app
-    wrapper.setState({
-      maxPasswordLength: 0,
-      password: 'djamik123',
-      imei: 'new imei',
-      match: true,
-    });
-    expect(wrapper.state()).toEqual(expectedState);
   });
     //
   it('Password component children count should be equal to 3', () => {
@@ -248,26 +210,6 @@ describe('<Login />', () => {
     //     expect(mockClick).toBeCalled()
     // })
 
-  it('passwordConfirmAvailability() should be called and return false value', () => {
-    const expectedValue = false;
-    const wrapper = shallow(
-      <Password
-        signup={() => {
-        }}
-        login={() => {
-        }}
-        setPassword={() => {
-        }}
-        store={store}
-        user={user}
-        navigation={navigation}
-      />,
-        );
-    expect(
-            wrapper.instance().passwordConfirmAvailability(),
-        ).toEqual(expectedValue);
-  });
-    //
   it('renderPassMask() should be called and return digits', () => {
     const wrapper = shallow(
       <Password
@@ -419,84 +361,9 @@ describe('<Login />', () => {
     expect(wrapper.find('View').first().children().length).toBe(3);
   });
 
-
-  it('TelInput component should handle states', () => {
-    const user = {
-      account: {
-        payload: {},
-        isFetching: false,
-      },
-      validate: {
-        payload: {},
-        isFetching: false,
-      },
-      phoneCreate: {
-        isFetching: true,
-      },
-      photo: 'image',
-    };
-    initialState = {
-      maxPhoneLength: 19,
-      phone: '',
-    };
-    expectedState = {
-      maxPhoneLength: 40,
-      phone: '+998901443407',
-    };
-    const wrapper = shallow(
-      <TelInput
-        phoneNumberCreate={() => {
-        }}
-        store={store}
-        user={user}
-        navigation={navigation}
-      />,
-        );
-    expect(wrapper.state()).toEqual(initialState);
-        // will change state of the app
-    wrapper.setState({
-      maxPhoneLength: 40,
-      phone: '+998901443407',
-    });
-    expect(wrapper.state()).toEqual(expectedState);
-  });
-
-  it('renderInput() should be called and return some view with phoneNumber', () => {
-    const user = {
-      account: {
-        payload: {},
-        isFetching: false,
-      },
-      validate: {
-        payload: {},
-        isFetching: false,
-      },
-      phoneCreate: {
-        isFetching: true,
-      },
-      photo: 'image',
-
-    };
-    const expectedPhoneNumber = '+998901443407';
-    const onClick = jest.fn();
-    const wrapper = shallow(
-      <TelInput
-        phoneNumberCreate={() => {
-        }}
-        store={store}
-        user={user}
-        navigation={navigation}
-      />,
-        );
-    wrapper.setState({
-      phone: expectedPhoneNumber,
-    });
-    expect(wrapper.instance().renderInput().props.children.props.children).toEqual(expectedPhoneNumber);
-  });
-    //
     /** *
      * Testing Confirm component
-     ***/
+     ** */
 
   it('should render Confirm component correctly', () => {
     const onClick = jest.fn();
@@ -537,7 +404,7 @@ describe('<Login />', () => {
 
     /** *
      * Testing Tutorial component
-     ***/
+     ** */
 
 
   it('should render Tutorial component correctly', () => {
@@ -554,23 +421,6 @@ describe('<Login />', () => {
     const wrapper = shallow(<Tutorial navigation={navigation} />);
     expect(wrapper).toMatchSnapshot();
     expect(wrapper.length).toBe(1);
-  });
-
-  it('Tutorial should render child components', () => {
-    const navigation = {
-      navigate: jest.fn(),
-      dispatch: jest.fn(), // spy function
-      state: {
-        params: {
-          nextScene: jest.fn(),
-        }, // spy function
-      },
-    };
-
-    const wrapper = shallow(<Tutorial navigation={navigation} />);
-    expect(
-            wrapper.find('View').first().children().length,
-        ).toBe(1);
   });
 
   it('Tutorial should call method handleTutorialPlay() and change State', () => {

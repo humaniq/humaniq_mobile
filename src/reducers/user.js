@@ -11,6 +11,15 @@ function photo(state = '', action) {
   }
 }
 
+function profile(state = {}, action) {
+  switch (action.type) {
+    case ActionTypes.SET_PROFILE:
+      return action.profile;
+    default:
+      return state;
+  }
+}
+
 function password(state = '', action) {
   switch (action.type) {
     case ActionTypes.SET_PASSWORD:
@@ -100,4 +109,5 @@ export const user = combineReducers({
   photo,
   password,
   phoneNumber,
+  profile,
 });
