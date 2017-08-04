@@ -26,5 +26,14 @@ function vh(px) {
   return viewPortCalc(px, DESIGN_HEIGHT, SCREEN_HEIGHT);
 }
 
+function secureText(length) {
+  if (length == 0) { return '****'; }
+  let text = '';
+  for (let i = 0; i < length; i++) {
+    text += '*';
+  }
+  return text;
+}
 
-export { SCREEN_HEIGHT, SCREEN_WIDTH, pixelRatio, vw, vh };
+
+export { SCREEN_HEIGHT, SCREEN_WIDTH, pixelRatio, vw, vh, secureText };
