@@ -114,7 +114,7 @@ export class Password extends Component {
                 photo: this.props.user.photo,
                 number: `${registeredAcc.phone_number.country_code}${registeredAcc.phone_number.phone_number}`,
               });
-              this.props.navigation.navigate('Dashboard');
+              this.props.navigation.navigate('Choose');
             } else {
               // primary user
               this.props.addPrimaryAccount({
@@ -128,7 +128,7 @@ export class Password extends Component {
           case 2001:
             // login, password ok (save password & token?)
             this.props.setPassword(this.state.password);
-            this.props.navigation.navigate('Dashboard');
+            this.props.navigation.navigate('Choose');
             break;
 
           case 2002:
