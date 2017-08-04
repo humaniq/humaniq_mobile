@@ -14,8 +14,8 @@ import SmsListener from 'react-native-android-sms-listener';
 import CustomStyleSheet from '../../utils/customStylesheet';
 import PhoneKeyboard from '../Shared/Components/PhoneKeyboard';
 import ConfirmButton from '../Shared/Buttons/ConfirmButton';
+import RequestSmsButton from '../Shared/Buttons/RequestSmsButton';
 import Modal from '../Shared/Components/Modal';
-import HelpButton from '../Shared/Buttons/HelpButton';
 import { vw } from '../../utils/units';
 import { phoneNumberValidate } from '../../actions';
 
@@ -49,6 +49,7 @@ export class CodeInput extends Component {
     // for modal
     modalVisible: false,
     errorCode: null,
+    cooldownTime: 0,
   };
 
   componentDidMount() {
@@ -218,6 +219,21 @@ export class CodeInput extends Component {
     this.setState({ modalVisible: false, errorCode: null });
   };
 
+  handleRequestSms = () => {
+    // request sms
+    // set cooldown
+    this.setState({ cooldownTime: 45 });
+    let interval;
+    let cooldown = () => {
+      if (this.state.cooldownTime > 0) {
+        this.setState({ cooldownTime: this.state.cooldownTime -= 1 });
+      } else {
+        clearInterval(interval);
+      }
+    };
+    interval = setInterval(cooldown, 1000);
+  };
+
   render() {
     return (
       <View style={styles.container}>
@@ -232,8 +248,15 @@ export class CodeInput extends Component {
           </Animated.View>
         </View>
         <View style={styles.buttonsContainer}>
-          <HelpButton onPress={this.handleHelpPress} />
-          <ConfirmButton onPress={this.handleCodeConfirm} disabled={this.state.code.length < 6} />
+          <RequestSmsButton
+            onPress={this.handleRequestSms}
+            disabled={this.state.cooldownTime > 0}
+            cooldownTime={this.state.cooldownTime}
+          />
+          <ConfirmButton
+            onPress={this.handleCodeConfirm}
+            disabled={this.state.code.length < 6}
+          />
         </View>
         <PhoneKeyboard
           onNumberPress={this.handleNumberPress}
