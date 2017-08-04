@@ -27,6 +27,9 @@ import Choose from './components/Transactions/Choose';
 import Temp from './components/Transactions/Temp';
 import Input from './components/Transactions/Input';
 import SelectAmount from './components/Transactions/SelectAmount';
+import { Profile, ProfileSettings, ProfileEdit, ProfileEditPassword } from './components/Profile/index';
+import CameraEdit from './components/Profile/CameraEdit';
+import PasswordEdit from './components/Profile/PasswordEdit';
 
 /*
 const Dashboard = TabNavigator(
@@ -61,6 +64,12 @@ const stack = {
   Choose: { screen: Choose },
   Input: { screen: Input },
   SelectAmount: { screen: SelectAmount },
+  Profile: { screen: Profile },
+  ProfileSettings: { screen: ProfileSettings },
+  ProfileEdit: { screen: ProfileEdit },
+  ProfileEditPassword: { screen: ProfileEditPassword },
+  CameraEdit: { screen: CameraEdit },
+  PasswordEdit: { screen: PasswordEdit },
 };
 
 const LoginStack = StackNavigator(
