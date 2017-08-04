@@ -24,7 +24,6 @@ export class Dashboard extends Component {
         {/* <Text>{`${this.props.user.registered ? "EXISTING" : "NEW"} USER`}</Text>*/}
         <Text>{JSON.stringify(this.props.user, null,2)}</Text>
         <Text>{`user id: ${this.props.user.id}`}</Text>
-        <Text>{`user pass: ${this.props.user.password}`}</Text>
         <Text>{`user imei: ${this.props.user.imei}`}</Text>
         <Text>{`user phone: ${this.props.user.phone}`}</Text>
         <Text>{`user token: ${this.props.user.token}`}</Text>

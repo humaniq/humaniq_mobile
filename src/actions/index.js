@@ -77,7 +77,6 @@ export const faceEmotionValidate = {
 };
 
 export const setAvatarLocalPath = path => action(SET_AVATAR_LOCAL_PATH, { path });
-export const setPassword = password => action(SET_PASSWORD, { password });
 export const savePhone = number => action(SAVE_PHONE, { number });
 export const addPrimaryAccount = account => action(ADD_PRIMARY_ACCOUNT, { account });
 export const addSecondaryAccount = account => action(ADD_SECONDARY_ACCOUNT, { account });

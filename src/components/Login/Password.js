@@ -15,7 +15,7 @@ import IMEI from 'react-native-imei';
 import Keyboard from '../Shared/Components/Keyboard';
 import CustomStyleSheet from '../../utils/customStylesheet';
 const spinner = require('../../assets/animations/s-spiner.json');
-import { login, signup, setPassword, addPrimaryAccount, addSecondaryAccount } from '../../actions';
+import { login, signup, addPrimaryAccount, addSecondaryAccount } from '../../actions';
 import Modal from "../Shared/Components/Modal";
 import { vw } from '../../utils/units';
 
@@ -32,11 +32,9 @@ export class Password extends Component {
         isFetching: PropTypes.bool,
       }).isRequired,
 
-      password: PropTypes.string,
       photo: PropTypes.string.isRequired,
     }).isRequired,
 
-    setPassword: PropTypes.func.isRequired,
     login: PropTypes.func.isRequired,
     signup: PropTypes.func.isRequired,
     navigation: PropTypes.shape({
@@ -90,70 +88,66 @@ export class Password extends Component {
       }
 
       const code = nextProps.user.account.payload.code;
-      const password = nextProps.user.password;
 
-      if (!password) {
-        switch (code) {
-          case 6000:
-            this.setState({
-              error: true,
-              errorCode: nextProps.user.account.payload.code,
+      switch (code) {
+        case 6000:
+          this.setState({
+            error: true,
+            errorCode: nextProps.user.account.payload.code,
+          });
+          break;
+
+        case 1001:
+          const registeredAcc = nextProps.user.account.payload.payload.account_information;
+          // this.props.navigation.navigate('TelInput');
+
+          // TODO: replace with validated??
+          if (registeredAcc.phone_number.country_code) {
+            // secondary user, redirect to dash
+            this.props.addSecondaryAccount({
+              accountId: registeredAcc.account_id,
+              photo: this.props.user.photo,
+              number: `${registeredAcc.phone_number.country_code}${registeredAcc.phone_number.phone_number}`,
             });
-            break;
-
-          case 1001:
-            const registeredAcc = nextProps.user.account.payload.payload.account_information;
-            this.props.setPassword(this.state.password);
-            // this.props.navigation.navigate('TelInput');
-
-            // TODO: replace with validated??
-            if (registeredAcc.phone_number.country_code) {
-              // secondary user, redirect to dash
-              this.props.addSecondaryAccount({
-                accountId: registeredAcc.account_id,
-                photo: this.props.user.photo,
-                number: `${registeredAcc.phone_number.country_code}${registeredAcc.phone_number.phone_number}`,
-              });
-              this.props.navigation.navigate('Dashboard');
-            } else {
-              // primary user
-              this.props.addPrimaryAccount({
-                accountId: registeredAcc.account_id,
-                photo: this.props.user.photo,
-              });
-              this.props.navigation.navigate('TelInput');
-            }
-            break;
-
-          case 2001:
-            // login, password ok (save password & token?)
-            this.props.setPassword(this.state.password);
             this.props.navigation.navigate('Dashboard');
-            break;
-
-          case 2002:
-            // Authentication Failed
-            this.setState({
-              password: '',
-              error: true,
-              errorCode: nextProps.user.account.payload.code,
+          } else {
+            // primary user
+            this.props.addPrimaryAccount({
+              accountId: registeredAcc.account_id,
+              photo: this.props.user.photo,
             });
-            break;
+            this.props.navigation.navigate('TelInput');
+          }
+          break;
 
-          case 3003:
-            // Facial Image Not Found
-            this.setState({
-              error: true,
-              errorCode: nextProps.user.account.payload.code,
-            });
-            break;
+        case 2001:
+          // login, password ok (save password & token?)
+          // TODO: SET TOKEN THERE
+          this.props.navigation.navigate('Dashboard');
+          break;
 
-          default:
-            this.setState({
-              error: true,
-              errorCode: nextProps.user.account.payload.code,
-            });
-        }
+        case 2002:
+          // Authentication Failed
+          this.setState({
+            password: '',
+            error: true,
+            errorCode: nextProps.user.account.payload.code,
+          });
+          break;
+
+        case 3003:
+          // Facial Image Not Found
+          this.setState({
+            error: true,
+            errorCode: nextProps.user.account.payload.code,
+          });
+          break;
+
+        default:
+          this.setState({
+            error: true,
+            errorCode: nextProps.user.account.payload.code,
+          });
       }
     }
   }
@@ -213,7 +207,7 @@ export class Password extends Component {
       // TODO: go to tel input with reset
       this.createRegistration(password);
     } else {
-      this.props.navigation.navigate('Password', { password: password });
+      this.props.navigation.navigate('Password', { password });
     }
   };
 
@@ -222,7 +216,7 @@ export class Password extends Component {
     this.props.login({
       facial_image_id: this.props.user.validate.payload.payload.facial_image_id,
       device_imei: this.state.imei,
-      password: password,
+      password,
     });
   };
 
@@ -232,13 +226,13 @@ export class Password extends Component {
     const isEmulator = DeviceInfo.isEmulator();
     const randomImei = Math.floor((10000000 + Math.random()) * 90000000).toString();
     const imei = isEmulator ? randomImei : IMEI.getImei();
-    // const imei = randomImei.toString();
+    // const imei = randomImei;
     // const imei = '1111111111925';
 
     this.props.signup({
       facial_image_id: this.props.user.validate.payload.payload.facial_image_id,
       device_imei: imei,
-      password: password,
+      password,
     });
   };
 
@@ -353,7 +347,6 @@ const mapStateToProps = state => ({
 export default connect(mapStateToProps, {
   login: login.request,
   signup: signup.request,
-  setPassword,
   addPrimaryAccount,
   addSecondaryAccount,
 })(Password);

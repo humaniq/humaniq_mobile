@@ -11,15 +11,6 @@ function photo(state = '', action) {
   }
 }
 
-function password(state = '', action) {
-  switch (action.type) {
-    case ActionTypes.SET_PASSWORD:
-      return action.password;
-    default:
-      return state;
-  }
-}
-
 function phoneNumber(state = '', action) {
   switch (action.type) {
     case ActionTypes.SAVE_PHONE:
@@ -98,6 +89,5 @@ export const user = combineReducers({
   }),
   account,
   photo,
-  password,
   phoneNumber,
 });
