@@ -5,7 +5,6 @@ import CodeInput from './CodeInput';
 import Accounts from './Accounts';
 import Loading from './Loading';
 import CountryCode from './CountryCode';
-import SmsCodeInput from './SmsCodeInput';
 
 export {
   Tutorial,
@@ -15,5 +14,4 @@ export {
   Accounts,
   Loading,
   CountryCode,
-  SmsCodeInput
 };
