@@ -52,7 +52,7 @@ const stack = {
   // Chats: { screen: Chats },
   // Chat: { screen: Chat },
   // Temp: { screen: Temp },
-  Loading: { screen: Profile },
+  Loading: { screen: Loading },
   Accounts: { screen: Accounts },
   Tutorial: { screen: Tutorial },
   Camera: { screen: Camera },
