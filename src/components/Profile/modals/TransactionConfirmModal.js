@@ -39,7 +39,7 @@ class TransactionConfirmModal extends Component {
   }
 
   componentDidMount() {
-    console.warn(JSON.stringify(this.props.item))
+    console.warn(JSON.stringify(this.props.item));
     HumaniqProfileApiLib.getExchangeUsd('1').then((data) => {
       const { USD = 0 } = data;
       this.setState({
@@ -49,7 +49,7 @@ class TransactionConfirmModal extends Component {
   }
 
   render() {
-    const { onClick, visibility, item, onCancelClick } = this.props;
+    const { onClick, visibility, item, onCancelClick, contacts } = this.props;
     const { rate } = this.state;
 
     const priceBeforePoint
@@ -58,6 +58,7 @@ class TransactionConfirmModal extends Component {
         = item.amount ? item.amount.toString().split('.')[1] : '';
 
     const amFloat = Math.round(parseFloat(item.amount) * rate * 100) / 100;
+    const contact = contacts.find(cnt => cnt.id === item.contactID);
 
     return (
       <View>
@@ -71,13 +72,15 @@ class TransactionConfirmModal extends Component {
             <View style={styles.rootContainer}>
               <TouchableWithoutFeedback onPress={() => {}}>
                 <View style={styles.content}>
-                  <View style={styles.header}>
-                  </View>
+                  <View style={styles.header} />
                   <View style={{ alignSelf: 'center', alignItems: 'center' }}>
                     <View style={styles.avatarContainer}>
                       <Image
                         style={styles.avatar}
-                        source={ic_photo_holder}
+                        source={contact && contact.avatar
+                            ? { uri: contact.avatar }
+                            : ic_photo_holder
+                        }
                       />
                       <Image
                         resizeMode="contain"
@@ -85,6 +88,7 @@ class TransactionConfirmModal extends Component {
                         source={ic_outgoing}
                       />
                     </View>
+                    {contact && contact.name ? this.renderCredentials(contact) : this.renderWallet(contact)}
                     <View style={styles.priceContainer}>
                       <Text style={styles.priceInt}>
                         {`${priceBeforePoint}.`}
@@ -109,30 +113,25 @@ class TransactionConfirmModal extends Component {
     );
   }
 
-  renderNameWithPhone = (user) => {
-    const names = user && user.person
-        ? `${user.person.first_name} ${user.person.last_name}` : '';
-    const phones = user && user.phone_number
-        ? `+(${user.phone_number.country_code}) ${user.phone_number.phone_number}` : '';
+
+  renderCredentials = contact => (
+    <View style={{alignItems: 'center', justifyContent: 'center'}}>
+      <Text style={styles.name}>{`${contact.name}`}</Text>
+      <Text style={styles.phone}>{`${contact.phone}`}</Text>
+    </View>
+  );
+
+  renderWallet = (contact) => {
+    const wallet = contact.phone
     return (
       <View style={{ flex: 1, alignSelf: 'center' }}>
         <Text style={styles.name}>
-          {names}
-        </Text>
-        <Text style={styles.phoneSmall}>
-          {phones}
+          {wallet}
         </Text>
       </View>
     );
-  }
+  };
 
-  renderPhone = item => (
-    <View style={{ flex: 1, alignSelf: 'center' }}>
-      <Text style={styles.phone}>
-        {item.phone}
-      </Text>
-    </View>
-    );
 }
 
 const styles = CustomStyleSheet({
@@ -151,6 +150,10 @@ const styles = CustomStyleSheet({
     marginRight: 16,
     marginTop: 18,
     marginBottom: 16,
+  },
+  phone: {
+    fontSize: 14,
+    color: '#1b1d1d',
   },
   date: {
     fontSize: 14,
@@ -184,10 +187,6 @@ const styles = CustomStyleSheet({
     bottom: 0,
     width: 36,
     height: 36,
-  },
-  phone: {
-    color: '#1b1d1d',
-    fontSize: 17,
   },
   phoneSmall: {
     color: '#1b1d1d',

@@ -138,7 +138,7 @@ export class Profile extends Component {
     this.getBalance();
     this.getExchangeValue();
 
-    HumaniqTokenApiLib.saveCredentials('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJpSlVydGJYQW5qTjkxSUNhbXFBS1Z5RGZzc0gxeFMxYnVkTklEMnZ6Z2x5MEl0UGc3YzEzUWcxT3BPRnFObFdRZEJicVFhdThCblBOWXhqbGpGWnlZempNUjNzY3ZxUzlXRkFIbThtbDg1aW9hUk8xZ241bGU3SG1zdGp4aHZEdSJ9.CDTkPZvOMXWv4Tk5yFQHjQcy4qZOJcf7Fo44KpKHaoQ', this.props.id).then((response) => { console.log(response.status); });
+    HumaniqTokenApiLib.saveCredentials('jwtToken', this.props.id).then((response) => { console.log(response.status); });
     // add listener to listen transactions status changes
     DeviceEventEmitter.addListener('EVENT_TRANSACTION_CHANGED', (event) => {
       console.log(event);
@@ -243,6 +243,7 @@ export class Profile extends Component {
       .catch((err) => {
         // handle error
         console.log(err);
+        this.setState({ refreshing: false });
       });
   }
 
@@ -513,6 +514,7 @@ export class Profile extends Component {
         onClick={() => this.onTransactionConfirmClick()}
         item={this.state.newTransaction}
         visibility={this.state.confirmTransactionVisibility}
+        contacts={this.props.contacts}
       />
     );
   }
@@ -803,8 +805,9 @@ export default connect(
     state => ({
       user: state.user,
       profile: state.user.profile || {},
-      id: state.user.account.account_id || '1572531576435115074',
+      id: state.user.account.account_id || '1572028879579645944',
       newTransaction: state.newtransaction,
+      contacts: state.contacts,
     }),
     dispatch => ({
       setProfile: profile => dispatch(actions.setProfile(profile)),

@@ -173,6 +173,8 @@ export class ProfileSettings extends Component {
               style={{
                 height: TOOLBAR_HEIGHT,
                 backgroundColor: 'transparent',
+                marginLeft: 5,
+                marginRight: 5,
               }}
               onIconClicked={() => this.handleClose()}
               navIcon={ic_close}

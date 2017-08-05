@@ -76,6 +76,8 @@ export class ProfileEdit extends Component {
             style={{
               height: 56,
               backgroundColor: '#598FBA',
+              marginLeft: 5,
+              marginRight: 5,
             }}
             onIconClicked={() => this.handleClose()}
             onActionSelected={position => this.onActionClick(position)}
