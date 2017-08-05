@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import PropTypes from 'prop-types';
 import QRCode from 'react-native-qrcode';
-import CustomStyleSheet from '../../../utils/customStylesheet'
+import CustomStyleSheet from '../../../utils/customStylesheet';
 
 const ic_clipboard = require('../../../assets/icons/ic_copy_blue.png');
 

@@ -72,6 +72,15 @@ export class ProfileEdit extends Component {
           <StatusBar
             backgroundColor="#598FBA"
           />
+          <View style={{
+            height: 56,
+            backgroundColor: '#598FBA',
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+          }}
+          />
           <ToolbarAndroid
             style={{
               height: 56,
