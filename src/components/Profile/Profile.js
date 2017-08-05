@@ -349,6 +349,8 @@ export class Profile extends Component {
               style={{
                 height: TOOLBAR_HEIGHT,
                 backgroundColor: 'transparent',
+                marginLeft: 5,
+                marginRight: 5,
               }}
               onIconClicked={() => this.backButtonHandle()}
               navIcon={ic_back_white}
@@ -801,7 +803,7 @@ export default connect(
     state => ({
       user: state.user,
       profile: state.user.profile || {},
-      id: state.user.account.account_id || '1573759152352658789',
+      id: state.user.account.account_id || '1572531576435115074',
       newTransaction: state.newtransaction,
     }),
     dispatch => ({
