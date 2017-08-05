@@ -3,6 +3,8 @@
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <!-- Customize your theme here. -->
+        <item name="colorControlNormal">#d8d8d8</item>
+        <item name="colorControlActivated">#37a9f0</item>
     </style>
 
 </resources>

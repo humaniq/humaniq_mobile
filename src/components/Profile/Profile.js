@@ -632,10 +632,12 @@ export class Profile extends Component {
 
   getExchangeValue() {
     HumaniqProfileApiLib.getExchangeUsd('1').then((data) => {
-      const { USD = 0 } = data;
-      this.setState({
-        rate: USD,
-      });
+      if (this.activity) {
+        const { USD = 0 } = data;
+        this.setState({
+          rate: USD,
+        });
+      }
     });
   }
 
@@ -799,7 +801,7 @@ export default connect(
     state => ({
       user: state.user,
       profile: state.user.profile || {},
-      id: state.user.profile.profile_id || '1573759152352658789',
+      id: state.user.account.account_id || '1573759152352658789',
       newTransaction: state.newtransaction,
     }),
     dispatch => ({
