@@ -203,7 +203,7 @@ const styles = CustomStyleSheet({
   },
   phone: {
     color: '#1b1d1d',
-    fontSize: 17,
+    fontSize: 15,
   },
   phoneSmall: {
     color: '#1b1d1d',

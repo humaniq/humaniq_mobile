@@ -138,12 +138,12 @@ export class Profile extends Component {
     this.getBalance();
     this.getExchangeValue();
 
-    HumaniqTokenApiLib.saveCredentials('jwtToken', this.props.id).then((response) => { console.log(response.status); });
     // add listener to listen transactions status changes
     DeviceEventEmitter.addListener('EVENT_TRANSACTION_CHANGED', (event) => {
-      console.log(event);
+      console.log('push::',event);
       HumaniqProfileApiLib.getUserTransaction(this.props.id, event.hash)
           .then((resp) => {
+            console.log('get transcation event::', event);
             this.getBalance();
             if (this.activity) {
               if (!this.isTransactionExist(resp)) {
@@ -159,9 +159,6 @@ export class Profile extends Component {
             }
           });
     });
-  }
-
-  componentDidMount() {
   }
 
   componentWillReceiveProps(nextProps) {
@@ -613,15 +610,16 @@ export class Profile extends Component {
     } else if (newTransaction.adress) {
       toUserAddress = newTransaction.adress;
     }
-    HumaniqProfileApiLib.createTransaction(this.props.id, toUserId, toUserAddress, newTransaction.amount)
+    HumaniqProfileApiLib.createTransaction(this.props.id, toUserId, toUserAddress, (newTransaction.amount * 100000000))
       .then((resp) => {
         // do your stuff
+        console.log('create transaction::', resp);
         transactionsId.push(resp);
         this.setState({ transactionsId });
       })
       .catch((err) => {
         // handle error
-        console.log(err);
+        console.log('create transaction error::', err);
       });
     this.emptyTransaction();
     this.setState({ confirmTransactionVisibility: false });
@@ -805,7 +803,7 @@ export default connect(
     state => ({
       user: state.user,
       profile: state.user.profile || {},
-      id: state.user.account.account_id || '1572028879579645944',
+      id: state.user.account.account_id || '1573759152352658789',
       newTransaction: state.newtransaction,
       contacts: state.contacts,
     }),

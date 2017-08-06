@@ -147,7 +147,7 @@ class TransactionsModal extends Component {
     const userLastName = user && user.person
         ? user.person.last_name : '';
     return (
-      <View>
+      <View style={{alignItems: 'center', justifyContent: 'center'}}>
         <Text style={styles.name}>{`${userName} ${userLastName}`}</Text>
         <Text style={styles.phone}>{`+(${countryCode})`} {phone}</Text>
       </View>
