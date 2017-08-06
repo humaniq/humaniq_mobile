@@ -118,8 +118,7 @@ export class Password extends Component {
             };
             HumaniqTokenApiLib.saveCredentials(map2)
                 .then((res) => {
-              console.log(res)
-                })
+              console.log(res)})
                 .catch(err => console.log(err));
             // TODO: replace with validated??
             if (registeredAcc.phone_number.country_code) {
@@ -246,7 +245,7 @@ export class Password extends Component {
     // image_id, password, imei
     this.props.login({
       facial_image_id: this.props.user.validate.payload.payload.facial_image_id,
-      device_imei: this.state.imei,
+      device_imei: IMEI.getImei(),
       password,
     });
   };
@@ -262,7 +261,7 @@ export class Password extends Component {
 
     this.props.signup({
       facial_image_id: this.props.user.validate.payload.payload.facial_image_id,
-      device_imei: imei,
+      device_imei: IMEI.getImei(),
       password,
     });
   };
