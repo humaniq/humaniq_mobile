@@ -1,6 +1,7 @@
 /* eslint-disable */
 import React, { Component } from 'react';
 import {
+  View,
   ScrollView,
   StyleSheet,
   TouchableOpacity,
@@ -8,6 +9,7 @@ import {
   Text,
 } from 'react-native';
 
+/*
 import { NavigationActions } from 'react-navigation';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
@@ -21,7 +23,7 @@ export class Dashboard extends Component {
     return (
       <ScrollView>
         <Text>DASHBOARD</Text>
-        {/* <Text>{`${this.props.user.registered ? "EXISTING" : "NEW"} USER`}</Text>*/}
+        {/* <Text>{`${this.props.user.registered ? "EXISTING" : "NEW"} USER`}</Text>}
         <Text>{JSON.stringify(this.props.user, null,2)}</Text>
         <Text>{`user id: ${this.props.user.id}`}</Text>
         <Text>{`user pass: ${this.props.user.password}`}</Text>
@@ -71,9 +73,20 @@ export class Dashboard extends Component {
     );
   }
 }
+*/
 
+export default class Dashboard extends Component {
+  render() {
+    return (
+      <View />
+    )
+  }
+}
+
+/*
 const mapStateToProps = state => ({
   user: state.user,
 });
 
 export default connect(mapStateToProps)(Dashboard);
+*/

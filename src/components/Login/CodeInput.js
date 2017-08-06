@@ -1,27 +1,26 @@
 import React, { Component } from 'react';
 import {
-  View,
-  Image,
-  Text,
+    View,
+    Image,
+    Text,
+    Animated,
 } from 'react-native';
+
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import VMasker from 'vanilla-masker';
 import SmsListener from 'react-native-android-sms-listener';
-import EStyleSheet from 'react-native-extended-stylesheet';
-import Keyboard from '../Shared/Components/Keyboard';
-import Confirm from '../Shared/Buttons/Confirm';
-import { vh, vw } from '../../utils/units';
+
+import CustomStyleSheet from '../../utils/customStylesheet';
+import PhoneKeyboard from '../Shared/Components/PhoneKeyboard';
+import ConfirmButton from '../Shared/Buttons/ConfirmButton';
+import RequestSmsButton from '../Shared/Buttons/RequestSmsButton';
+import Modal from '../Shared/Components/Modal';
+import { vw } from '../../utils/units';
 import { phoneNumberValidate } from '../../actions';
 
 
-const ic_user = require('../../assets/icons/ic_user.png');
-
-// SmsListener.addListener(message => {
-//   console.log(message);
-//   console.info(message);
-// });
-
-class CodeInput extends Component {
+export class CodeInput extends Component {
   static propTypes = {
     user: PropTypes.shape({
       account: PropTypes.shape({
@@ -32,6 +31,7 @@ class CodeInput extends Component {
         payload: PropTypes.object,
         isFetching: PropTypes.bool,
       }).isRequired,
+      photo: PropTypes.string.isRequired,
       phoneNumber: PropTypes.string,
     }).isRequired,
 
@@ -43,9 +43,13 @@ class CodeInput extends Component {
   };
 
   state = {
-    code: 55555,
-    maxPasswordLength: 5,
-    password: '',
+    phone: '',
+    code: '',
+    codeError: new Animated.Value(0),
+    // for modal
+    modalVisible: false,
+    errorCode: null,
+    cooldownTime: 0,
   };
 
   componentDidMount() {
@@ -67,7 +71,6 @@ class CodeInput extends Component {
     });
   }
 
-
   componentWillReceiveProps(nextProps) {
     // TODO: MOVE TO SAGA TO PREVENT LAG
     // console.log('📞 nextProps', nextProps.user.validate);
@@ -78,103 +81,184 @@ class CodeInput extends Component {
         switch (code) {
           case 6000:
             // alert(nextProps.user.validate.payload.message);
+            this.setState({
+              modalVisible: true,
+              errorCode: code,
+            });
             break;
 
           case 4002:
-            // registered user
-            // this.props.setAvatarLocalPath(this.state.path);
-            this.props.navigation.navigate('Dashboard');
+            this.setState({ code }, () => this.props.navigation.navigate('Dashboard'));
             break;
 
-          case 3003:
-            // new user
-            // this.props.setAvatarLocalPath(this.state.path);
-            // this.props.navigation.navigate('Tutorial', { nextScene: 'Password' });
+          case 4004:
+            this.setState({
+              modalVisible: true,
+              errorCode: code,
+            });
             break;
 
-          case 3000:
-            // this.setState({ path: '' });
-            // alert(nextProps.user.validate.payload.message);
-            // reset payload?
+          case 4003:
+            this.setState({
+              modalVisible: true,
+              errorCode: code,
+            });
+            break;
+
+          case 4010:
+            this.setState({
+              modalVisible: true,
+              errorCode: code,
+            });
+            break;
+
+          case 4001:
+            this.setState({
+              modalVisible: true,
+              errorCode: code,
+            });
+            break;
+
+          case 4009:
+            this.setState({
+              modalVisible: true,
+              errorCode: code,
+            });
             break;
 
           default:
-            alert(`Unknown code ${nextProps.user.phoneValidate.payload.code}, no info in Postman`);
+            this.setState({
+              modalVisible: true,
+              errorCode: code,
+            });
         }
       }
     }
   }
 
-  componentWillUnmount() {
-    this.listener.remove();
-  }
-
   handleNumberPress = (number) => {
-    if (this.state.password.length < this.state.maxPasswordLength) {
-      this.setState({ password: this.state.password += number });
+    const c = this.state.code + number;
+    console.log(c.length);
+    if (c.length < 7) {
+      this.setState({ code: c });
+    } else {
+      this.setState({ error: true });
+      this.animatePasswordError();
     }
   };
 
   handleBackspacePress = () => {
-    const password = this.state.password.slice(0, -1);
-    this.setState({ password });
+    const code = this.state.code.slice(0, -1);
+    this.setState({ code });
   };
 
   handleHelpPress = () => {
-    alert('В шаббат у нас с мамой традиция — зажигать свечи и смотреть „Колесо фортуны“');
+    this.props.navigation.navigate('Instructions');
   };
 
-  handleNavigate = () => {
-    // open camera
-    this.props.navigation.navigate(this.state.nextScene);
+  handleCodeConfirm = () => {
+    this.props.phoneNumberValidate({
+      account_id: this.props.user.account.payload.payload.account_information.account_id,
+      phone_number: this.props.user.phoneNumber,
+      validation_code: this.state.code.toString(),
+    });
   };
 
-  renderBullets = () => {
-    const { password, maxPasswordLength } = this.state;
-    const passLen = password.length;
-    const bullets = [];
+  animatePasswordError = () => {
+    Animated.sequence([
+      Animated.timing(this.state.codeError, {
+        toValue: vw(20),
+        duration: 50,
+      }),
+      Animated.timing(this.state.codeError, {
+        toValue: vw(-20),
+        duration: 100,
+      }),
+      Animated.timing(this.state.codeError, {
+        toValue: vw(20),
+        duration: 100,
+      }),
+      Animated.timing(this.state.codeError, {
+        toValue: vw(-20),
+        duration: 100,
+      }),
+      Animated.timing(this.state.codeError, {
+        toValue: vw(0),
+        duration: 50,
+      }),
+    ]).start(() => { this.setState({ error: null }); });
+  };
 
-    /*
-    let error;
-    if (passLen == maxPasswordLength) {
-      error = password === this.state.code;
-    }
-    */
-
-    for (let i = 0; i < maxPasswordLength; i += 1) {
-      bullets.push(
-        <View key={i}>
-          {password[i] ?
-            <View style={[
-              styles.passFilled,
-              passLen === maxPasswordLength && styles.passMaxLen,
-            ]}
-            >
-              <Text style={styles.number}>{password[i]}</Text>
-            </View> :
-            <View style={styles.passEmpty} />
-          }
-        </View>,
+  renderInput = () => (
+    VMasker.toPattern(this.state.code, { pattern: '999999', placeholder: '0' }).split('').map((o, i) => {
+      if (i == 2) {
+        return [
+          <View style={[styles.numberContainer, this.state.error ? styles.errorContainer : null]}>
+            <Text style={[styles.codeInput, this.state.error ? styles.errorText : null]}>
+              {o}
+            </Text>
+          </View>,
+          <View style={[styles.numberContainer, this.state.error ? styles.errorContainer : null]}>
+            <Text style={[styles.codeInput, this.state.error ? styles.errorText : null]}>
+              {'-'}
+            </Text>
+          </View>,
+        ];
+      }
+      return (
+        <View style={[styles.numberContainer, this.state.error ? styles.errorContainer : null]}>
+          <Text style={[styles.codeInput, this.state.error ? styles.errorText : null]}>
+            {o}
+          </Text>
+        </View>
       );
-    }
-    return bullets;
+    })
+  );
+
+  handleDismissModal = () => {
+    this.setState({ modalVisible: false, errorCode: null });
+  };
+
+  handleRequestSms = () => {
+    // request sms
+    // set cooldown
+    this.setState({ cooldownTime: 45 });
+    let interval;
+    let cooldown = () => {
+      if (this.state.cooldownTime > 0) {
+        this.setState({ cooldownTime: this.state.cooldownTime -= 1 });
+      } else {
+        clearInterval(interval);
+      }
+    };
+    interval = setInterval(cooldown, 1000);
   };
 
   render() {
     return (
       <View style={styles.container}>
-        <View style={styles.header}>
-          <Image style={styles.userPhoto} source={ic_user} />
-          <Text>{`sms code ${this.state.code}`}</Text>
-          <View style={styles.passContainer}>
-            {this.renderBullets()}
-          </View>
-        </View>
-        <Confirm
-          active={this.state.password.length === this.state.maxPasswordLength}
-          onPress={this.handleNavigate}
+        <Modal
+          onPress={this.handleDismissModal}
+          visible={this.state.modalVisible}
+          code={this.state.errorCode}
         />
-        <Keyboard
+        <View style={styles.header}>
+          <Animated.View style={[styles.codeInputContainer, { marginLeft: this.state.codeError }]}>
+            {this.renderInput() }
+          </Animated.View>
+        </View>
+        <View style={styles.buttonsContainer}>
+          <RequestSmsButton
+            onPress={this.handleRequestSms}
+            disabled={this.state.cooldownTime > 0}
+            cooldownTime={this.state.cooldownTime}
+          />
+          <ConfirmButton
+            onPress={this.handleCodeConfirm}
+            disabled={this.state.code.length < 6}
+          />
+        </View>
+        <PhoneKeyboard
           onNumberPress={this.handleNumberPress}
           onBackspacePress={this.handleBackspacePress}
           onHelpPress={this.handleHelpPress}
@@ -192,54 +276,58 @@ export default connect(mapStateToProps, {
   phoneNumberValidate: phoneNumberValidate.request,
 })(CodeInput);
 
-const styles = EStyleSheet.create({
+const styles = CustomStyleSheet({
   container: {
     flex: 1,
-    // justifyContent: 'space-between',
-    backgroundColor: 'white',
+    backgroundColor: '#439fe0',
   },
   header: {
     flex: 1,
-    justifyContent: 'space-between',
-    paddingVertical: vh(20),
+    paddingTop: 120,
+    paddingLeft: 16,
+    paddingRight: 16,
   },
-  userPhoto: {
-    alignSelf: 'center',
-  },
-  passContainer: {
+  codeInputContainer: {
     flexDirection: 'row',
+    alignItems: 'center',
+    height: 72,
+    width: 328,
+  },
+  numberContainer: {
+    width: 30,
+    height: 56,
+    borderBottomWidth: 1,
+    borderColor: 'white',
+    marginRight: 12,
+    justifyContent: 'center',
+  },
+  codeInput: {
+    marginTop: 4,
+    lineHeight: 36,
+    fontSize: 36,
+    textAlign: 'center',
+    color: 'white',
+  },
+  dash: {
+    lineHeight: 36,
+    fontSize: 18,
+    width: 36,
+    height: 56,
+    color: 'white',
+    textAlign: 'center',
+  },
+  buttonsContainer: {
+    height: 61,
+    width: 360,
     justifyContent: 'space-between',
-    marginHorizontal: vw(18),
+    flexDirection: 'row',
+    paddingLeft: 16,
+    paddingRight: 16,
   },
-  passEmpty: {
-    width: vh(25),
-    height: vh(25),
-    borderRadius: 50,
-    borderWidth: 1,
-    borderColor: '$cGray',
-    justifyContent: 'center',
-    alignItems: 'center',
+  errorContainer: {
+    borderBottomColor: '#f01434',
   },
-  number: {
-    fontSize: 25,
-    color: '$cGray',
-  },
-  passFilled: {
-    width: vh(25),
-    height: vh(25),
-    borderRadius: 50,
-    borderWidth: 1,
-    borderColor: '$cGray',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  passMaxLen: {
-    borderWidth: 4,
-    borderColor: '#B8E986',
-  },
-  wrong: {
-    borderWidth: 4,
-    borderColor: 'tomato',
+  errorText: {
+    color: '#f01434',
   },
 });
-
