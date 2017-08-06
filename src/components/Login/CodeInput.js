@@ -88,7 +88,7 @@ export class CodeInput extends Component {
             break;
 
           case 4002:
-            this.setState({ code }, () => this.props.navigation.navigate('Dashboard'));
+            this.setState({ code }, () => this.props.navigation.navigate('Profile'));
             break;
 
           case 4004:
