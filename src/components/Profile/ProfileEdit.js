@@ -23,7 +23,7 @@ const TOOLBAR_HEIGHT = 56;
 const ic_close = require('../../assets/icons/ic_close_white.png');
 const ic_done_white = require('../../assets/icons/ic_white.png');
 const ic_photo = require('../../assets/icons/ic_photo_white.png');
-const ic_photo_holder = require('../../assets/icons/ic_avatar_holder.png');
+const ic_photo_holder = require('../../assets/icons/ic_mock.png');
 
 export class ProfileEdit extends Component {
   static propTypes = {

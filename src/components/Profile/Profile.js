@@ -42,7 +42,7 @@ const ic_back_white = require('../../assets/icons/ic_back_white.png');
 const ic_settings_white = require('../../assets/icons/ic_settings_white.png');
 const ic_fab = require('../../assets/icons/ic_fab_money.png');
 const ic_empty = require('../../assets/icons/ic_profile_feed.png');
-const ic_photo_holder = require('../../assets/icons/ic_avatar_holder.png');
+const ic_photo_holder = require('../../assets/icons/ic_mock.png');
 
 export class Profile extends Component {
   static propTypes = {
@@ -332,7 +332,7 @@ export class Profile extends Component {
             >
               <Animated.Image
                 style={styles.avatar}
-                source={{ uri: profile.avatar.url }}
+                source={profile.avatar ? { uri: profile.avatar.url } : ic_photo_holder}
               />
               <Animated.View style={styles.infoContainer}>
                 <Text style={styles.title}>{`${hmqInt}.`}
@@ -359,8 +359,6 @@ export class Profile extends Component {
                 marginLeft: 5,
                 marginRight: 5,
               }}
-              onIconClicked={() => this.backButtonHandle()}
-              navIcon={ic_back_white}
               actions={[{
                 title: '',
                 icon: ic_settings_white,
