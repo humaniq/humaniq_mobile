@@ -32,7 +32,7 @@ HelpButton.propTypes = propTypes;
 const styles = CustomStyleSheet({
   container: {
     height: 45,
-    width: 155,
+    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: '$cPaper',
