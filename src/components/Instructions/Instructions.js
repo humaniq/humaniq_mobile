@@ -10,6 +10,7 @@ import {
   Animated,
   Easing,
   DeviceEventEmitter,
+  StatusBar,
 } from 'react-native';
 
 import { HumaniqDownloadFileLib } from 'react-native-android-library-humaniq-api';
@@ -34,6 +35,7 @@ export class Instructions extends Component {
   video: Video;
   activity = true;
   animationValue = new Animated.Value(0);
+
   constructor(props) {
     super(props);
     this.state = {
@@ -46,7 +48,7 @@ export class Instructions extends Component {
       source: '',
       loading: true,
       width: 0,
-      videoUrl: this.props.url || 'http://clips.vorwaerts-gmbh.de/VfE_html5.mp4',
+      videoUrl: 'http://0.s3.envato.com/h264-video-previews/80fad324-9db4-11e3-bf3d-0050569255a8/490527.mp4',
       progressText: 0,
     };
   }
@@ -162,6 +164,9 @@ export class Instructions extends Component {
 
     return (
       <View style={styles.container}>
+        <StatusBar
+          hidden
+        />
         {!this.state.loading ? this.showVideoPlayer(height, width) : this.showProgress()}
         <LinearGradient
           colors={['rgba(170, 170, 170, 0.6)', 'rgba(186, 186, 186, 0.4)', 'rgba(186, 186, 186, 0.05)']}
@@ -194,7 +199,7 @@ export class Instructions extends Component {
     );
   }
 
-  showVideoPlayer(height, width) {
+  showVideoPlayer(height, width, source) {
     return (
       <TouchableWithoutFeedback
         delayPressIn={0}
