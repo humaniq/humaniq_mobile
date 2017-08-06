@@ -78,7 +78,7 @@ export class ProfileEdit extends Component {
             position: 'absolute',
             top: 0,
             left: 0,
-            right: 0,
+            right
           }}
           />
           <ToolbarAndroid

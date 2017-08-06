@@ -24,7 +24,7 @@ const ic_photo_holder = require('../../assets/icons/ic_avatar_holder.png');
 export class PasswordEdit extends Component {
   constructor(props) {
     super(props);
-    const { password } = this.props.password;
+    const { password } = this.props;
     this.state = {
       maxPasswordLength: 4,
       old_password: password || '1234',
@@ -189,7 +189,7 @@ export class PasswordEdit extends Component {
     console.warn(newPassword);
     this.animateCycle(2000, 0, 1);
     HumaniqProfileApiLib.changeProfilePassword(
-        this.props.profile.account_id,
+        this.props.id,
         oldPassword,
         newPassword,
         )
@@ -222,6 +222,7 @@ export default connect(
       user: state.user,
       profile: state.user.profile || {},
       password: state.user.password || '',
+      id: state.accounts.primaryAccount.account_id,
     }),
     dispatch => ({
       setProfile: profile => dispatch(actions.setProfile(profile)),
