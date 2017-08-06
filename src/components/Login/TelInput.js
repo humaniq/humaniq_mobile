@@ -74,7 +74,7 @@ export class TelInput extends Component {
             // registered user
             // Account Phone Number Created Successfully. Validation Code Sent
             this.props.savePhone(VMasker.toNumber(`${this.state.code}${this.state.phone}`));
-            this.props.navigation.navigate('CodeInput');
+            this.navigateTo('CodeInput');
             // alert('Proceed to codeInput');
             break;
 
@@ -92,6 +92,14 @@ export class TelInput extends Component {
     }
   }
 
+  navigateTo = (screen, params) => {
+    const resetAction = NavigationActions.reset({
+      index: 0,
+      actions: [NavigationActions.navigate({ routeName: screen, params: params })],
+    });
+    this.props.navigation.dispatch(resetAction);
+  };
+
   handleNumberPress = (number) => {
     if (this.state.phone.length < this.state.maxPhoneLength) {
       let inputVal = this.state.phone;
@@ -108,7 +116,7 @@ export class TelInput extends Component {
   };
 
   handleHelpPress = () => {
-    this.props.navigation.navigate('Instructions');
+    this.navigateTo('Instructions');
   };
 
   handlePhoneConfirm = () => {
@@ -161,7 +169,7 @@ export class TelInput extends Component {
         <TouchableOpacity
           style={styles.countryCodeContainer}
           onPress={() => {
-            this.props.navigation.navigate('CountryCode',
+            this.navigateTo('CountryCode',
               { refresh: (dialCode, code, flag) => { dialCode != null ? this.setState({ code: dialCode, countryCode: code, flag: flag }) : null } })
           } }>
           <Image style={styles.flag} source={{ uri: this.state.flag }}/>
@@ -189,7 +197,7 @@ export class TelInput extends Component {
           onNumberPress={this.handleNumberPress}
           onBackspacePress={this.handleBackspacePress}
           onHelpPress={this.handleHelpPress}
-        />
+          />
       </View>
     );
   }
