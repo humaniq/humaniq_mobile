@@ -15,7 +15,7 @@ const ic_outgoing = require('../../assets/icons/ic_payment.png');
 const ic_done = require('../../assets/icons/ic_done.png');
 const ic_wait = require('../../assets/icons/ic_wait.png');
 const ic_cancel = require('../../assets/icons/ic_transaction_cancel.png');
-const ic_photo_holder = require('../../assets/icons/ic_avatar_holder.png');
+const ic_photo_holder = require('../../assets/icons/ic_mock.png');
 
 class Item extends Component {
   constructor(props) {

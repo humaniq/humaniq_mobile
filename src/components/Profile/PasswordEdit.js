@@ -19,7 +19,7 @@ import Modal from '../Shared/Components/Modal';
 import { vw } from '../../utils/units';
 
 const spinner = require('../../assets/animations/s-spiner.json');
-const ic_photo_holder = require('../../assets/icons/ic_avatar_holder.png');
+const ic_photo_holder = require('../../assets/icons/ic_mock.png');
 
 export class PasswordEdit extends Component {
   constructor(props) {

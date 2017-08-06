@@ -40,7 +40,7 @@ const ic_edit = require('../../assets/icons/ic_edit_white.png');
 const ic_phone = require('../../assets/icons/ic_call_dark.png');
 const ic_editBlue = require('../../assets/icons/ic_edit_blue.png');
 const ic_lock = require('../../assets/icons/ic_pass_dark.png');
-const ic_photo_holder = require('../../assets/icons/ic_avatar_holder.png');
+const ic_photo_holder = require('../../assets/icons/ic_mock.png');
 
 export class ProfileSettings extends Component {
   static propTypes = {

@@ -42,7 +42,7 @@ const ic_back_white = require('../../assets/icons/ic_back_white.png');
 const ic_settings_white = require('../../assets/icons/ic_settings_white.png');
 const ic_fab = require('../../assets/icons/ic_fab_money.png');
 const ic_empty = require('../../assets/icons/ic_profile_feed.png');
-const ic_photo_holder = require('../../assets/icons/ic_avatar_holder.png');
+const ic_photo_holder = require('../../assets/icons/ic_mock.png');
 
 export class Profile extends Component {
   static propTypes = {
@@ -140,7 +140,7 @@ export class Profile extends Component {
 
     // add listener to listen transactions status changes
     DeviceEventEmitter.addListener('EVENT_TRANSACTION_CHANGED', (event) => {
-      console.log('push::',event);
+      console.log('push::', event);
       HumaniqProfileApiLib.getUserTransaction(this.props.id, event.hash)
           .then((resp) => {
             console.log('get transcation event::', event);
@@ -172,10 +172,15 @@ export class Profile extends Component {
     HumaniqProfileApiLib.getAccountProfile(this.props.id)
       .then((response) => {
         if (this.activity) {
-          this.props.setProfile(response);
+          if (response.code === 401) {
+            this.props.navigation.navigate('Camera');
+          } else {
+            this.props.setProfile(response);
+          }
         }
       })
       .catch((err) => {
+        console.warn(JSON.stringify(err));
       });
   }
 
@@ -184,20 +189,24 @@ export class Profile extends Component {
     HumaniqProfileApiLib.getBalance(this.props.id)
       .then((addressState) => {
         if (this.activity) {
-          const { balance } = this.state;
-          if (addressState) {
-            balance.token.currency = addressState.token.currency;
-            balance.token.amount = addressState.token.amount.toString();
-            // if local currency is null, use default currency
-            if (addressState.local) {
-              balance.price.currency = addressState.local.currency;
-              balance.price.amount = addressState.local.amount.toString();
-            } else {
-              balance.price.currency = addressState.default.currency;
-              balance.price.amount = addressState.default.amount.toString();
+          if (addressState.code === 401) {
+            this.props.navigation.navigate('Camera');
+          } else {
+            const { balance } = this.state;
+            if (addressState) {
+              balance.token.currency = addressState.token.currency;
+              balance.token.amount = addressState.token.amount.toString();
+              // if local currency is null, use default currency
+              if (addressState.local) {
+                balance.price.currency = addressState.local.currency;
+                balance.price.amount = addressState.local.amount.toString();
+              } else {
+                balance.price.currency = addressState.default.currency;
+                balance.price.amount = addressState.default.amount.toString();
+              }
             }
+            this.setState({ balance });
           }
-          this.setState({ balance });
         }
       })
       .catch((err) => {
@@ -350,8 +359,6 @@ export class Profile extends Component {
                 marginLeft: 5,
                 marginRight: 5,
               }}
-              onIconClicked={() => this.backButtonHandle()}
-              navIcon={ic_back_white}
               actions={[{
                 title: '',
                 icon: ic_settings_white,
@@ -612,10 +619,14 @@ export class Profile extends Component {
     }
     HumaniqProfileApiLib.createTransaction(this.props.id, toUserId, toUserAddress, (newTransaction.amount * 100000000))
       .then((resp) => {
-        // do your stuff
-        console.log('create transaction::', resp);
-        transactionsId.push(resp);
-        this.setState({ transactionsId });
+        if (resp.code === 401) {
+          this.props.navigation.navigate('Camera');
+        } else {
+          // do your stuff
+          console.log('create transaction::', resp);
+          transactionsId.push(resp);
+          this.setState({ transactionsId });
+        }
       })
       .catch((err) => {
         // handle error

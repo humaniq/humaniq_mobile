@@ -119,8 +119,7 @@ export class Password extends Component {
             };
             HumaniqTokenApiLib.saveCredentials(map2)
                 .then((res) => {
-              console.log(res)
-                })
+              console.log(res)})
                 .catch(err => console.log(err));
             // TODO: replace with validated??
             if (registeredAcc.phone_number.country_code) {

@@ -19,7 +19,7 @@ const ic_chat = require('../../../assets/icons/ic_chat_blue.png');
 // const ic_bot = require('../../../assets/icons/ic_humaniq_bot.png');
 const ic_outgoing = require('../../../assets/icons/ic_payment.png');
 const ic_incoming = require('../../../assets/icons/ic_incoming.png');
-const ic_photo_holder = require('../../../assets/icons/ic_avatar_holder.png');
+const ic_photo_holder = require('../../../assets/icons/ic_mock.png');
 
 class TransactionsModal extends Component {
   static propTypes = {

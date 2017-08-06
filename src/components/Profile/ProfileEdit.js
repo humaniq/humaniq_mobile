@@ -23,7 +23,7 @@ const TOOLBAR_HEIGHT = 56;
 const ic_close = require('../../assets/icons/ic_close_white.png');
 const ic_done_white = require('../../assets/icons/ic_white.png');
 const ic_photo = require('../../assets/icons/ic_photo_white.png');
-const ic_photo_holder = require('../../assets/icons/ic_avatar_holder.png');
+const ic_photo_holder = require('../../assets/icons/ic_mock.png');
 
 export class ProfileEdit extends Component {
   static propTypes = {
@@ -212,14 +212,18 @@ export class ProfileEdit extends Component {
       .then((data) => {
         HumaniqProfileApiLib.uploadProfileAvatar(this.props.profile.account_id, data)
           .then((resp) => {
-            console.warn(JSON.stringify(resp));
-            if (resp.code === 5004) {
-              ToastAndroid.show('Success', ToastAndroid.LONG);
-              const { profile } = this.props;
-              profile.avatar.url = resp.avatar.url;
-              this.props.setProfile({ ...profile });
-            } else if (resp.code === 3013) {
-              // do some stuff
+            if (resp.code === 401) {
+              this.props.navigation.navigate('Camera');
+            } else {
+              console.warn(JSON.stringify(resp));
+              if (resp.code === 5004) {
+                ToastAndroid.show('Success', ToastAndroid.LONG);
+                const { profile } = this.props;
+                profile.avatar.url = resp.avatar.url;
+                this.props.setProfile({ ...profile });
+              } else if (resp.code === 3013) {
+                // do some stuff
+              }
             }
           })
           .catch((err) => {
@@ -238,13 +242,18 @@ export class ProfileEdit extends Component {
   uploadPerson() {
     HumaniqProfileApiLib.updateUserPerson(
             this.state.profile.account_id, this.state.name, this.state.surname,
-        ).then((resp) => {
-          const { profile } = this.props;
-          profile.person.first_name = resp.payload.person.first_name;
-          profile.person.last_name = resp.payload.person.last_name;
-          this.props.setProfile({ ...profile });
-          this.setState({ fieldChanged: false });
-          ToastAndroid.show('Success', ToastAndroid.LONG);
+        )
+        .then((resp) => {
+          if (resp.code === 401) {
+            this.props.navigation.navigate('Camera');
+          } else {
+            const { profile } = this.props;
+            profile.person.first_name = resp.payload.person.first_name;
+            profile.person.last_name = resp.payload.person.last_name;
+            this.props.setProfile({ ...profile });
+            this.setState({ fieldChanged: false });
+            ToastAndroid.show('Success', ToastAndroid.LONG);
+          }
         })
             .catch((err) => {
               console.warn(JSON.stringify(err));
