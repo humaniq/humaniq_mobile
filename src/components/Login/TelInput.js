@@ -18,6 +18,7 @@ import PhoneKeyboard from '../Shared/Components/PhoneKeyboard';
 import ConfirmButton from '../Shared/Buttons/ConfirmButton';
 import HelpButton from '../Shared/Buttons/HelpButton';
 import { phoneNumberCreate, savePhone } from '../../actions';
+import { NavigationActions } from 'react-navigation';
 import { vw } from '../../utils/units';
 
 const ic_user = require('../../assets/icons/ic_user.png');
