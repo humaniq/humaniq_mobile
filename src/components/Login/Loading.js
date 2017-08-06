@@ -6,7 +6,6 @@ import {
 
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { NavigationActions } from 'react-navigation';
 import CustomStyleSheet from '../../utils/customStylesheet';
 
 const logo_face = require('../../assets/icons/logo_face.png');
@@ -39,26 +38,8 @@ class Loading extends Component {
 
   onTimeoutFinish = () => {
     const savedDataExists = this.props.accounts.saved === true;
-
-    if (savedDataExists) {
-      // go to accs
-      const resetAction = NavigationActions.reset({
-        index: 0,
-        actions: [
-          NavigationActions.navigate({ routeName: 'Accounts' }),
-        ],
-      });
-      this.props.navigation.dispatch(resetAction);
-    } else {
-      // go to tuts
-      const resetAction = NavigationActions.reset({
-        index: 0,
-        actions: [
-          NavigationActions.navigate({ routeName: 'Tutorial' }),
-        ],
-      });
-      this.props.navigation.dispatch(resetAction);
-    }
+    // go to accs or tuts
+    this.props.navigation.navigate(savedDataExists ? 'Accounts' : 'Tutorial');
   };
 
   render() {
