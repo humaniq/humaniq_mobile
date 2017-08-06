@@ -332,7 +332,7 @@ export class Profile extends Component {
             >
               <Animated.Image
                 style={styles.avatar}
-                source={profile.avatar ? { uri: profile.avatar.url } : ic_photo_holder}
+                source={{ uri: profile.avatar.url }}
               />
               <Animated.View style={styles.infoContainer}>
                 <Text style={styles.title}>{`${hmqInt}.`}

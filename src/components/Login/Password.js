@@ -245,7 +245,7 @@ export class Password extends Component {
     // image_id, password, imei
     this.props.login({
       facial_image_id: this.props.user.validate.payload.payload.facial_image_id,
-      device_imei: IMEI.getImei(),
+      device_imei: this.state.imei,
       password,
     });
   };
@@ -261,7 +261,7 @@ export class Password extends Component {
 
     this.props.signup({
       facial_image_id: this.props.user.validate.payload.payload.facial_image_id,
-      device_imei: IMEI.getImei(),
+      device_imei: imei,
       password,
     });
   };
