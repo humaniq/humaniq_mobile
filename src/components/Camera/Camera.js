@@ -138,7 +138,7 @@ export class Cam extends Component {
           this.setState({ animation: doneAnimation });
           this.animate(1000, 0, 1, () => {
             this.setState({ animation: pressAnimation });
-            this.props.navigation.navigate('Password');
+            this.navigateTo('Password');
           });
           break;
 
@@ -156,7 +156,7 @@ export class Cam extends Component {
             this.setState({ animation: doneAnimation });
             this.animate(1000, 0, 1, () => {
               this.setState({ animation: pressAnimation });
-              this.props.navigation.navigate('Tutorial', { nextScene: 'Password' });
+              this.navigateTo('Tutorial', { nextScene: 'Password' });
             });
           }
 
@@ -221,7 +221,7 @@ export class Cam extends Component {
         // reduce emotions there
         this.setState({ animation: doneAnimation });
         this.animate(1000, 0, 1, () => {
-          this.props.navigation.navigate('Tutorial', { nextScene: 'Password' });
+          this.navigateTo('Tutorial', { nextScene: 'Password' });
         });
       } else {
         this.setState({
@@ -308,6 +308,14 @@ export class Cam extends Component {
     this.props.navigation.dispatch(backAction);
   };
 
+  navigateTo = (screen, params) => {
+    const resetAction = NavigationActions.reset({
+      index: 0,
+      actions: [NavigationActions.navigate({ routeName: screen , params: params })],
+    });
+    this.props.navigation.dispatch(resetAction);
+  };
+
   // Animation
   animate = (time, fr = 0, to = 1, callback) => {
     this.state.progress.setValue(fr);
@@ -373,7 +381,7 @@ export class Cam extends Component {
     const { params = {} } = this.props.navigation.state;
     const { mode } = params;
     const isQR = mode === 'qr'
-    const fn = ()=>null;
+    const fn = () => null;
     return (
       <View style={styles.container}>
         <Modal

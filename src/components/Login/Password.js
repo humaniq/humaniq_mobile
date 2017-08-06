@@ -19,7 +19,8 @@ import CustomStyleSheet from '../../utils/customStylesheet';
 const spinner = require('../../assets/animations/s-spiner.json');
 
 import { login, signup, setPassword, addPrimaryAccount, addSecondaryAccount } from '../../actions';
-import Modal from '../Shared/Components/Modal';
+import { NavigationActions } from 'react-navigation';
+import Modal from "../Shared/Components/Modal";
 import { vw } from '../../utils/units';
 
 export class Password extends Component {
@@ -129,15 +130,14 @@ export class Password extends Component {
                 photo: this.props.user.photo,
                 number: `${registeredAcc.phone_number.country_code}${registeredAcc.phone_number.phone_number}`,
               });
-
-              this.props.navigation.navigate('Profile');
+              this.navigateTo('Profile');
             } else {
               // primary user
               this.props.addPrimaryAccount({
                 accountId: registeredAcc.account_id,
                 photo: this.props.user.photo,
               });
-              this.props.navigation.navigate('TelInput');
+              this.navigateTo('TelInput');
             }
             break;
 
@@ -153,7 +153,7 @@ export class Password extends Component {
             HumaniqTokenApiLib.saveCredentials(map)
                 .then((res) => {
                   this.props.setPassword(this.state.password);
-                  this.props.navigation.navigate('Profile');
+                  this.navigateTo('Profile');
                 })
                 .catch(err => console.log(err));
             break;
@@ -184,6 +184,14 @@ export class Password extends Component {
       }
     }
   }
+
+  navigateTo = (screen, params) => {
+    const resetAction = NavigationActions.reset({
+      index: 0,
+      actions: [NavigationActions.navigate({ routeName: screen, params: params })],
+    });
+    this.props.navigation.dispatch(resetAction);
+  };
 
   handleDismissModal = () => {
     this.setState({ error: false, errorCode: null });
@@ -238,7 +246,7 @@ export class Password extends Component {
       // TODO: go to tel input with reset
       this.createRegistration(password);
     } else {
-      this.props.navigation.navigate('Password', { password });
+      this.navigateTo('Password', { password: password });
     }
   };
 
@@ -345,14 +353,14 @@ export class Password extends Component {
           onPress={this.handleDismissModal}
           code={this.state.errorCode}
           visible={this.state.error != null && this.state.errorCode != null}
-        />
+          />
         <View style={styles.header}>
           <View style={styles.animationContainer}>
             <Animation
               style={styles.animation}
               source={spinner}
               progress={this.state.progress}
-            />
+              />
           </View>
           <Image style={styles.userPhoto} source={{ uri: this.props.user.photo }} />
           {this.renderInputStep() }
@@ -364,7 +372,7 @@ export class Password extends Component {
             onNumberPress={this.handleNumberPress}
             onBackspacePress={this.handleBackspacePress}
             onHelpPress={this.handleHelpPress}
-          />
+            />
         </View>
       </View>
     );
