@@ -130,6 +130,8 @@ export class Cam extends Component {
       switch (code) {
         case 3002:
           // registered user
+            console.warn(JSON.stringify(nextProps.user.validate))
+            console.warn(JSON.stringify(nextProps.user.validate.payload))
           this.props.setAvatarLocalPath(this.state.path);
           this.state.progress.stopAnimation();
           this.state.progress.setValue(0);

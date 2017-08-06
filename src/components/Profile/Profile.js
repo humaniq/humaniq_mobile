@@ -803,7 +803,8 @@ export default connect(
     state => ({
       user: state.user,
       profile: state.user.profile || {},
-      id: state.accounts.primaryAccount.account_id || '1573759152352658789',
+      id: state.accounts.primaryAccount.accountId,
+      acc: state.accounts.primaryAccount,
       newTransaction: state.newtransaction,
       contacts: state.contacts,
     }),

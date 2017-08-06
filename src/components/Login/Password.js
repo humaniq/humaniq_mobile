@@ -3,7 +3,7 @@ import {
   View,
   Image,
   Text,
-  Animated
+  Animated,
 } from 'react-native';
 
 import PropTypes from 'prop-types';
@@ -11,12 +11,15 @@ import Animation from 'lottie-react-native';
 import { connect } from 'react-redux';
 import DeviceInfo from 'react-native-device-info';
 import IMEI from 'react-native-imei';
+import { HumaniqTokenApiLib } from 'react-native-android-library-humaniq-api';
 
 import Keyboard from '../Shared/Components/Keyboard';
 import CustomStyleSheet from '../../utils/customStylesheet';
+
 const spinner = require('../../assets/animations/s-spiner.json');
+
 import { login, signup, setPassword, addPrimaryAccount, addSecondaryAccount } from '../../actions';
-import Modal from "../Shared/Components/Modal";
+import Modal from '../Shared/Components/Modal';
 import { vw } from '../../utils/units';
 
 export class Password extends Component {
@@ -72,10 +75,10 @@ export class Password extends Component {
         }),
         Animated.timing(this.state.progress, {
           toValue: 0,
-          duration: 0
-        })
-      ])
-    ).start()
+          duration: 0,
+        }),
+      ]),
+    ).start();
   }
 
   componentWillReceiveProps(nextProps) {
@@ -103,6 +106,7 @@ export class Password extends Component {
 
           case 1001:
             const registeredAcc = nextProps.user.account.payload.payload.account_information;
+            console.log(registeredAcc)
             this.props.setPassword(this.state.password);
             // this.props.navigation.navigate('TelInput');
 
@@ -114,7 +118,21 @@ export class Password extends Component {
                 photo: this.props.user.photo,
                 number: `${registeredAcc.phone_number.country_code}${registeredAcc.phone_number.phone_number}`,
               });
-              this.props.navigation.navigate('Profile');
+              const map = {
+                token: nextProps.user.account.payload.payload.token,
+                account_id: nextProps.user.account.payload.payload.account_id,
+                facial_image_id: this.props.user.validate.payload.payload.facial_image_id,
+                password,
+                device_imei: IMEI.getImei(),
+              };
+              HumaniqTokenApiLib.saveCredentials(map)
+                  .then((res) => {
+                    console.log(nextProps.user);
+                    this.props.setPassword(this.state.password);
+                    this.props.navigation.navigate('Profile');
+                    console.log(res);
+                  })
+                  .catch(err => console.log(err));
             } else {
               // primary user
               this.props.addPrimaryAccount({
@@ -127,8 +145,21 @@ export class Password extends Component {
 
           case 2001:
             // login, password ok (save password & token?)
-            this.props.setPassword(this.state.password);
-            this.props.navigation.navigate('Profile');
+            const map = {
+              token: nextProps.user.account.payload.payload.token,
+              account_id: nextProps.user.account.payload.payload.account_id,
+              facial_image_id: this.props.user.validate.payload.payload.facial_image_id,
+              password,
+              device_imei: IMEI.getImei(),
+            };
+            HumaniqTokenApiLib.saveCredentials(map)
+                .then((res) => {
+                  console.log(nextProps.user);
+                  this.props.setPassword(this.state.password);
+                  this.props.navigation.navigate('Profile');
+                  console.log(res);
+                })
+                .catch(err => console.log(err));
             break;
 
           case 2002:
@@ -176,19 +207,17 @@ export class Password extends Component {
           this.handlePasswordConfirm(true, res);
         } else if (this.state.maxPasswordLength === res.length && params.password !== res) {
           // incorrect password
-          this.setState({error: true});
+          this.setState({ error: true });
           this.animatePasswordError();
         }
       } else if (res.length === this.state.maxPasswordLength) {
         // Registration step 1
         this.handlePasswordConfirm(false, res);
       }
-    } else {
-      if (res.length === this.state.maxPasswordLength) {
+    } else if (res.length === this.state.maxPasswordLength) {
         // Auth
-        console.log("authenticate");
-        this.handlePasswordConfirm(false, res);
-      }
+      console.log('authenticate');
+      this.handlePasswordConfirm(false, res);
     }
   };
 
@@ -213,7 +242,7 @@ export class Password extends Component {
       // TODO: go to tel input with reset
       this.createRegistration(password);
     } else {
-      this.props.navigation.navigate('Password', { password: password });
+      this.props.navigation.navigate('Password', { password });
     }
   };
 
@@ -222,7 +251,7 @@ export class Password extends Component {
     this.props.login({
       facial_image_id: this.props.user.validate.payload.payload.facial_image_id,
       device_imei: this.state.imei,
-      password: password,
+      password,
     });
   };
 
@@ -238,7 +267,7 @@ export class Password extends Component {
     this.props.signup({
       facial_image_id: this.props.user.validate.payload.payload.facial_image_id,
       device_imei: imei,
-      password: password,
+      password,
     });
   };
 
@@ -260,7 +289,7 @@ export class Password extends Component {
       digits.push(
         <View key={i}>
           <View style={style} />
-        </View>
+        </View>,
       );
     }
     return (
@@ -278,7 +307,7 @@ export class Password extends Component {
       }),
       Animated.timing(this.state.passwordError, {
         toValue: vw(30),
-        duration: 100
+        duration: 100,
       }),
       Animated.timing(this.state.passwordError, {
         toValue: vw(-30),
@@ -292,7 +321,7 @@ export class Password extends Component {
         toValue: vw(0),
         duration: 50,
       }),
-    ]).start(() => {this.setState({ error: null })});
+    ]).start(() => { this.setState({ error: null }); });
   }
 
   renderInputStep = () => {
