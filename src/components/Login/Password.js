@@ -96,86 +96,84 @@ export class Password extends Component {
       const code = nextProps.user.account.payload.code;
       const password = nextProps.user.password;
 
-      if (!password) {
-        switch (code) {
-          case 6000:
-            this.setState({
-              error: true,
-              errorCode: nextProps.user.account.payload.code,
+      switch (code) {
+        case 6000:
+          this.setState({
+            error: true,
+            errorCode: nextProps.user.account.payload.code,
+          });
+          break;
+
+        case 1001:
+          const registeredAcc = nextProps.user.account.payload.payload.account_information;
+          console.log('registeredAccount ::', registeredAcc)
+          // this.props.navigation.navigate('TelInput');
+          const map2 = {
+            token: nextProps.user.account.payload.payload.token,
+            account_id: registeredAcc.account_id,
+            facial_image_id: this.props.user.validate.payload.payload.facial_image_id,
+            password,
+            device_imei: IMEI.getImei(),
+          };
+          HumaniqTokenApiLib.saveCredentials(map2)
+              .then((res) => console.log(res))
+              .catch(err => console.log(err));
+          // TODO: replace with validated??
+          if (registeredAcc.phone_number.country_code) {
+            // secondary user, redirect to dash
+            this.props.addSecondaryAccount({
+              accountId: registeredAcc.account_id,
+              photo: this.props.user.photo,
+              number: `${registeredAcc.phone_number.country_code}${registeredAcc.phone_number.phone_number}`,
             });
-            break;
-
-          case 1001:
-            const registeredAcc = nextProps.user.account.payload.payload.account_information;
-            console.log('registeredAccount ::', registeredAcc)
-            // this.props.navigation.navigate('TelInput');
-            const map2 = {
-              token: nextProps.user.account.payload.payload.token,
-              account_id: registeredAcc.account_id,
-              facial_image_id: this.props.user.validate.payload.payload.facial_image_id,
-              password,
-              device_imei: IMEI.getImei(),
-            };
-            HumaniqTokenApiLib.saveCredentials(map2)
-                .then((res) => console.log(res))
-                .catch(err => console.log(err));
-            // TODO: replace with validated??
-            if (registeredAcc.phone_number.country_code) {
-              // secondary user, redirect to dash
-              this.props.addSecondaryAccount({
-                accountId: registeredAcc.account_id,
-                photo: this.props.user.photo,
-                number: `${registeredAcc.phone_number.country_code}${registeredAcc.phone_number.phone_number}`,
-              });
-              this.navigateTo('Profile');
-            } else {
-              // primary user
-              this.props.addPrimaryAccount({
-                accountId: registeredAcc.account_id,
-                photo: this.props.user.photo,
-              });
-              this.navigateTo('TelInput');
-            }
-            break;
-
-          case 2001:
-            // login, password ok (save password & token?)
-            const map = {
-              token: nextProps.user.account.payload.payload.token,
-              account_id: nextProps.user.account.payload.payload.account_id,
-              facial_image_id: this.props.user.validate.payload.payload.facial_image_id,
-              password,
-              device_imei: IMEI.getImei(),
-            };
-            HumaniqTokenApiLib.saveCredentials(map)
-                .then((res) => {console.log(res)})
-                .catch(err => console.log(err));
             this.navigateTo('Profile');
-            break;
-
-          case 2002:
-            // Authentication Failed
-            this.setState({
-              password: '',
-              error: true,
-              errorCode: nextProps.user.account.payload.code,
+          } else {
+            // primary user
+            this.props.addPrimaryAccount({
+              accountId: registeredAcc.account_id,
+              photo: this.props.user.photo,
             });
-            break;
+            this.navigateTo('TelInput');
+          }
+          break;
 
-          case 3003:
-            // Facial Image Not Found
-            this.setState({
-              error: true,
-              errorCode: nextProps.user.account.payload.code,
-            });
-            break;
+        case 2001:
+          // login, password ok (save password & token?)
+          const map = {
+            token: nextProps.user.account.payload.payload.token,
+            account_id: nextProps.user.account.payload.payload.account_id,
+            facial_image_id: this.props.user.validate.payload.payload.facial_image_id,
+            password,
+            device_imei: IMEI.getImei(),
+          };
+          HumaniqTokenApiLib.saveCredentials(map)
+              .then((res) => {console.log(res)})
+              .catch(err => console.log(err));
+          this.navigateTo('Profile');
+          break;
 
-          default:
-            this.setState({
-              error: true,
-              errorCode: nextProps.user.account.payload.code,
-            });
-        }
+        case 2002:
+          // Authentication Failed
+          this.setState({
+            password: '',
+            error: true,
+            errorCode: nextProps.user.account.payload.code,
+          });
+          break;
+
+        case 3003:
+          // Facial Image Not Found
+          this.setState({
+            error: true,
+            errorCode: nextProps.user.account.payload.code,
+          });
+          break;
+
+        default:
+          this.setState({
+            error: true,
+            errorCode: nextProps.user.account.payload.code,
+          });
       }
     }
   }
