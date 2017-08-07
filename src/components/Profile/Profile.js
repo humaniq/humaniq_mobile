@@ -513,6 +513,8 @@ export class Profile extends Component {
   componentWillUnmount() {
     // to prevent null pointers
     this.activity = false;
+    DeviceEventEmitter.removeListener('EVENT_TRANSACTION_ERROR');
+    DeviceEventEmitter.removeListener('EVENT_TRANSACTION_CHANGED');
     // DeviceEventEmitter.removeAllListeners()
   }
 
