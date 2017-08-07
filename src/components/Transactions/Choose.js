@@ -75,7 +75,9 @@ class Choose extends React.Component {
                 return {
                   id: p.account_id,
                   approved: false,
-                  phone: phone_number.country_code ? `+${phone_number.country_code}` : '',
+                  phone: phone_number.country_code ?
+                  `+(${phone_number.country_code}) ${phone_number.phone_number}` :
+                  `${phone_number.phone_number}`,
                   name: `${person.first_name} ${person.last_name}`,
                   status: 1,
                   avatar: avatar.url,
