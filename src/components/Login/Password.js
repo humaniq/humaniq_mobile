@@ -241,7 +241,7 @@ export class Password extends Component {
       // TODO: go to tel input with reset
       this.createRegistration(password);
     } else {
-      this.navigateTo('Password', { password: password });
+      this.props.navigation.navigate('Password', { password: password });
     }
   };
 
