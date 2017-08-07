@@ -51,6 +51,11 @@ export const fetchFaceEmotionValidate = fetchEntity.bind(
   actions.faceEmotionValidate,
   api.faceEmotionValidate,
 );
+export const smsCodeRepeat = fetchEntity.bind(
+  null,
+  actions.smsCodeRepeat,
+  api.smsCodeRepeat,
+);
 
 function* validate({ facial_image }) {
   const errorCodes = [3000, 3001, 6000];
@@ -121,6 +126,19 @@ function* phoneNumberValidate({ phone_number, validation_code, account_id }) {
   yield call(fetchPhoneNumberValidate, body, errorCodes);
 }
 
+function* smsCodeRepeat({ account_id, phone_number, imei }) {
+  const errorCodes = [6000, 4010, 4004, 4003, 4001, 4009];
+  // let code = phone_number.toString().slice(0, 1);
+  // let number = phone_number.toString().slice(1);
+  const body = {
+    account_id,
+    phone_number,
+    imei,
+  };
+  console.log('sms code repeat', body);
+  yield call(fetchSmsCodeRepeat, body, errorCodes);
+}
+
 function* faceEmotionCreate({ facial_image_id }) {
   const errorCodes = [3000, 6000, 3003];
   yield call(fetchFaceEmotionCreate, { facial_image_id }, errorCodes);
@@ -153,11 +171,19 @@ function* watchPhoneNumberValidate() {
   yield takeLatest(actions.PHONE_NUMBER_VALIDATE.REQUEST, phoneNumberValidate);
 }
 
+function* watchSmsCodeRepeat() {
+  yield takeLatest(actions.SMS_CODE_REPEAT.REQUEST, smsCodeRepeat);
+}
+
 function* watchFaceEmotionCreate() {
   yield takeLatest(actions.FACE_EMOTION_CREATE.REQUEST, faceEmotionCreate);
 }
 
 function* watchFaceEmotionValidate() {
+  yield takeLatest(actions.FACE_EMOTION_VALIDATE.REQUEST, faceEmotionValidate);
+}
+
+function* watchPhoneCodeRequest() {
   yield takeLatest(actions.FACE_EMOTION_VALIDATE.REQUEST, faceEmotionValidate);
 }
 
