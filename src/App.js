@@ -99,7 +99,7 @@ LoginStack.router.getStateForAction = (action, state) => {
   if (action.type === 'Navigation/NAVIGATE' && state.index >= 0) {
     const prevRouteName = state.routes[state.index].routeName;
     // reset routing stack
-    if (prevRouteName === 'Loading' || action.routeName === 'Profile') {
+    if (prevRouteName === 'Loading' || action.routeName === 'Dashboard') {
       newAction = NavigationActions.reset({
         actions: [action],
         index: 0,

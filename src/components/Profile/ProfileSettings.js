@@ -380,11 +380,23 @@ export class ProfileSettings extends Component {
     HumaniqProfileApiLib.deauthenticateUser(this.state.user.id)
       .then((response) => {
         // log out
+        console.log(response)
+        if (response.code === 200) {
+          this.navigateTo('Camera');
+        }
       })
       .catch((err) => {
         // handle error
       });
   }
+
+  navigateTo = (screen, params) => {
+    const resetAction = NavigationActions.reset({
+      index: 0,
+      actions: [NavigationActions.navigate({ routeName: screen, params: params })],
+    });
+    this.props.navigation.dispatch(resetAction);
+  };
 
   showQrModal() {
     return (

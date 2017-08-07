@@ -14,6 +14,7 @@ import {
   ScrollView,
   DeviceEventEmitter,
   Alert,
+  BackHandler,
 } from 'react-native';
 import CustomStyleSheet from '../../utils/customStylesheet';
 
@@ -117,8 +118,8 @@ export class Profile extends Component {
     DeviceEventEmitter.addListener('EVENT_TRANSACTION_ERROR', (event) => {
       console.log('ошибка');
       console.log(event);
-      const error = JSON.parse(event.error);
-      if (this.activity) {
+      if (this.activity && event) {
+        const error = JSON.parse(event.error);
         if (this.isTransactionIdExist(error)) {
           Alert.alert(null, error.error, [
             {
@@ -159,6 +160,9 @@ export class Profile extends Component {
             }
           });
     });
+  }
+
+  componentDidMount() {
   }
 
   componentWillReceiveProps(nextProps) {
@@ -655,10 +659,12 @@ export class Profile extends Component {
   }
 
   isTransactionIdExist(error) {
-    const transactionsId = this.state.transactionsId;
-    for (let i = 0; i < transactionsId.length; i += 1) {
-      if (transactionsId[i].transactionId === error.transaction_id) {
-        return true;
+    if (error !== null) {
+      const transactionsId = this.state.transactionsId;
+      for (let i = 0; i < transactionsId.length; i += 1) {
+        if (transactionsId[i].transactionId === error.transaction_id) {
+          return true;
+        }
       }
     }
     return false;
@@ -814,7 +820,7 @@ export default connect(
     state => ({
       user: state.user,
       profile: state.user.profile || {},
-      id: state.accounts.primaryAccount.accountId,
+      id: state.user.account.payload.payload.account_id,
       acc: state.accounts.primaryAccount,
       newTransaction: state.newtransaction,
       contacts: state.contacts,

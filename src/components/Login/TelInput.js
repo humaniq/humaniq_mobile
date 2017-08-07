@@ -18,7 +18,6 @@ import PhoneKeyboard from '../Shared/Components/PhoneKeyboard';
 import ConfirmButton from '../Shared/Buttons/ConfirmButton';
 import HelpButton from '../Shared/Buttons/HelpButton';
 import { phoneNumberCreate, savePhone } from '../../actions';
-import { NavigationActions } from 'react-navigation';
 import { vw } from '../../utils/units';
 
 const ic_user = require('../../assets/icons/ic_user.png');
@@ -75,7 +74,7 @@ export class TelInput extends Component {
             // registered user
             // Account Phone Number Created Successfully. Validation Code Sent
             this.props.savePhone(VMasker.toNumber(`${this.state.code}${this.state.phone}`));
-            this.navigateTo('CodeInput');
+            this.props.navigation.navigate('CodeInput');
             // alert('Proceed to codeInput');
             break;
 
@@ -93,14 +92,6 @@ export class TelInput extends Component {
     }
   }
 
-  navigateTo = (screen, params) => {
-    const resetAction = NavigationActions.reset({
-      index: 0,
-      actions: [NavigationActions.navigate({ routeName: screen, params: params })],
-    });
-    this.props.navigation.dispatch(resetAction);
-  };
-
   handleNumberPress = (number) => {
     if (this.state.phone.length < this.state.maxPhoneLength) {
       let inputVal = this.state.phone;
@@ -117,7 +108,7 @@ export class TelInput extends Component {
   };
 
   handleHelpPress = () => {
-    this.navigateTo('Instructions');
+    this.props.navigation.navigate('Instructions');
   };
 
   handlePhoneConfirm = () => {
@@ -170,7 +161,7 @@ export class TelInput extends Component {
         <TouchableOpacity
           style={styles.countryCodeContainer}
           onPress={() => {
-            this.navigateTo('CountryCode',
+            this.props.navigation.navigate('CountryCode',
               { refresh: (dialCode, code, flag) => { dialCode != null ? this.setState({ code: dialCode, countryCode: code, flag: flag }) : null } })
           } }>
           <Image style={styles.flag} source={{ uri: this.state.flag }}/>
@@ -198,7 +189,7 @@ export class TelInput extends Component {
           onNumberPress={this.handleNumberPress}
           onBackspacePress={this.handleBackspacePress}
           onHelpPress={this.handleHelpPress}
-          />
+        />
       </View>
     );
   }
