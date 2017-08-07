@@ -230,7 +230,7 @@ export class Password extends Component {
   };
 
   handleHelpPress = () => {
-    alert('В шаббат у нас с мамой традиция — зажигать свечи и смотреть „Колесо фортуны“');
+    // TODO: support button action
   };
 
   handlePasswordConfirm = (match, password) => {
@@ -370,7 +370,7 @@ export class Password extends Component {
             isBackspaceEnabled={(this.state.password.length > 0) && !this.props.user.account.isFetching}
             onNumberPress={this.handleNumberPress}
             onBackspacePress={this.handleBackspacePress}
-            onHelpPress={this.handleHelpPress}
+            // onHelpPress={this.handleHelpPress}
             />
         </View>
       </View>

@@ -120,7 +120,7 @@ class CodeInput extends Component {
   };
 
   handleHelpPress = () => {
-    alert('В шаббат у нас с мамой традиция — зажигать свечи и смотреть „Колесо фортуны“');
+    // TODO: support button action
   };
 
   handleNavigate = () => {
@@ -176,7 +176,7 @@ class CodeInput extends Component {
         <Keyboard
           onNumberPress={this.handleNumberPress}
           onBackspacePress={this.handleBackspacePress}
-          onHelpPress={this.handleHelpPress}
+          // onHelpPress={this.handleHelpPress}
         />
       </View>
     );
