@@ -194,7 +194,7 @@ const styles = CustomStyleSheet({
   },
   name: {
     color: '#1b1d1d',
-    fontSize: 17,
+    fontSize: 20,
   },
   priceContainer: {
     marginTop: 25,
