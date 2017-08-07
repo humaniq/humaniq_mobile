@@ -1,4 +1,5 @@
 /* eslint-disable import/no-unresolved */
+/* eslint-disable react/forbid-prop-types */
 import React from 'react';
 import { View, TouchableOpacity, Image, Text } from 'react-native';
 import VMasker from 'vanilla-masker';
@@ -17,6 +18,9 @@ import PhoneKeyboard from '../Shared/Components/PhoneKeyboard';
 const backWhite = require('./../../assets/icons/back_white.png');
 const paymentBig = require('./../../assets/icons/payment_big.png');
 const doneWhite = require('./../../assets/icons/done_white.png');
+const paymentArrow = require('./../../assets/icons/payment_arrow_right.png');
+const icUser = require('./../../assets/icons/ic_user.png');
+const amountReorder = require('./../../assets/icons/amount_reorder.png');
 
 const pattern = { pattern: '999.99', placeholder: '0' };
 
@@ -24,23 +28,27 @@ class SelectAmount extends React.Component {
   static propTypes = {
     newTransaction: PropTypes.shape({
       rootScreen: PropTypes.string.isRequired,
+      contactID: PropTypes.string,
     }),
     navigation: PropTypes.shape({
       navigate: PropTypes.func.isRequired,
       dispatch: PropTypes.func.isRequired,
     }),
     setTrAmount: PropTypes.func,
+    user: PropTypes.object,
+    contacts: PropTypes.array,
   };
 
   constructor() {
     super();
     this.state = {
       currency: 'HMQ',
-      rate: 0,
+      rateHMQtoUSD: 0,
+      rateUSDtoHMQ: 0,
       adress: '',
       contactID: '',
       maxAmountLength: 5,
-      amount: '',
+      amount: '00000',
       maskedAmount: VMasker.toPattern(0, pattern),
     };
   }
@@ -49,15 +57,27 @@ class SelectAmount extends React.Component {
     HumaniqProfileApiLib.getExchangeUsd('1').then((data) => {
       const { USD = 0 } = data;
       this.setState({
-        rate: USD,
+        rateHMQtoUSD: USD,
+      });
+    });
+
+    HumaniqProfileApiLib.getExchangeHmq('1').then((data) => {
+      const { HMQ = 0 } = data;
+      this.setState({
+        rateUSDtoHMQ: HMQ,
       });
     });
   }
 
   setAmount = () => {
-    const { maskedAmount } = this.state;
+    const { maskedAmount, currency, rateHMQtoUSD, rateUSDtoHMQ } = this.state;
     const { newTransaction: { rootScreen }, setTrAmount, navigation: { dispatch } } = this.props;
-    setTrAmount(parseFloat(maskedAmount));
+    const rate = currency === 'HMQ' ? rateHMQtoUSD : rateUSDtoHMQ;
+    const amount = currency === 'HMQ' ?
+      parseFloat(maskedAmount) :
+      Math.round(parseFloat(maskedAmount) * rate * 100) / 100;
+
+    setTrAmount(amount);
     dispatch(
       NavigationActions.back({
         key: rootScreen,
@@ -66,35 +86,70 @@ class SelectAmount extends React.Component {
   };
 
   handleBackspacePress = () => {
-    const inputVal = this.state.amount.slice(0, -1);
+    const inputVal = `0${this.state.amount.slice(0, -1)}`;
     const m = VMasker.toPattern(inputVal, pattern);
     this.setState({ amount: inputVal, maskedAmount: m });
   };
 
   handleNumberPress = (number) => {
-    if (this.state.amount.length < this.state.maxAmountLength) {
+    if (this.state.amount[0] === '0') {
       let inputVal = this.state.amount;
-      inputVal += number;
+      inputVal = this.state.amount.slice(1) + number;
       const m = VMasker.toPattern(inputVal, pattern);
       this.setState({ amount: inputVal, maskedAmount: m });
     }
   };
 
+  swap = () => {
+    const { maskedAmount, currency, rateHMQtoUSD, rateUSDtoHMQ } = this.state;
+    const oldRate = currency === 'HMQ' ? rateHMQtoUSD : rateUSDtoHMQ;
+    const oldExchange = Math.round(parseFloat(maskedAmount) * oldRate * 100);
+    const maskedExchange = String(`00000${oldExchange}`).slice(-5);
+    const newCurr = currency === 'HMQ' ? '$' : 'HMQ';
+    this.setState({
+      currency: newCurr,
+      amount: maskedExchange,
+      maskedAmount: VMasker.toPattern(maskedExchange, pattern),
+    });
+  }
+
   renderContent() {
-    const { maskedAmount, currency, rate } = this.state;
+    const { maskedAmount, currency, rateHMQtoUSD, rateUSDtoHMQ } = this.state;
     const am = maskedAmount.split('.');
+    const rate = currency === 'HMQ' ? rateHMQtoUSD : rateUSDtoHMQ;
+    const oppositeCurr = currency === 'HMQ' ? '$' : 'HMQ';
     const amFloat = Math.round(parseFloat(maskedAmount) * rate * 100) / 100;
+    const user = this.props.user || {};
+    const photo = user.photo;
+    const myPhoto = photo ? { uri: photo } : icUser;
+
+    const toID = this.props.newTransaction.contactID;
+    const contacts = this.props.contacts;
+    const toContact = toID ? contacts.find(cnt => cnt.id === toID) || {} : {};
+    const toPhoto = toContact.avatar ? { uri: toContact.avatar } : icUser;
+
     return (
       <View style={{ flex: 1, flexDirection: 'column' }}>
-        <View style={styles.amountInput}>
+        <View style={styles.avatars}>
+          <View style={{ position: 'absolute', flexDirection: 'row' }}>
+            <Image source={paymentArrow} style={styles.arrow_right} />
+            <Image source={paymentArrow} style={styles.arrow_right} />
+            <Image source={paymentArrow} style={styles.arrow_right} />
+            <Image source={paymentArrow} style={styles.arrow_right} />
+          </View>
+          <Image resizeMode="cover" source={myPhoto} style={[styles.avatarImage, { marginRight: 60 }]} />
+          <Image resizeMode="cover" source={toPhoto} style={styles.avatarImage} />
+        </View>
+        <TouchableOpacity onPress={this.swap} style={styles.amountInput}>
           <View style={{ flex: 1, flexDirection: 'row', alignItems: 'flex-end' }}>
             <Text style={[styles.number, { fontSize: 60, color: 'black' }]}>{`${am[0]}.`}</Text>
             <Text style={[styles.number, { marginBottom: 6 }]}>{`${am[1]} ${currency}`}</Text>
+            <Image source={amountReorder} style={{ width: 24, height: 24, marginLeft: 16, alignSelf: 'flex-end' }} />
           </View>
           <View style={{ flex: 1, flexDirection: 'row', alignItems: 'flex-start' }}>
-            <Text style={[styles.number, { fontSize: 15 }]}>{`${amFloat} $`}</Text>
+            <Text style={[styles.number, { fontSize: 15 }]}>{`${amFloat} ${oppositeCurr}`}</Text>
           </View>
-        </View>
+        </TouchableOpacity>
         <PhoneKeyboard
           onNumberPress={this.handleNumberPress}
           onBackspacePress={this.handleBackspacePress}
@@ -169,6 +224,24 @@ const styles = {
     width: 38,
     height: 38,
   },
+  avatars: {
+    flexDirection: 'row',
+    height: 72,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderBottomColor: colors.white_two,
+    borderBottomWidth: 0.5,
+  },
+  avatarImage: {
+    width: 48,
+    height: 48,
+    borderRadius: 96,
+  },
+  arrow_right: {
+    height: 12.5,
+    width: 12.5,
+    margin: 7.5 / 2,
+  },
   // >>
   amountInput: {
     flex: 1,
@@ -210,6 +283,8 @@ const styles = {
 
 const mapStateToProps = state => ({
   newTransaction: state.newtransaction,
+  user: state.user,
+  contacts: state.contacts,
 });
 
 export default connect(mapStateToProps, {
