@@ -41,7 +41,7 @@ export class PasswordEdit extends Component {
     HumaniqTokenApiLib.getPassword()
       .then((result) => {
         console.warn(JSON.stringify(result));
-        this.setState({ old_password: result });
+        this.setState({ old_password: result.password });
       });
   }
 
@@ -181,7 +181,7 @@ export class PasswordEdit extends Component {
             isBackspaceEnabled={this.state.password !== ''}
             onNumberPress={this.handleNumberPress}
             onBackspacePress={this.handleBackspacePress}
-            onHelpPress={this.handleHelpPress}
+            //onHelpPress={this.handleHelpPress}
           />
         </View>
       </View>
