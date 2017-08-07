@@ -282,6 +282,7 @@ export class CodeInput extends Component {
   }
 }
 
+
 const mapStateToProps = state => ({
   user: state.user,
 });
