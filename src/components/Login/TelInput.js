@@ -69,9 +69,11 @@ export class TelInput extends Component {
           case 4005:
             // registered user
             // Account Phone Number Created Successfully. Validation Code Sent
-            this.props.savePhone(VMasker.toNumber(`${this.state.code}${this.state.phone}`));
+            this.props.savePhone({
+              country_code: VMasker.toNumber(this.state.code),
+              phone_number: VMasker.toNumber(this.state.phone),
+            });
             this.props.navigation.navigate('CodeInput');
-            // alert('Proceed to codeInput');
             break;
 
         case 4011:

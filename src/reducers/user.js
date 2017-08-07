@@ -114,6 +114,13 @@ export const user = combineReducers({
       ActionTypes.FACE_EMOTION_CREATE.FAILURE,
     ],
   }),
+  smsCodeRepeat: subroutineReducerCreator({
+    types: [
+      ActionTypes.SMS_CODE_REPEAT.REQUEST,
+      ActionTypes.SMS_CODE_REPEAT.SUCCESS,
+      ActionTypes.SMS_CODE_REPEAT.FAILURE,
+    ],
+  }),
   account,
   photo,
   password,
