@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import {
     View,
-    Image,
     Text,
     Animated,
 } from 'react-native';
@@ -10,6 +9,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import VMasker from 'vanilla-masker';
 import SmsListener from 'react-native-android-sms-listener';
+import IMEI from 'react-native-imei';
 
 import CustomStyleSheet from '../../utils/customStylesheet';
 import PhoneKeyboard from '../Shared/Components/PhoneKeyboard';
@@ -17,7 +17,7 @@ import ConfirmButton from '../Shared/Buttons/ConfirmButton';
 import RequestSmsButton from '../Shared/Buttons/RequestSmsButton';
 import Modal from '../Shared/Components/Modal';
 import { vw } from '../../utils/units';
-import { phoneNumberValidate } from '../../actions';
+import { phoneNumberValidate, smsCodeRepeat } from '../../actions';
 
 
 export class CodeInput extends Component {
@@ -220,7 +220,11 @@ export class CodeInput extends Component {
   };
 
   handleRequestSms = () => {
-    // request sms
+    this.props.smsCodeRepeat({
+      account_id: this.props.user.account.payload.payload.account_information.account_id,
+      phone_number: this.props.user.phoneNumber,
+      imei: IMEI.getImei().toString(),
+    });
     // set cooldown
     this.setState({ cooldownTime: 45 });
     let interval;
@@ -274,6 +278,7 @@ const mapStateToProps = state => ({
 
 export default connect(mapStateToProps, {
   phoneNumberValidate: phoneNumberValidate.request,
+  smsCodeRepeat: smsCodeRepeat.request,
 })(CodeInput);
 
 const styles = CustomStyleSheet({
