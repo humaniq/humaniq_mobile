@@ -366,6 +366,6 @@ export default connect(
     }),
     dispatch => ({
       setProfile: profile => dispatch(actions.setProfile(profile)),
-      setLocalPath: path => dispatch(actions.setAvatarLocalPath(path)),
+      setLocalPath: path => dispatch(actions.setTempLocalPath(path)),
     }),
 )(ProfileEdit);

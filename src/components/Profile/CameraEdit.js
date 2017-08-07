@@ -49,6 +49,7 @@ export class CameraEdit extends Component {
       isButtonVisible: true,
       emojiAnimation: new Animated.Value(0),
       capturing: false,
+      lastPath: '',
     };
   }
 
@@ -110,7 +111,7 @@ export class CameraEdit extends Component {
 
   handleImageDelete = () => {
     this.state.progress.setValue(0);
-    this.setState({ path: '', animation: pressAnimation });
+    this.setState({ path: '', animation: pressAnimation});
   };
 
   animate = (time, fr = 0, to = 1, callback) => {
@@ -217,6 +218,8 @@ export class CameraEdit extends Component {
   }
 
   createValidation(resp) {
+    const { path } = this.state
+    console.warn(path)
     // returns emotions
     HumaniqPhotoValidation.createValidation(resp.facial_image_id)
       .then((resp2) => {
@@ -226,6 +229,7 @@ export class CameraEdit extends Component {
         this.setState({ animation: doneAnimation });
         this.animate(1000, 0, 1, () => {
           this.setState({
+            lastPath: path,
             isButtonVisible: false,
             count: 2,
             facialImageValidation: resp2.facial_image_validation_id });
@@ -246,11 +250,11 @@ export class CameraEdit extends Component {
       .then((response) => {
         this.state.progress.stopAnimation();
         this.state.progress.setValue(0);
-        if (response.code == 3008) {
+        if (response.code === 3008) {
           this.setState({ animation: doneAnimation });
           this.animate(1000, 0, 1, () => {
             ToastAndroid.show(response.message, ToastAndroid.LONG);
-            this.props.setLocalPath(this.state.path);
+            this.props.setLocalPath(this.state.lastPath);
             this.handleCameraClose();
           });
         } else {
@@ -287,11 +291,11 @@ export default connect(
     state => ({
       user: state.user,
       profile: state.user.profile || {},
-      photo: state.user.photo || '',
+      photo: state.user.tempPhoto || '',
     }),
     dispatch => ({
       validate: validate.request,
-      setLocalPath: path => dispatch(actions.setAvatarLocalPath(path)),
+      setLocalPath: path => dispatch(actions.setTempLocalPath(path)),
     }),
 )(CameraEdit);
 

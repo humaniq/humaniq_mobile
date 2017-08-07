@@ -115,6 +115,7 @@ export class Profile extends Component {
   };
 
   componentWillMount() {
+    console.log(this.props.id)
     DeviceEventEmitter.addListener('EVENT_TRANSACTION_ERROR', (event) => {
       console.log('ошибка');
       console.log(event);

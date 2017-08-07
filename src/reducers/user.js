@@ -11,6 +11,15 @@ function photo(state = '', action) {
   }
 }
 
+function tempPhoto(state = '', action) {
+  switch (action.type) {
+    case ActionTypes.SET_TEMP_LOCAL_PATH:
+      return action.path;
+    default:
+      return state;
+  }
+}
+
 function profile(state = {}, action) {
   switch (action.type) {
     case ActionTypes.SET_PROFILE:
@@ -110,4 +119,5 @@ export const user = combineReducers({
   password,
   phoneNumber,
   profile,
+  tempPhoto,
 });

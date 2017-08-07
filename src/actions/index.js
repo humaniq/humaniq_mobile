@@ -18,6 +18,7 @@ export const FACE_EMOTION_CREATE = createRequestTypes('FACE_EMOTION_CREATE');
 export const FACE_EMOTION_VALIDATE = createRequestTypes('FACE_EMOTION_VALIDATE');
 
 export const SET_AVATAR_LOCAL_PATH = 'SET_AVATAR_LOCAL_PATH';
+export const SET_TEMP_LOCAL_PATH = 'SET_AVATAR_LOCAL_PATH';
 export const SET_PASSWORD = 'SET_PASSWORD';
 export const SAVE_PHONE = 'SAVE_PHONE';
 export const ADD_PRIMARY_ACCOUNT = 'ADD_PRIMARY_ACCOUNT';
@@ -78,6 +79,7 @@ export const faceEmotionValidate = {
 };
 
 export const setAvatarLocalPath = path => action(SET_AVATAR_LOCAL_PATH, { path });
+export const setTempLocalPath = path => action(SET_TEMP_LOCAL_PATH, { path });
 export const setPassword = password => action(SET_PASSWORD, { password });
 export const setProfile = profile => action(SET_PROFILE, { profile });
 export const savePhone = number => action(SAVE_PHONE, { number });
