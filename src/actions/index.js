@@ -14,6 +14,7 @@ export const LOGIN = createRequestTypes('LOGIN');
 export const SIGNUP = createRequestTypes('SIGNUP');
 export const PHONE_NUMBER_CREATE = createRequestTypes('PHONE_NUMBER_CREATE');
 export const PHONE_NUMBER_VALIDATE = createRequestTypes('PHONE_NUMBER_VALIDATE');
+export const SMS_CODE_REPEAT = createRequestTypes('SMS_CODE_REPEAT');
 export const FACE_EMOTION_CREATE = createRequestTypes('FACE_EMOTION_CREATE');
 export const FACE_EMOTION_VALIDATE = createRequestTypes('FACE_EMOTION_VALIDATE');
 
@@ -60,6 +61,12 @@ export const phoneNumberCreate = {
 };
 
 export const phoneNumberValidate = {
+  request: request => action(PHONE_NUMBER_VALIDATE[REQUEST], request),
+  success: response => action(PHONE_NUMBER_VALIDATE[SUCCESS], { response }),
+  failure: error => action(PHONE_NUMBER_VALIDATE[FAILURE], { error }),
+};
+
+export const smsCodeRepeat = {
   request: request => action(PHONE_NUMBER_VALIDATE[REQUEST], request),
   success: response => action(PHONE_NUMBER_VALIDATE[SUCCESS], { response }),
   failure: error => action(PHONE_NUMBER_VALIDATE[FAILURE], { error }),
