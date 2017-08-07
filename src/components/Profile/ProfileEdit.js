@@ -49,6 +49,7 @@ export class ProfileEdit extends Component {
       surname: lastName || '',
       fieldChanged: false,
       localPath: '',
+      uploading: false,
     };
   }
 
@@ -198,11 +199,13 @@ export class ProfileEdit extends Component {
 
   doneAction = () => {
     // make request
-    if (this.props.photo) {
+    console.warn(this.props.photo)
+    if (this.props.photo !== '') {
+      // upload avatar if temp path exists
       this.uploadAvatar();
     }
     if (this.state.fieldChanged) {
-      // do your stuff here
+      // upload name and lastname if any field was changed
       this.uploadPerson();
     }
   };
@@ -213,7 +216,7 @@ export class ProfileEdit extends Component {
         HumaniqProfileApiLib.uploadProfileAvatar(this.props.profile.account_id, data)
           .then((resp) => {
             if (resp.code === 401) {
-              this.props.navigation.navigate('Camera');
+              this.navigateTo('Tutorial');
             } else {
               console.warn(JSON.stringify(resp));
               if (resp.code === 5004) {
@@ -221,6 +224,7 @@ export class ProfileEdit extends Component {
                 const { profile } = this.props;
                 profile.avatar.url = resp.avatar.url;
                 this.props.setProfile({ ...profile });
+                this.props.setAvatarPath(resp.avatar.url);
               } else if (resp.code === 3013) {
                 // do some stuff
               }
@@ -239,13 +243,21 @@ export class ProfileEdit extends Component {
     this.props.navigation.navigate('CameraEdit', { ...navState.params, user: this.state.user });
   };
 
+  navigateTo = (screen, params) => {
+    const resetAction = NavigationActions.reset({
+      index: 0,
+      actions: [NavigationActions.navigate({ routeName: screen, params: params })],
+    });
+    this.props.navigation.dispatch(resetAction);
+  };
+
   uploadPerson() {
     HumaniqProfileApiLib.updateUserPerson(
             this.state.profile.account_id, this.state.name, this.state.surname,
         )
         .then((resp) => {
           if (resp.code === 401) {
-            this.props.navigation.navigate('Camera');
+            this.navigateTo('Tutorial');
           } else {
             const { profile } = this.props;
             profile.person.first_name = resp.payload.person.first_name;
@@ -362,10 +374,11 @@ export default connect(
     state => ({
       user: state.user,
       profile: state.user.profile || {},
-      photo: state.user.photo,
+      photo: state.user.tempPhoto,
     }),
     dispatch => ({
       setProfile: profile => dispatch(actions.setProfile(profile)),
-      setLocalPath: path => dispatch(actions.setAvatarLocalPath(path)),
+      setLocalPath: path => dispatch(actions.setTempLocalPath(path)),
+      setAvatarPath: path => dispatch(actions.setAvatarLocalPath(path)),
     }),
 )(ProfileEdit);

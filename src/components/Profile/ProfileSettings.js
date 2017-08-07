@@ -382,7 +382,7 @@ export class ProfileSettings extends Component {
         // log out
         console.log(response)
         if (response.code === 200) {
-          this.navigateTo('Camera');
+          this.navigateTo('Accounts');
         }
       })
       .catch((err) => {

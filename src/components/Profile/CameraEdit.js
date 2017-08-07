@@ -19,6 +19,7 @@ import { HumaniqPhotoValidation } from 'react-native-android-library-humaniq-api
 import * as actions from '../../actions/index';
 
 import CustomStyleSheet from '../../utils/customStylesheet';
+import Modal from '../Shared/Components/Modal';
 
 const emojiHappy = require('../../assets/icons/emojiHappy.png');
 const close = require('../../assets/icons/ic_close.png');
@@ -49,6 +50,7 @@ export class CameraEdit extends Component {
       isButtonVisible: true,
       emojiAnimation: new Animated.Value(0),
       capturing: false,
+      lastPath: '',
     };
   }
 
@@ -159,9 +161,19 @@ export class CameraEdit extends Component {
     );
   }
 
+  handleDismissModal = () => {
+    this.state.progress.stopAnimation();
+    this.setState({ error: false, errorCode: null, animation: pressAnimation });
+  };
+
   render() {
     return (
       <View style={styles.container}>
+        <Modal
+          onPress={this.handleDismissModal}
+          code={this.state.errorCode}
+          visible={this.state.error}
+        />
         <View style={styles.cameraImageContainer}>
           {this.state.path ? this.renderImage() : this.renderCamera() }
         </View>
@@ -188,7 +200,7 @@ export class CameraEdit extends Component {
               />}
           <View style={styles.captureContainer}>
             {
-              <TouchableWithoutFeedback
+              this.state.isButtonVisible ? <TouchableWithoutFeedback
                 activeOpacity={1}
                 style={[styles.captureBtn, this.state.path && styles.uploadBtn]}
                 onPress={this.handleImageCapture}
@@ -202,10 +214,10 @@ export class CameraEdit extends Component {
                     progress={this.state.progress}
                   />
                 }
-              </TouchableWithoutFeedback>
+              </TouchableWithoutFeedback> : null
             }
             {
-                  this.state.requiredEmotions.length !== 0 && this.state.isButtonVisible ?
+                  this.state.count === 2 && this.state.isButtonVisible ?
                     <TouchableOpacity style={styles.repeat} onPress={this.replayEmoji}>
                       <Image source={repeat} />
                     </TouchableOpacity> : <View />
@@ -217,6 +229,8 @@ export class CameraEdit extends Component {
   }
 
   createValidation(resp) {
+    const { path } = this.state;
+    console.warn(path);
     // returns emotions
     HumaniqPhotoValidation.createValidation(resp.facial_image_id)
       .then((resp2) => {
@@ -226,6 +240,7 @@ export class CameraEdit extends Component {
         this.setState({ animation: doneAnimation });
         this.animate(1000, 0, 1, () => {
           this.setState({
+            lastPath: path,
             isButtonVisible: false,
             count: 2,
             facialImageValidation: resp2.facial_image_validation_id });
@@ -246,14 +261,16 @@ export class CameraEdit extends Component {
       .then((response) => {
         this.state.progress.stopAnimation();
         this.state.progress.setValue(0);
-        if (response.code == 3008) {
+        if (response.code === 3008) {
           this.setState({ animation: doneAnimation });
           this.animate(1000, 0, 1, () => {
             ToastAndroid.show(response.message, ToastAndroid.LONG);
-            this.props.setLocalPath(this.state.path);
+            this.props.setLocalPath(this.state.lastPath);
             this.handleCameraClose();
           });
         } else {
+          console.warn(JSON.stringify(response))
+          this.setState({error: true, errorCode: response.code})
           this.handleImageDelete();
           ToastAndroid.show('Try again', ToastAndroid.LONG);
         }
@@ -272,10 +289,12 @@ export class CameraEdit extends Component {
           this.createValidation(resp);
         })
         .catch((err) => {
+          console.warn(JSON.stringify(err));
           this.state.progress.stopAnimation();
           this.state.progress.setValue(0);
           this.handleImageDelete();
           ToastAndroid.show('Try again', ToastAndroid.LONG);
+          this.setState({error: true, errorCode: 3001})
         });
     } else if (this.state.count === 2) {
       this.validate(base64);
@@ -287,11 +306,11 @@ export default connect(
     state => ({
       user: state.user,
       profile: state.user.profile || {},
-      photo: state.user.photo || '',
+      photo: state.user.tempPhoto || '',
     }),
     dispatch => ({
       validate: validate.request,
-      setLocalPath: path => dispatch(actions.setAvatarLocalPath(path)),
+      setLocalPath: path => dispatch(actions.setTempLocalPath(path)),
     }),
 )(CameraEdit);
 
@@ -355,10 +374,17 @@ const styles = CustomStyleSheet({
   captureBtn: {
     width: 79,
     height: 79,
+    alignSelf: 'center',
   },
   uploadBtn: {
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  repeat: {
+    position: 'absolute',
+    right: 68,
+    bottom: 68,
+    alignSelf: 'center',
   },
   closeBtn: {
     marginTop: 16,

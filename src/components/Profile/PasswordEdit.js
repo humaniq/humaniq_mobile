@@ -14,7 +14,7 @@ import { NavigationActions } from 'react-navigation';
 import Keyboard from '../Shared/Components/Keyboard';
 import CustomStyleSheet from '../../utils/customStylesheet';
 import Confirm from '../Shared/Buttons/Confirm';
-import { HumaniqProfileApiLib } from 'react-native-android-library-humaniq-api';
+import { HumaniqProfileApiLib, HumaniqTokenApiLib } from 'react-native-android-library-humaniq-api';
 import Modal from '../Shared/Components/Modal';
 import { vw } from '../../utils/units';
 
@@ -24,10 +24,9 @@ const ic_photo_holder = require('../../assets/icons/ic_mock.png');
 export class PasswordEdit extends Component {
   constructor(props) {
     super(props);
-    const { password } = this.props;
     this.state = {
       maxPasswordLength: 4,
-      old_password: password || '1234',
+      old_password: '',
       new_password: '',
       password: '',
       match: null,
@@ -38,7 +37,12 @@ export class PasswordEdit extends Component {
     };
   }
 
-  componentDidMount() {
+  componentWillMount() {
+    HumaniqTokenApiLib.getPassword()
+      .then((result) => {
+        console.warn(JSON.stringify(result));
+        this.setState({ old_password: result.password });
+      });
   }
 
   animateCycle = (time, fr = 0, to = 1, callback) => {
@@ -89,7 +93,7 @@ export class PasswordEdit extends Component {
   };
 
   handleHelpPress = () => {
-    //alert('');
+    // alert('');
   };
 
   renderPassMask = () => {
@@ -177,7 +181,7 @@ export class PasswordEdit extends Component {
             isBackspaceEnabled={this.state.password !== ''}
             onNumberPress={this.handleNumberPress}
             onBackspacePress={this.handleBackspacePress}
-            onHelpPress={this.handleHelpPress}
+            //onHelpPress={this.handleHelpPress}
           />
         </View>
       </View>

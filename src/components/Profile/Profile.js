@@ -115,6 +115,7 @@ export class Profile extends Component {
   };
 
   componentWillMount() {
+    console.warn(this.props.id)
     DeviceEventEmitter.addListener('EVENT_TRANSACTION_ERROR', (event) => {
       console.log('ошибка');
       console.log(event);
@@ -177,7 +178,7 @@ export class Profile extends Component {
       .then((response) => {
         if (this.activity) {
           if (response.code === 401) {
-            this.props.navigation.navigate('Camera');
+            this.navigateTo('Tutorial');
           } else {
             this.props.setProfile(response);
           }
@@ -188,13 +189,21 @@ export class Profile extends Component {
       });
   }
 
+  navigateTo = (screen, params) => {
+    const resetAction = NavigationActions.reset({
+      index: 0,
+      actions: [NavigationActions.navigate({ routeName: screen, params: params })],
+    });
+    this.props.navigation.dispatch(resetAction);
+  };
+
   getBalance() {
     // get Balance
     HumaniqProfileApiLib.getBalance(this.props.id)
       .then((addressState) => {
         if (this.activity) {
           if (addressState.code === 401) {
-            this.props.navigation.navigate('Camera');
+            this.navigateTo('Tutorial');
           } else {
             const { balance } = this.state;
             if (addressState) {
@@ -404,6 +413,8 @@ export class Profile extends Component {
     this.setState({ refreshing: true });
     this.getTransactions(true, true);
     this.getBalance();
+    this.getUserInfo();
+    this.getExchangeValue();
   }
 
   settingsButtonHandle = () => {
@@ -624,7 +635,7 @@ export class Profile extends Component {
     HumaniqProfileApiLib.createTransaction(this.props.id, toUserId, toUserAddress, (newTransaction.amount * 100000000))
       .then((resp) => {
         if (resp.code === 401) {
-          this.props.navigation.navigate('Camera');
+          this.navigateTo('Tutorial');
         } else {
           // do your stuff
           console.log('create transaction::', resp);
