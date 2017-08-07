@@ -130,8 +130,8 @@ export class Cam extends Component {
       switch (code) {
         case 3002:
           // registered user
-            console.warn(JSON.stringify(nextProps.user.validate))
-            console.warn(JSON.stringify(nextProps.user.validate.payload))
+          console.warn(JSON.stringify(nextProps.user.validate))
+          console.warn(JSON.stringify(nextProps.user.validate.payload))
           this.props.setAvatarLocalPath(this.state.path);
           this.state.progress.stopAnimation();
           this.state.progress.setValue(0);
@@ -215,7 +215,12 @@ export class Cam extends Component {
     ) {
       this.state.progress.stopAnimation();
       this.state.progress.setValue(0);
-      const code = nextProps.user.faceEmotionValidate.payload.code;
+      let code = 0;
+      if (nextProps.user.faceEmotionValidate.payload.errors) {
+        code = Number(nextProps.user.faceEmotionValidate.payload.errors[0].code);
+      } else {
+        code = nextProps.user.faceEmotionValidate.payload.code;
+      }
       console.log('validateFacialRecognitionValidationReceiveProps', code);
       if (code === 3008) {
         // reduce emotions there
@@ -311,7 +316,7 @@ export class Cam extends Component {
   navigateTo = (screen, params) => {
     const resetAction = NavigationActions.reset({
       index: 0,
-      actions: [NavigationActions.navigate({ routeName: screen , params: params })],
+      actions: [NavigationActions.navigate({ routeName: screen, params: params })],
     });
     this.props.navigation.dispatch(resetAction);
   };
