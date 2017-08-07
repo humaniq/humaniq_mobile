@@ -130,15 +130,13 @@ export class Cam extends Component {
       switch (code) {
         case 3002:
           // registered user
-            console.warn(JSON.stringify(nextProps.user.validate))
-            console.warn(JSON.stringify(nextProps.user.validate.payload))
           this.props.setAvatarLocalPath(this.state.path);
           this.state.progress.stopAnimation();
           this.state.progress.setValue(0);
           this.setState({ animation: doneAnimation });
           this.animate(1000, 0, 1, () => {
             this.setState({ animation: pressAnimation });
-            this.navigateTo('Password');
+            this.props.navigation.navigate('Password');
           });
           break;
 
@@ -156,7 +154,7 @@ export class Cam extends Component {
             this.setState({ animation: doneAnimation });
             this.animate(1000, 0, 1, () => {
               this.setState({ animation: pressAnimation });
-              this.navigateTo('Tutorial', { nextScene: 'Password' });
+              this.props.navigation.navigate('Tutorial', { nextScene: 'Password' });
             });
           }
 
@@ -221,7 +219,7 @@ export class Cam extends Component {
         // reduce emotions there
         this.setState({ animation: doneAnimation });
         this.animate(1000, 0, 1, () => {
-          this.navigateTo('Tutorial', { nextScene: 'Password' });
+          this.props.navigation.navigate('Tutorial', { nextScene: 'Password' });
         });
       } else {
         this.setState({
@@ -308,14 +306,6 @@ export class Cam extends Component {
     this.props.navigation.dispatch(backAction);
   };
 
-  navigateTo = (screen, params) => {
-    const resetAction = NavigationActions.reset({
-      index: 0,
-      actions: [NavigationActions.navigate({ routeName: screen , params: params })],
-    });
-    this.props.navigation.dispatch(resetAction);
-  };
-
   // Animation
   animate = (time, fr = 0, to = 1, callback) => {
     this.state.progress.setValue(fr);
@@ -381,7 +371,7 @@ export class Cam extends Component {
     const { params = {} } = this.props.navigation.state;
     const { mode } = params;
     const isQR = mode === 'qr'
-    const fn = () => null;
+    const fn = ()=>null;
     return (
       <View style={styles.container}>
         <Modal

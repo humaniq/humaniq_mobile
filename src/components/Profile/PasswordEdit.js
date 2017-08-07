@@ -89,7 +89,7 @@ export class PasswordEdit extends Component {
   };
 
   handleHelpPress = () => {
-    alert('');
+    //alert('');
   };
 
   renderPassMask = () => {

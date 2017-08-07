@@ -108,7 +108,6 @@ export class Password extends Component {
           case 1001:
             const registeredAcc = nextProps.user.account.payload.payload.account_information;
             console.log('registeredAccount ::', registeredAcc)
-            this.props.setPassword(this.state.password);
             // this.props.navigation.navigate('TelInput');
             const map2 = {
               token: nextProps.user.account.payload.payload.token,
@@ -141,7 +140,6 @@ export class Password extends Component {
 
           case 2001:
             // login, password ok (save password & token?)
-            this.navigateTo('Profile');
             const map = {
               token: nextProps.user.account.payload.payload.token,
               account_id: nextProps.user.account.payload.payload.account_id,
@@ -152,6 +150,7 @@ export class Password extends Component {
             HumaniqTokenApiLib.saveCredentials(map)
                 .then((res) => {console.log(res)})
                 .catch(err => console.log(err));
+            this.navigateTo('Profile');
             break;
 
           case 2002:
