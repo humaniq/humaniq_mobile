@@ -118,8 +118,7 @@ export class Password extends Component {
               device_imei: IMEI.getImei(),
             };
             HumaniqTokenApiLib.saveCredentials(map2)
-                .then((res) => {
-              console.log(res)})
+                .then((res) => console.log(res))
                 .catch(err => console.log(err));
             // TODO: replace with validated??
             if (registeredAcc.phone_number.country_code) {
@@ -142,6 +141,7 @@ export class Password extends Component {
 
           case 2001:
             // login, password ok (save password & token?)
+            this.navigateTo('Profile');
             const map = {
               token: nextProps.user.account.payload.payload.token,
               account_id: nextProps.user.account.payload.payload.account_id,
@@ -150,10 +150,7 @@ export class Password extends Component {
               device_imei: IMEI.getImei(),
             };
             HumaniqTokenApiLib.saveCredentials(map)
-                .then((res) => {
-                  this.props.setPassword(this.state.password);
-                  this.navigateTo('Profile');
-                })
+                .then((res) => {console.log(res)})
                 .catch(err => console.log(err));
             break;
 
@@ -230,7 +227,7 @@ export class Password extends Component {
   };
 
   handleHelpPress = () => {
-    alert('В шаббат у нас с мамой традиция — зажигать свечи и смотреть „Колесо фортуны“');
+    //alert('В шаббат у нас с мамой традиция — зажигать свечи и смотреть „Колесо фортуны“');
   };
 
   handlePasswordConfirm = (match, password) => {

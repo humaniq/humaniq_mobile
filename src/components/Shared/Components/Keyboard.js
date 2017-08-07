@@ -161,9 +161,9 @@ const styles = CustomStyleSheet({
     width: 64,
     alignItems: 'center',
   },
-  cellContainer: { 
-    width: 64, 
-    justifyContent: 'center' 
+  cellContainer: {
+    width: 64,
+    justifyContent: 'center'
   },
   animationContainer: {
     position: 'absolute',

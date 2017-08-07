@@ -7,6 +7,11 @@ import {
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import CustomStyleSheet from '../../utils/customStylesheet';
+import {
+  NavigationActions,
+  StackNavigator,
+  // TabNavigator,
+} from 'react-navigation';
 
 const logo_face = require('../../assets/icons/logo_face.png');
 const logo_text = require('../../assets/icons/logo_text.png');

@@ -14,6 +14,7 @@ import {
   ScrollView,
   DeviceEventEmitter,
   Alert,
+  BackHandler,
 } from 'react-native';
 import CustomStyleSheet from '../../utils/customStylesheet';
 
