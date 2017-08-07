@@ -106,15 +106,16 @@ function* phoneNumberCreate({ phone_number, account_id }) {
 
 function* phoneNumberValidate({ phone_number, validation_code, account_id }) {
   const errorCodes = [6000, 4010, 4004, 4003, 4001, 4009];
-  let code = phone_number.toString().slice(0, 1);
-  let number = phone_number.toString().slice(1);
+  // let code = phone_number.toString().slice(0, 1);
+  // let number = phone_number.toString().slice(1);
   const body = {
     validation_code: validation_code.toString(),
     account_id: account_id.toString(),
-    phone_number: {
-      country_code: code,
-      phone_number: number,
-    },
+    phone_number,
+    // phone_number: {
+      // country_code: code,
+      // phone_number: number,
+    // },
   };
   console.log('validate sms body', body);
   yield call(fetchPhoneNumberValidate, body, errorCodes);
