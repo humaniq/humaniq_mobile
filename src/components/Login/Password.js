@@ -108,7 +108,6 @@ export class Password extends Component {
           case 1001:
             const registeredAcc = nextProps.user.account.payload.payload.account_information;
             console.log('registeredAccount ::', registeredAcc)
-            this.props.setPassword(this.state.password);
             // this.props.navigation.navigate('TelInput');
             const map2 = {
               token: nextProps.user.account.payload.payload.token,
@@ -118,8 +117,7 @@ export class Password extends Component {
               device_imei: IMEI.getImei(),
             };
             HumaniqTokenApiLib.saveCredentials(map2)
-                .then((res) => {
-              console.log(res)})
+                .then((res) => console.log(res))
                 .catch(err => console.log(err));
             // TODO: replace with validated??
             if (registeredAcc.phone_number.country_code) {
@@ -150,11 +148,9 @@ export class Password extends Component {
               device_imei: IMEI.getImei(),
             };
             HumaniqTokenApiLib.saveCredentials(map)
-                .then((res) => {
-                  this.props.setPassword(this.state.password);
-                  this.navigateTo('Profile');
-                })
+                .then((res) => {console.log(res)})
                 .catch(err => console.log(err));
+            this.navigateTo('Profile');
             break;
 
           case 2002:

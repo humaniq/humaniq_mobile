@@ -89,7 +89,7 @@ export class PasswordEdit extends Component {
   };
 
   handleHelpPress = () => {
-    alert('');
+    //alert('');
   };
 
   renderPassMask = () => {
@@ -189,7 +189,7 @@ export class PasswordEdit extends Component {
     console.warn(newPassword);
     this.animateCycle(2000, 0, 1);
     HumaniqProfileApiLib.changeProfilePassword(
-        this.props.id,
+        this.props.profile.account_id,
         oldPassword,
         newPassword,
         )
