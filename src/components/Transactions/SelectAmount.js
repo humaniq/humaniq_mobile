@@ -20,6 +20,7 @@ const paymentBig = require('./../../assets/icons/payment_big.png');
 const doneWhite = require('./../../assets/icons/done_white.png');
 const paymentArrow = require('./../../assets/icons/payment_arrow_right.png');
 const icUser = require('./../../assets/icons/ic_user.png');
+const amountReorder = require('./../../assets/icons/amount_reorder.png');
 
 const pattern = { pattern: '999.99', placeholder: '0' };
 
@@ -47,7 +48,7 @@ class SelectAmount extends React.Component {
       adress: '',
       contactID: '',
       maxAmountLength: 5,
-      amount: '',
+      amount: '00000',
       maskedAmount: VMasker.toPattern(0, pattern),
     };
   }
@@ -69,9 +70,14 @@ class SelectAmount extends React.Component {
   }
 
   setAmount = () => {
-    const { maskedAmount } = this.state;
+    const { maskedAmount, currency, rateHMQtoUSD, rateUSDtoHMQ } = this.state;
     const { newTransaction: { rootScreen }, setTrAmount, navigation: { dispatch } } = this.props;
-    setTrAmount(parseFloat(maskedAmount));
+    const rate = currency === 'HMQ' ? rateHMQtoUSD : rateUSDtoHMQ;
+    const amount = currency === 'HMQ' ?
+      parseFloat(maskedAmount) :
+      Math.round(parseFloat(maskedAmount) * rate * 100) / 100;
+
+    setTrAmount(amount);
     dispatch(
       NavigationActions.back({
         key: rootScreen,
@@ -80,32 +86,39 @@ class SelectAmount extends React.Component {
   };
 
   handleBackspacePress = () => {
-    const inputVal = this.state.amount.slice(0, -1);
+    const inputVal = `0${this.state.amount.slice(0, -1)}`;
     const m = VMasker.toPattern(inputVal, pattern);
     this.setState({ amount: inputVal, maskedAmount: m });
   };
 
   handleNumberPress = (number) => {
-    if (this.state.amount.length < this.state.maxAmountLength) {
+    if (this.state.amount[0] === '0') {
       let inputVal = this.state.amount;
-      inputVal += number;
+      inputVal = this.state.amount.slice(1) + number;
       const m = VMasker.toPattern(inputVal, pattern);
       this.setState({ amount: inputVal, maskedAmount: m });
     }
   };
 
-  const swap = () => {
+  swap = () => {
     const { maskedAmount, currency, rateHMQtoUSD, rateUSDtoHMQ } = this.state;
-    const newCurr = currency === 'HMQ' ? 'USD' : 'HMQ'
-    const rate
+    const oldRate = currency === 'HMQ' ? rateHMQtoUSD : rateUSDtoHMQ;
+    const oldExchange = Math.round(parseFloat(maskedAmount) * oldRate * 100);
+    const maskedExchange = String(`00000${oldExchange}`).slice(-5);
+    const newCurr = currency === 'HMQ' ? '$' : 'HMQ';
     this.setState({
-      currency: newCurr
-    })
+      currency: newCurr,
+      amount: maskedExchange,
+      maskedAmount: VMasker.toPattern(maskedExchange, pattern),
+    });
   }
+
   renderContent() {
     const { maskedAmount, currency, rateHMQtoUSD, rateUSDtoHMQ } = this.state;
     const am = maskedAmount.split('.');
-    const amFloat = Math.round(parseFloat(maskedAmount) * rateHMQtoUSD * 100) / 100;
+    const rate = currency === 'HMQ' ? rateHMQtoUSD : rateUSDtoHMQ;
+    const oppositeCurr = currency === 'HMQ' ? '$' : 'HMQ';
+    const amFloat = Math.round(parseFloat(maskedAmount) * rate * 100) / 100;
     const user = this.props.user || {};
     const photo = user.photo;
     const myPhoto = photo ? { uri: photo } : icUser;
@@ -127,15 +140,16 @@ class SelectAmount extends React.Component {
           <Image resizeMode="cover" source={myPhoto} style={[styles.avatarImage, { marginRight: 60 }]} />
           <Image resizeMode="cover" source={toPhoto} style={styles.avatarImage} />
         </View>
-        <View style={styles.amountInput}>
+        <TouchableOpacity onPress={this.swap} style={styles.amountInput}>
           <View style={{ flex: 1, flexDirection: 'row', alignItems: 'flex-end' }}>
             <Text style={[styles.number, { fontSize: 60, color: 'black' }]}>{`${am[0]}.`}</Text>
             <Text style={[styles.number, { marginBottom: 6 }]}>{`${am[1]} ${currency}`}</Text>
+            <Image source={amountReorder} style={{ width: 24, height: 24, marginLeft: 16, alignSelf: 'flex-end' }} />
           </View>
           <View style={{ flex: 1, flexDirection: 'row', alignItems: 'flex-start' }}>
-            <Text style={[styles.number, { fontSize: 15 }]}>{`${amFloat} $`}</Text>
+            <Text style={[styles.number, { fontSize: 15 }]}>{`${amFloat} ${oppositeCurr}`}</Text>
           </View>
-        </View>
+        </TouchableOpacity>
         <PhoneKeyboard
           onNumberPress={this.handleNumberPress}
           onBackspacePress={this.handleBackspacePress}
