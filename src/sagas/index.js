@@ -51,7 +51,7 @@ export const fetchFaceEmotionValidate = fetchEntity.bind(
   actions.faceEmotionValidate,
   api.faceEmotionValidate,
 );
-export const smsCodeRepeat = fetchEntity.bind(
+export const fetchSmsCodeRepeat = fetchEntity.bind(
   null,
   actions.smsCodeRepeat,
   api.smsCodeRepeat,
