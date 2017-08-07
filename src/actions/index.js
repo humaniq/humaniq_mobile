@@ -27,6 +27,7 @@ export const SET_TR_PHONE = 'SET_TR_PHONE';
 export const SET_TR_CONTACT = 'SET_TR_CONTACT';
 export const SET_TR_AMOUNT = 'SET_TR_AMOUNT';
 export const ADD_CONTACT = 'ADD_CONTACT';
+export const ADD_CONTACTS = 'ADD_CONTACTS';
 export const SET_TR_ROOT_SCREEN = 'SET_TR_ROOT_SCREEN';
 
 function action(type, payload = {}) {
@@ -82,6 +83,7 @@ export const savePhone = number => action(SAVE_PHONE, { number });
 export const addPrimaryAccount = account => action(ADD_PRIMARY_ACCOUNT, { account });
 export const addSecondaryAccount = account => action(ADD_SECONDARY_ACCOUNT, { account });
 export const addContact = contact => action(ADD_CONTACT, { contact });
+export const addContacts = contacts => action(ADD_CONTACTS, { contacts });
 
 
 export const newTransaction = {

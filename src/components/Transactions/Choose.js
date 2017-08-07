@@ -12,7 +12,7 @@ import PropTypes from 'prop-types';
 
 import { colors } from '../../utils/constants';
 import ChooseItem from './ChooseItem';
-import { newTransaction, addContact } from '../../actions';
+import { newTransaction, addContacts } from '../../actions';
 
 const backWhite = require('./../../assets/icons/back_white.png');
 const paymentBig = require('./../../assets/icons/payment_big.png');
@@ -41,7 +41,7 @@ class Choose extends React.Component {
       state: PropTypes.object,
     }),
     setRootScreen: PropTypes.func,
-    newContact: PropTypes.func,
+    newContacts: PropTypes.func,
     setTrContact: PropTypes.func,
   };
 
@@ -55,7 +55,7 @@ class Choose extends React.Component {
   }
 
   componentDidMount() {
-    const { navigation: { state }, setRootScreen, newContact } = this.props;
+    const { navigation: { state }, setRootScreen, newContacts } = this.props;
     const { key = '' } = state;
     setRootScreen(key);
 
@@ -68,19 +68,20 @@ class Choose extends React.Component {
           HumaniqProfileApiLib.getAccountProfiles(accs)
             .then((profiles) => {
               // console.log('profiles.ok--->', JSON.stringify(profiles));
-              profiles.forEach((p) => {
+              const forAdd = profiles.map((p) => {
                 const { phone_number = {} } = p;
                 const { person = {} } = p;
                 const { avatar = {} } = p;
-                newContact({
+                return {
                   id: p.account_id,
                   approved: false,
                   phone: phone_number.country_code ? `+${phone_number.country_code}` : '',
                   name: `${person.first_name} ${person.last_name}`,
                   status: 1,
                   avatar: avatar.url,
-                });
+                };
               });
+              newContacts(forAdd);
             })
             .catch((/* err */) => {
               // console.log('profiles.err--->', JSON.stringify(err));
@@ -331,7 +332,7 @@ const mapStateToProps = state => ({
 });
 
 export default connect(mapStateToProps, {
-  newContact: addContact,
+  newContacts: addContacts,
   setTrPhone: newTransaction.setTrPhone,
   setTrContact: newTransaction.setTrContact,
   setRootScreen: newTransaction.setRootScreen,
