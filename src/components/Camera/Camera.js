@@ -213,7 +213,12 @@ export class Cam extends Component {
     ) {
       this.state.progress.stopAnimation();
       this.state.progress.setValue(0);
-      const code = nextProps.user.faceEmotionValidate.payload.code;
+      let code = 0;
+      if (nextProps.user.faceEmotionValidate.payload.errors) {
+        code = Number(nextProps.user.faceEmotionValidate.payload.errors[0].code);
+      } else {
+        code = nextProps.user.faceEmotionValidate.payload.code;
+      }
       console.log('validateFacialRecognitionValidationReceiveProps', code);
       if (code === 3008) {
         // reduce emotions there
@@ -304,6 +309,14 @@ export class Cam extends Component {
       key: null,
     });
     this.props.navigation.dispatch(backAction);
+  };
+
+  navigateTo = (screen, params) => {
+    const resetAction = NavigationActions.reset({
+      index: 0,
+      actions: [NavigationActions.navigate({ routeName: screen, params: params })],
+    });
+    this.props.navigation.dispatch(resetAction);
   };
 
   // Animation

@@ -13,7 +13,7 @@ import sinon from 'sinon';
 
 /** *
  * Testing Camera component
- ***/
+ ** */
 
 
 const user = {
@@ -29,6 +29,15 @@ const user = {
     },
     isFetching: false,
   },
+  faceEmotionCreate: {
+    payload: {},
+    isFetching: false,
+  },
+  faceEmotionValidate: {
+    payload: {},
+    isFetching: false,
+  },
+  photo: 'photo',
   registered: true,
   id: 1,
   password: 'password',
@@ -42,50 +51,67 @@ const user = {
 };
 
 const navigation = {
-  dispatch: jest.fn(),
+  navigation: {
+    navigate: jest.fn(),
+    dispatch: jest.fn(),
+  },
+  state: {
+    params: {
+      user,
+    },
+  },
 };
 
 describe('<Camera />', () => {
     /** *
      * Testing Camera component separately from connected (Redux)
-     ***/
+     ** */
 
   const mockedStore = store;
-
+  //
   it('should render Camera component correctly', () => {
-    const wrapper = shallow(<Cam store={store} user={user} />);
+    const wrapper = shallow(<Cam store={store} user={user} navigation={navigation} />);
     expect(wrapper.length).toBe(1);
     expect(wrapper).toMatchSnapshot();
   });
 
   it('Must call function handleCameraClose after click', () => {
+    const navigation = {
+      navigation: {
+        navigate: jest.fn(),
+        dispatch: jest.fn(),
+
+      },
+      dispatch: jest.fn(),
+      state: {
+        dispatch: jest.fn(),
+        params: {
+          user,
+        },
+      },
+    };
     const wrapper = shallow(<Cam store={store} user={user} navigation={navigation} />);
     wrapper.find('TouchableOpacity').at(0).simulate('press');
     expect(navigation.dispatch).toBeCalled();
   });
 
-  it('should render 3 parent views', () => {
-    const wrapper = shallow(<Cam user={user} store={mockedStore} />);
+  it('should render 4 parent views', () => {
+    const wrapper = shallow(<Cam user={user} store={mockedStore} navigation={navigation} />);
     const container = wrapper.find('View').at(0);
-    expect(container.props().children.length).toBe(3);
-  });
-
-  it('touchableOpacity width and height must be greater than 0', () => {
-    const wrapper = shallow(<Cam user={user} store={mockedStore} />);
-    const container = wrapper.find('TouchableOpacity').at(1);
-    expect(container.props().style[0].width).toBeGreaterThan(0);
-    expect(container.props().style[0].height).toBeGreaterThan(0);
+    expect(container.props().children.length).toBe(4);
   });
 
   it('initial imagePath and imageB64 must be equal to empty', () => {
-    const wrapper = shallow(<Cam user={user} store={mockedStore} />);
+    const wrapper = shallow(<Cam user={user} store={mockedStore} navigation={navigation} />);
     expect(wrapper.state().path).toEqual('');
-    expect(wrapper.state().base64).toEqual('');
-    expect(wrapper.state().count).toEqual(1);
+    expect(wrapper.state().error).toEqual(false);
+    expect(wrapper.state().errorCode).toEqual(null);
+    expect(wrapper.state().photoGoal).toEqual('isRegistered');
+    expect(wrapper.state().requiredEmotions).toEqual([]);
   });
 
   it('should return type Function', () => {
-    const wrapper = shallow(<Cam user={user} store={mockedStore} />);
+    const wrapper = shallow(<Cam user={user} store={mockedStore} navigation={navigation} />);
     expect(typeof wrapper.instance().handleCameraClose).toEqual('function');
   });
 });

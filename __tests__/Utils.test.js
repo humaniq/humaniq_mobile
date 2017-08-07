@@ -3,8 +3,9 @@
  */
 import { Dimensions } from 'react-native';
 import {
-    fontScale,
-    viewPortCalc,
+  fontScale,
+  viewPortCalc,
+  secureText,
 } from '../src/utils/units';
 
 /** *
@@ -28,9 +29,9 @@ describe('Utils test', () => {
     expect(fontScale(null, null)).toEqual(NaN);
   });
 
-    /** *
-     * Testing viewPortCalc()
-     ***/
+  /** *
+  * Testing viewPortCalc()
+  ***/
 
   test('viewPortCalc should take strings', () => {
     const px = '12';
@@ -54,5 +55,23 @@ describe('Utils test', () => {
     const stringValue = viewPortCalc('20', null, null);
     const integerValue = viewPortCalc(20, 10, 10);
     expect(stringValue).toEqual(NaN);
+  });
+
+  /** *
+  * Testing textSecure() function
+  ***/
+
+  test('textSecure should ****', () => {
+    const testString = '';
+    const expectedString = '****';
+    const string = secureText(testString.length);
+    expect(string).toEqual(expectedString);
+  });
+
+  test('textSecure should return secured text (*)', () => {
+    const testString = 'test';
+    const expectedString = '****';
+    const string = secureText(testString.length);
+    expect(string).toEqual(expectedString);
   });
 });

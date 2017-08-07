@@ -1,0 +1,73 @@
+{
+  "project_info": {
+    "project_number": "645111448706",
+    "firebase_url": "https://humaniq-168420.firebaseio.com",
+    "project_id": "humaniq-168420",
+    "storage_bucket": "humaniq-168420.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:645111448706:android:87983567241c1aa8",
+        "android_client_info": {
+          "package_name": "com.humaniq.mobile"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "645111448706-eiahe8h9r0nsi5gfsskoo57015fnanj0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBBVFKdhrtZgCfIogvKlI_5VtO6hw-SvIg"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:645111448706:android:960bae7de48297ce",
+        "android_client_info": {
+          "package_name": "com.humaniq_mobile"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "645111448706-eiahe8h9r0nsi5gfsskoo57015fnanj0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBBVFKdhrtZgCfIogvKlI_5VtO6hw-SvIg"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

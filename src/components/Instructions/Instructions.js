@@ -1,28 +1,40 @@
 import React, { Component } from 'react';
 import {
-    View,
-    TouchableOpacity,
-    TouchableWithoutFeedback,
-    Image,
-    Text,
-    ActivityIndicator,
-    Dimensions,
+  View,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  Image,
+  Text,
+  ActivityIndicator,
+  Dimensions,
+  Animated,
+  Easing,
+  DeviceEventEmitter,
+  StatusBar,
 } from 'react-native';
 
+import { HumaniqDownloadFileLib } from 'react-native-android-library-humaniq-api';
 import { NavigationActions } from 'react-navigation';
 import { connect } from 'react-redux';
 import Video from 'react-native-video';
 import LinearGradient from 'react-native-linear-gradient';
-import { Bar } from 'react-native-progress';
-
+import PropTypes from 'prop-types';
 import CustomStyleSheet from '../../utils/customStylesheet';
-import { downloadVideo } from '../../utils/videoCache';
 
-const closeIcon = require('../../assets/icons/ic_close.png');
-const botIcon = require('../../assets/icons/ic_help.png');
+const closeIcon = require('../../assets/icons/ic_close_white.png');
+const botIcon = require('../../assets/icons/ic_humaniq_bot.png');
 
 export class Instructions extends Component {
+  static propTypes = {
+    navigation: PropTypes.shape({
+      navigate: PropTypes.func.isRequired,
+      dispatch: PropTypes.func.isRequired,
+    }),
+    url: PropTypes.string.isRequired,
+  };
   video: Video;
+  activity = true;
+  animationValue = new Animated.Value(0);
 
   constructor(props) {
     super(props);
@@ -32,44 +44,68 @@ export class Instructions extends Component {
       muted: false,
       resizeMode: 'contain',
       duration: 0.0,
-      currentTime: 0.0,
       paused: false,
-      progress: 0,
       source: '',
       loading: true,
-      downloaded: true,
+      width: 0,
+      videoUrl: 'http://0.s3.envato.com/h264-video-previews/80fad324-9db4-11e3-bf3d-0050569255a8/490527.mp4',
+      progressText: 0,
     };
   }
 
+  componentWillMount() {
+  }
+
+  animateIndicator = (reset = true) => {
+    if (reset) this.animationValue.setValue(0);
+    requestAnimationFrame(() => {
+      Animated.timing(this.animationValue, {
+        toValue: 1,
+        easing: Easing.linear,
+        duration: (this.state.duration * 1000) * (1 - this.animationValue._value),
+      }).start();
+    });
+  }
+
   async componentDidMount() {
-    downloadVideo('http://clips.vorwaerts-gmbh.de/VfE_html5.mp4', 'intro')
-        .then((res) => {
-          this.setState({ source: res, loading: false });
-        })
-        .catch((err) => {
-          this.setState({ loading: false });
-        });
+    HumaniqDownloadFileLib.downloadVideoFile(this.state.videoUrl).then((uri) => {
+      if (this.activity) {
+        this.setState({ source: uri.uri, loading: false });
+      }
+    }).catch((error) => {
+      if (this.activity) {
+        this.setState({ loading: false });
+      }
+    });
+    //
+    DeviceEventEmitter.addListener('EVENT_PROGRESS_CHANGED', (event) => {
+      if (this.activity) {
+        this.setState({ progressText: event.progress });
+      }
+    });
   }
 
   componentWillUnmount() {
+    this.activity = false;
+    DeviceEventEmitter.removeListener('EVENT_PROGRESS_CHANGED');
   }
-
-  onProgress = (data) => {
-    this.setState({ progress: data.currentTime / this.state.duration });
-  };
 
   onPressEnd = () => {
-        // starts video again
+    // starts video again
     this.setState({ paused: false });
-  }
+    this.animateIndicator(false);
+  };
 
   onPressStart = () => {
-        // on click pauses video
+    // on click pauses video
     this.setState({ paused: true });
-  }
+    this.animationValue.stopAnimation((value) => {
+      this.setState({ pausedValue: value });
+    });
+  };
 
   onBotPress = () => {
-  }
+  };
 
   onClosePress = () => {
     // close component
@@ -77,65 +113,73 @@ export class Instructions extends Component {
       key: null,
     });
     this.props.navigation.dispatch(backAction);
-  }
+  };
 
   onLoad = (data) => {
     this.setState({ duration: data.duration });
+    this.animateIndicator();
   };
 
-
   onEnd = () => {
-    this.setState({ paused: true, progress: 1 });
+    this.setState({ paused: true });
     setTimeout(() => {
       if (this.video) {
-        this.setState({ paused: false, progress: 0 });
+        this.setState({ paused: false });
         this.video.seek(0);
+        this.animateIndicator(true);
       }
     }, 250);
   };
 
+  setWidthFromLayout = (event) => {
+    const { width } = event.nativeEvent.layout;
+    this.setState({ width });
+  };
+
+  renderLoadingComponent = () => (
+    <ActivityIndicator
+      color="#fff"
+      size={24}
+      style={styles.indicator}
+    />
+    );
+
+  renderCloseButton = () => (
+    <TouchableOpacity onPress={() => this.onClosePress()}>
+      <Image
+        resizeMode="contain"
+        style={styles.close}
+        source={closeIcon}
+      />
+    </TouchableOpacity>
+    );
+
   render() {
     const { height, width } = Dimensions.get('window');
+    const style = this.animationValue.interpolate({
+      inputRange: [0, 1],
+      outputRange: [0, this.state.width],
+      extrapolate: 'clamp',
+    });
 
     return (
       <View style={styles.container}>
-        <TouchableWithoutFeedback
-          onPressOut={() => this.onPressEnd()}
-          onPressIn={() => this.onPressStart()}
-        >
-          <Video
-            ref={(ref: Video) => { this.video = ref; }}
-            source={{ uri: this.state.source }}
-            style={[styles.fullScreen, { height, width }]}
-            paused={this.state.paused}
-            volume={this.state.volume}
-            muted={this.state.muted}
-            onProgress={this.onProgress}
-            onLoad={this.onLoad}
-            resizeMode="cover"
-            onEnd={this.onEnd}
-          />
-        </TouchableWithoutFeedback>
-
+        <StatusBar
+          hidden
+        />
+        {!this.state.loading ? this.showVideoPlayer(height, width) : this.showProgress()}
         <LinearGradient
           colors={['rgba(170, 170, 170, 0.6)', 'rgba(186, 186, 186, 0.4)', 'rgba(186, 186, 186, 0.05)']}
         >
+          {/* Progress Bar */}
           <View>
-            <Bar
-              animated
-              style={styles.progress}
-              height={1.5}
-              borderWidth={0}
-              borderColor={'transparent'}
-              borderRadius={0}
-              color="#fff"
-              unfilledColor="#B4B4B4"
-              progress={this.state.progress}
-              width={null}
-            />
-
+            <View style={styles.progress}>
+              <View style={styles.line} onLayout={event => this.setWidthFromLayout(event)}>
+                <Animated.View style={[styles.progress2, { width: style }]} />
+              </View>
+            </View>
             <View style={styles.buttonsContainer}>
-              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <View style={styles.leftContainer}>
                 <TouchableOpacity onPress={() => this.onBotPress()}>
                   <Image
                     resizeMode="contain"
@@ -143,36 +187,53 @@ export class Instructions extends Component {
                     source={botIcon}
                   />
                 </TouchableOpacity>
-
-                <Text style={{ color: '#fff', fontSize: 15 }}>
-                                    Instructions Caption
-                                </Text>
+                <Text style={styles.captionText}>
+                  {''}
+                </Text>
               </View>
-
-              <TouchableOpacity onPress={() => this.onClosePress()}>
-                <Image
-                  resizeMode="contain"
-                  style={styles.close}
-                  source={closeIcon}
-                />
-              </TouchableOpacity>
+              {this.state.loading ? this.renderLoadingComponent() : this.renderCloseButton()}
             </View>
           </View>
         </LinearGradient>
-
-
-        <ActivityIndicator
-          animating={this.state.loading}
-          color={'#000'}
-          size={100}
-          style={styles.indicator}
-        />
-
       </View>
     );
   }
 
+  showVideoPlayer(height, width, source) {
+    return (
+      <TouchableWithoutFeedback
+        delayPressIn={0}
+        delayPressOut={0}
+        onPressOut={() => this.onPressEnd()}
+        onPressIn={() => this.onPressStart()}
+      >
+        <Video
+          ref={(ref) => {
+            this.video = ref;
+          }}
+          source={{ uri: this.state.source }}
+          style={[styles.fullScreen, { height, width }]}
+          paused={this.state.paused}
+          volume={this.state.volume}
+          muted={this.state.muted}
+          onProgress={this.onProgress}
+          onLoad={this.onLoad}
+          resizeMode="cover"
+          onEnd={this.onEnd}
+        />
+      </TouchableWithoutFeedback>
+    );
+  }
+
+  showProgress() {
+    return (
+      <View style={styles.progressTextContainer}>
+        <Text style={{ fontSize: 26 }}>{this.state.progressText}%</Text>
+      </View>
+    );
+  }
 }
+
 const styles = CustomStyleSheet({
   container: {
     flex: 1,
@@ -180,10 +241,9 @@ const styles = CustomStyleSheet({
   buttonsContainer: {
     flexDirection: 'row',
     marginBottom: 15,
-    marginTop: 8,
+    marginTop: 10,
     marginRight: 10,
-    marginLeft: 2,
-    justifyContent: 'space-between',
+    marginLeft: 10,
     alignItems: 'center',
   },
   fullScreen: {
@@ -194,23 +254,50 @@ const styles = CustomStyleSheet({
     right: 0,
   },
   bot: {
-    height: 18,
+    height: 24,
   },
   close: {
-    height: 15,
+    height: 24,
   },
   progress: {
+    flexDirection: 'row',
     marginLeft: 10,
     marginRight: 10,
     marginTop: 8,
   },
   indicator: {
+  },
+  captionText: {
+    color: '#fff',
+    fontSize: 15,
+    marginLeft: 8,
+  },
+  leftContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
     flex: 1,
+  },
+  line: {
+    flex: 1,
+    backgroundColor: '#B4B4B4',
+    marginHorizontal: 1,
+    height: 1.1,
+    borderRadius: 2,
+  },
+  progress2: {
+    backgroundColor: '#fff',
+    height: 1.1,
+    borderRadius: 2,
+  },
+  progressTextContainer: {
     position: 'absolute',
     top: 0,
-    bottom: 0,
     left: 0,
     right: 0,
+    bottom: 0,
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });
 

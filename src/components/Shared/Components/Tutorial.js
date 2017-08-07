@@ -62,7 +62,7 @@ render() {
     <View style={styles.container}>
       <Image style={styles.illustration} source={source} />
       <View style={styles.buttonsContainer}>
-        <HelpButton onPress={this.handleHelpPress} />
+        {/*<HelpButton onPress={this.handleHelpPress} />*/}
         <ConfirmButton onPress={this.handleConfirmPress} />
       </View>
     </View>
@@ -82,10 +82,9 @@ const styles = CustomStyleSheet({
   buttonsContainer: {
     position: 'absolute',
     bottom: 0,
-    width: 360,
+    width: "100%",
     height: 77,
     flexDirection: 'row',
     padding: 16,
-    justifyContent: 'space-between',
   },
 });

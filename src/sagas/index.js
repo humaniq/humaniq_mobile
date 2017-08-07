@@ -74,7 +74,7 @@ function* login({ facial_image_id, password, device_imei }) {
 }
 
 function* signup({ facial_image_id, password, device_imei }) {
-  const errorCodes = [2002, 3003, 6000];
+  const errorCodes = [1003, 2002, 3003, 6000];
   const body = {
     facial_image_id,
     password,

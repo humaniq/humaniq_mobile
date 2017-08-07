@@ -1,6 +1,7 @@
 import React from 'react';
 import { AppRegistry } from 'react-native';
 import {
+  NavigationActions,
   StackNavigator,
   // TabNavigator,
 } from 'react-navigation';
@@ -27,6 +28,9 @@ import Choose from './components/Transactions/Choose';
 import Temp from './components/Transactions/Temp';
 import Input from './components/Transactions/Input';
 import SelectAmount from './components/Transactions/SelectAmount';
+import { Profile, ProfileSettings, ProfileEdit, ProfileEditPassword } from './components/Profile/index';
+import CameraEdit from './components/Profile/CameraEdit';
+import PasswordEdit from './components/Profile/PasswordEdit';
 
 /*
 const Dashboard = TabNavigator(
@@ -61,6 +65,12 @@ const stack = {
   Choose: { screen: Choose },
   Input: { screen: Input },
   SelectAmount: { screen: SelectAmount },
+  Profile: { screen: Profile },
+  ProfileSettings: { screen: ProfileSettings },
+  ProfileEdit: { screen: ProfileEdit },
+  ProfileEditPassword: { screen: ProfileEditPassword },
+  CameraEdit: { screen: CameraEdit },
+  PasswordEdit: { screen: PasswordEdit },
 };
 
 const LoginStack = StackNavigator(
@@ -70,26 +80,59 @@ const LoginStack = StackNavigator(
   },
 );
 
-const getCurrentRouteName = (navigationState) => {
-  if (!navigationState) {
-    return null;
-  }
-  const route = navigationState.routes[navigationState.index];
-  // dive into nested navigators
-  if (route.routes) {
-    return getCurrentRouteName(route);
-  }
+const defaultGetStateForAction = LoginStack.router.getStateForAction;
 
-  return { routeName: route.routeName, routeParams: route.params || {} };
+function kickRoutes(prevRouteName, nextRouteName) {
+  switch (prevRouteName) {
+    case 'Camera':
+      return 1;
+    case 'Password':
+      return nextRouteName === 'Password' ? 1 : 2;
+  }
+  return 0;
+}
+
+LoginStack.router.getStateForAction = (action, state) => {
+  // console.log('getStateForAction >>', action, state);
+  let newState = state;
+  let newAction = action;
+  if (action.type === 'Navigation/NAVIGATE' && state.index >= 0) {
+    const prevRouteName = state.routes[state.index].routeName;
+    // reset routing stack
+    if (prevRouteName === 'Loading' || action.routeName === 'Dashboard') {
+      newAction = NavigationActions.reset({
+        actions: [action],
+        index: 0,
+      });
+    } else {
+      const kickCount = kickRoutes(prevRouteName, action.routeName);
+      // kick intermediate screens
+      if (kickCount > 0) {
+        const newIndex = state.index - kickCount;
+        newState = {
+          ...state,
+          routes: state.routes.slice(0, 1 + newIndex),
+          index: Math.max(newIndex, 0),
+        };
+      }
+      // console.log('newState', newState);
+    }
+  }
+  // const res = defaultGetStateForAction(newAction, newState);
+  // console.log('defaultGetStateForAction >>', res);
+  // return res;
+  return defaultGetStateForAction(newAction, newState);
 };
 
 const App = () => (
   <Provider store={store}>
-    <LoginStack onNavigationStateChange={(prevState, currentState) => {
-      const { routeName, routeParams } = getCurrentRouteName(currentState);
-      if (routeName === 'Camera' && routeParams.mode === 'qr') {
-        oncetrig.blockCall(false);
-        newTransaction.setTrAdress('');
+    <LoginStack onNavigationStateChange={(prevState, { routes, index }) => {
+      if (routes && index >= 0) {
+        const { routeName, params } = routes[index];
+        if (routeName === 'Camera' && params && params.mode === 'qr') {
+          oncetrig.blockCall(false);
+          newTransaction.setTrAdress('');
+        }
       }
     }}
     />

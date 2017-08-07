@@ -14,7 +14,7 @@ import sinon from 'sinon';
 
 /** *
  * Testing Instructions component
- ***/
+ ** */
 
 describe('<Instructions />', () => {
   it('should render correctly Instruction', () => {
@@ -29,18 +29,21 @@ describe('<Instructions />', () => {
   });
 
   it('initial state should be equal to expected', () => {
+    const props = {
+      url: null,
+    };
     const initialState = {
       rate: 1,
       volume: 1,
       muted: false,
       resizeMode: 'contain',
       duration: 0.0,
-      currentTime: 0.0,
       paused: false,
-      progress: 0,
       source: '',
       loading: true,
-      downloaded: true,
+      width: 0,
+      videoUrl: props.url || 'http://clips.vorwaerts-gmbh.de/VfE_html5.mp4',
+      progressText: 0,
     };
     const wrapper = shallow(<Instructions store={store} />);
     expect(wrapper.state()).toEqual(initialState);
@@ -49,33 +52,28 @@ describe('<Instructions />', () => {
   it('ActivityIndicator should render and animating in the beginning', () => {
     const expectedValue = true;
     const wrapper = shallow(<Instructions store={store} />);
-    expect(wrapper.find('ActivityIndicator').first().props().animating).toEqual(expectedValue);
+    expect(wrapper.instance().renderLoadingComponent().props.animating).toEqual(true);
   });
 
   it('ActivityIndicator should stop animating after get data', () => {
     const wrapper = shallow(<Instructions store={store} />);
-    const expectedValue = false;
     wrapper.setState({
       loading: false,
     });
-    expect(wrapper.find('ActivityIndicator').first().props().animating).toEqual(expectedValue);
+    expect(wrapper.instance().renderLoadingComponent().props.animating).toEqual(true);
   });
 
-  it('onProgress() function should return progress value', () => {
-    const expectedValue = 1;
+  it('onLoad() function should return duration value', () => {
     const data = {
-      currentTime: 9.20,
+      duration: 10.67,
     };
     const wrapper = shallow(<Instructions store={store} />);
-    expect(wrapper.state().progress).toBeDefined();
-    expect(wrapper.state().progress).toEqual(0);
+    expect(wrapper.state().duration).toBeDefined();
+    expect(wrapper.state().duration).toEqual(0);
 
-    wrapper.setState({
-      duration: 9.20,
-    });
-    wrapper.instance().onProgress(data); // simulating function call
+    wrapper.instance().onLoad(data); // simulating function call
 
-    expect(wrapper.state().progress).toEqual(expectedValue);
+    expect(wrapper.state().duration).toEqual(data.duration);
   });
 
   it('should render Video component', () => {
@@ -94,7 +92,6 @@ describe('<Instructions />', () => {
         // then we call on onPressEnd() function which will resume movie again
     wrapper.instance().onPressEnd();
     expect(wrapper.state().paused).toEqual(expected);
-    expect(videoComponent.props().paused).toEqual(expected);
   });
 
   it('should call onLoad() and set Duration', () => {

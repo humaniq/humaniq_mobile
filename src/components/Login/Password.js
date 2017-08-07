@@ -3,7 +3,7 @@ import {
   View,
   Image,
   Text,
-  Animated
+  Animated,
 } from 'react-native';
 
 import PropTypes from 'prop-types';
@@ -11,11 +11,15 @@ import Animation from 'lottie-react-native';
 import { connect } from 'react-redux';
 import DeviceInfo from 'react-native-device-info';
 import IMEI from 'react-native-imei';
+import { HumaniqTokenApiLib } from 'react-native-android-library-humaniq-api';
 
 import Keyboard from '../Shared/Components/Keyboard';
 import CustomStyleSheet from '../../utils/customStylesheet';
+
 const spinner = require('../../assets/animations/s-spiner.json');
+
 import { login, signup, setPassword, addPrimaryAccount, addSecondaryAccount } from '../../actions';
+import { NavigationActions } from 'react-navigation';
 import Modal from "../Shared/Components/Modal";
 import { vw } from '../../utils/units';
 
@@ -72,10 +76,10 @@ export class Password extends Component {
         }),
         Animated.timing(this.state.progress, {
           toValue: 0,
-          duration: 0
-        })
-      ])
-    ).start()
+          duration: 0,
+        }),
+      ]),
+    ).start();
   }
 
   componentWillReceiveProps(nextProps) {
@@ -92,71 +96,95 @@ export class Password extends Component {
       const code = nextProps.user.account.payload.code;
       const password = nextProps.user.password;
 
-      if (!password) {
-        switch (code) {
-          case 6000:
-            this.setState({
-              error: true,
-              errorCode: nextProps.user.account.payload.code,
+      switch (code) {
+        case 6000:
+          this.setState({
+            error: true,
+            errorCode: nextProps.user.account.payload.code,
+          });
+          break;
+
+        case 1001:
+          const registeredAcc = nextProps.user.account.payload.payload.account_information;
+          console.log('registeredAccount ::', registeredAcc)
+          // this.props.navigation.navigate('TelInput');
+          const map2 = {
+            token: nextProps.user.account.payload.payload.token,
+            account_id: registeredAcc.account_id,
+            facial_image_id: this.props.user.validate.payload.payload.facial_image_id,
+            password,
+            device_imei: IMEI.getImei(),
+          };
+          HumaniqTokenApiLib.saveCredentials(map2)
+              .then((res) => console.log(res))
+              .catch(err => console.log(err));
+          // TODO: replace with validated??
+          if (registeredAcc.phone_number.country_code) {
+            // secondary user, redirect to dash
+            this.props.addSecondaryAccount({
+              accountId: registeredAcc.account_id,
+              photo: this.props.user.photo,
+              number: `${registeredAcc.phone_number.country_code}${registeredAcc.phone_number.phone_number}`,
             });
-            break;
-
-          case 1001:
-            const registeredAcc = nextProps.user.account.payload.payload.account_information;
-            this.props.setPassword(this.state.password);
-            // this.props.navigation.navigate('TelInput');
-
-            // TODO: replace with validated??
-            if (registeredAcc.phone_number.country_code) {
-              // secondary user, redirect to dash
-              this.props.addSecondaryAccount({
-                accountId: registeredAcc.account_id,
-                photo: this.props.user.photo,
-                number: `${registeredAcc.phone_number.country_code}${registeredAcc.phone_number.phone_number}`,
-              });
-              this.props.navigation.navigate('Choose');
-            } else {
-              // primary user
-              this.props.addPrimaryAccount({
-                accountId: registeredAcc.account_id,
-                photo: this.props.user.photo,
-              });
-              this.props.navigation.navigate('TelInput');
-            }
-            break;
-
-          case 2001:
-            // login, password ok (save password & token?)
-            this.props.setPassword(this.state.password);
-            this.props.navigation.navigate('Choose');
-            break;
-
-          case 2002:
-            // Authentication Failed
-            this.setState({
-              password: '',
-              error: true,
-              errorCode: nextProps.user.account.payload.code,
+            this.navigateTo('Profile');
+          } else {
+            // primary user
+            this.props.addPrimaryAccount({
+              accountId: registeredAcc.account_id,
+              photo: this.props.user.photo,
             });
-            break;
+            this.navigateTo('TelInput');
+          }
+          break;
 
-          case 3003:
-            // Facial Image Not Found
-            this.setState({
-              error: true,
-              errorCode: nextProps.user.account.payload.code,
-            });
-            break;
+        case 2001:
+          // login, password ok (save password & token?)
+          const map = {
+            token: nextProps.user.account.payload.payload.token,
+            account_id: nextProps.user.account.payload.payload.account_id,
+            facial_image_id: this.props.user.validate.payload.payload.facial_image_id,
+            password,
+            device_imei: IMEI.getImei(),
+          };
+          HumaniqTokenApiLib.saveCredentials(map)
+              .then((res) => {console.log(res)})
+              .catch(err => console.log(err));
+          this.navigateTo('Profile');
+          break;
 
-          default:
-            this.setState({
-              error: true,
-              errorCode: nextProps.user.account.payload.code,
-            });
-        }
+        case 2002:
+          // Authentication Failed
+          this.setState({
+            password: '',
+            error: true,
+            errorCode: nextProps.user.account.payload.code,
+          });
+          break;
+
+        case 3003:
+          // Facial Image Not Found
+          this.setState({
+            error: true,
+            errorCode: nextProps.user.account.payload.code,
+          });
+          break;
+
+        default:
+          this.setState({
+            error: true,
+            errorCode: nextProps.user.account.payload.code,
+          });
       }
     }
   }
+
+  navigateTo = (screen, params) => {
+    const resetAction = NavigationActions.reset({
+      index: 0,
+      actions: [NavigationActions.navigate({ routeName: screen, params: params })],
+    });
+    this.props.navigation.dispatch(resetAction);
+  };
 
   handleDismissModal = () => {
     this.setState({ error: false, errorCode: null });
@@ -176,19 +204,17 @@ export class Password extends Component {
           this.handlePasswordConfirm(true, res);
         } else if (this.state.maxPasswordLength === res.length && params.password !== res) {
           // incorrect password
-          this.setState({error: true});
+          this.setState({ error: true });
           this.animatePasswordError();
         }
       } else if (res.length === this.state.maxPasswordLength) {
         // Registration step 1
         this.handlePasswordConfirm(false, res);
       }
-    } else {
-      if (res.length === this.state.maxPasswordLength) {
+    } else if (res.length === this.state.maxPasswordLength) {
         // Auth
-        console.log("authenticate");
-        this.handlePasswordConfirm(false, res);
-      }
+      console.log('authenticate');
+      this.handlePasswordConfirm(false, res);
     }
   };
 
@@ -198,7 +224,7 @@ export class Password extends Component {
   };
 
   handleHelpPress = () => {
-    alert('В шаббат у нас с мамой традиция — зажигать свечи и смотреть „Колесо фортуны“');
+    // TODO: support button action
   };
 
   handlePasswordConfirm = (match, password) => {
@@ -222,7 +248,7 @@ export class Password extends Component {
     this.props.login({
       facial_image_id: this.props.user.validate.payload.payload.facial_image_id,
       device_imei: this.state.imei,
-      password: password,
+      password,
     });
   };
 
@@ -231,14 +257,14 @@ export class Password extends Component {
     // TODO: set real ID;
     const isEmulator = DeviceInfo.isEmulator();
     const randomImei = Math.floor((10000000 + Math.random()) * 90000000).toString();
-    const imei = isEmulator ? randomImei : IMEI.getImei();
-    // const imei = randomImei.toString();
+    // const imei = isEmulator ? randomImei : IMEI.getImei();
+    const imei = randomImei.toString();
     // const imei = '1111111111925';
 
     this.props.signup({
       facial_image_id: this.props.user.validate.payload.payload.facial_image_id,
       device_imei: imei,
-      password: password,
+      password,
     });
   };
 
@@ -260,7 +286,7 @@ export class Password extends Component {
       digits.push(
         <View key={i}>
           <View style={style} />
-        </View>
+        </View>,
       );
     }
     return (
@@ -278,7 +304,7 @@ export class Password extends Component {
       }),
       Animated.timing(this.state.passwordError, {
         toValue: vw(30),
-        duration: 100
+        duration: 100,
       }),
       Animated.timing(this.state.passwordError, {
         toValue: vw(-30),
@@ -292,7 +318,7 @@ export class Password extends Component {
         toValue: vw(0),
         duration: 50,
       }),
-    ]).start(() => {this.setState({ error: null })});
+    ]).start(() => { this.setState({ error: null }); });
   }
 
   renderInputStep = () => {
@@ -320,14 +346,14 @@ export class Password extends Component {
           onPress={this.handleDismissModal}
           code={this.state.errorCode}
           visible={this.state.error != null && this.state.errorCode != null}
-        />
+          />
         <View style={styles.header}>
           <View style={styles.animationContainer}>
             <Animation
               style={styles.animation}
               source={spinner}
               progress={this.state.progress}
-            />
+              />
           </View>
           <Image style={styles.userPhoto} source={{ uri: this.props.user.photo }} />
           {this.renderInputStep() }
@@ -338,8 +364,8 @@ export class Password extends Component {
             isBackspaceEnabled={(this.state.password.length > 0) && !this.props.user.account.isFetching}
             onNumberPress={this.handleNumberPress}
             onBackspacePress={this.handleBackspacePress}
-            onHelpPress={this.handleHelpPress}
-          />
+            // onHelpPress={this.handleHelpPress}
+            />
         </View>
       </View>
     );

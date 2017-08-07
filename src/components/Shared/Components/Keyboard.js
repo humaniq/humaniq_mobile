@@ -73,7 +73,7 @@ export default class VirtualKeyboard extends Component {
     isBackspaceEnabled: PropTypes.bool,
     onNumberPress: PropTypes.func.isRequired,
     onBackspacePress: PropTypes.func.isRequired,
-    onHelpPress: PropTypes.func.isRequired,
+    onHelpPress: PropTypes.func,
   };
 
   renderRow = (numbersArray) => {
@@ -101,12 +101,15 @@ export default class VirtualKeyboard extends Component {
   );
 
   renderHelp = () => (
+  this.props.onHelpPress ?
     <TouchableOpacity
       style={styles.help}
       onPress={this.props.onHelpPress}
-      >
+    >
       <Image source={icHelp} />
     </TouchableOpacity>
+    :
+    <View style={styles.help} />
   );
 
   render() {
@@ -161,9 +164,9 @@ const styles = CustomStyleSheet({
     width: 64,
     alignItems: 'center',
   },
-  cellContainer: { 
-    width: 64, 
-    justifyContent: 'center' 
+  cellContainer: {
+    width: 64,
+    justifyContent: 'center'
   },
   animationContainer: {
     position: 'absolute',
