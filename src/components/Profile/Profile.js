@@ -820,7 +820,7 @@ export default connect(
     state => ({
       user: state.user,
       profile: state.user.profile || {},
-      id: state.user.account.payload.payload.account_id,
+      id: state.user.account.payload.payload.account_id || state.accounts.primaryAccount.accountId,
       acc: state.accounts.primaryAccount,
       newTransaction: state.newtransaction,
       contacts: state.contacts,

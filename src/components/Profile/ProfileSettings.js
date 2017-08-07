@@ -377,7 +377,7 @@ export class ProfileSettings extends Component {
 
   logOutUser = () => {
     // deauthenticate user
-    HumaniqProfileApiLib.deauthenticateUser(this.state.user.id)
+    HumaniqProfileApiLib.deauthenticateUser(this.props.profile.account_id)
       .then((response) => {
         // log out
         console.log(response)
