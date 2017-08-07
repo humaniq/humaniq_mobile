@@ -42,7 +42,7 @@ describe('<Instructions />', () => {
       source: '',
       loading: true,
       width: 0,
-      videoUrl: props.url || 'http://clips.vorwaerts-gmbh.de/VfE_html5.mp4',
+      videoUrl: 'http://0.s3.envato.com/h264-video-previews/80fad324-9db4-11e3-bf3d-0050569255a8/490527.mp4',
       progressText: 0,
     };
     const wrapper = shallow(<Instructions store={store} />);
