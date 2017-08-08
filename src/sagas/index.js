@@ -183,10 +183,6 @@ function* watchFaceEmotionValidate() {
   yield takeLatest(actions.FACE_EMOTION_VALIDATE.REQUEST, faceEmotionValidate);
 }
 
-function* watchPhoneCodeRequest() {
-  yield takeLatest(actions.FACE_EMOTION_VALIDATE.REQUEST, faceEmotionValidate);
-}
-
 export default function* root() {
   yield all([
     fork(watchValidate),
@@ -194,6 +190,7 @@ export default function* root() {
     fork(watchLogin),
     fork(watchPhoneNumberCreate),
     fork(watchPhoneNumberValidate),
+    fork(watchSmsCodeRepeat),
     fork(watchFaceEmotionCreate),
     fork(watchFaceEmotionValidate),
   ]);

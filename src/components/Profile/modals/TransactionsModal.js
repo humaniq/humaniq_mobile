@@ -38,13 +38,13 @@ class TransactionsModal extends Component {
 
   getTransactionStatusImage = (item) => {
     switch (item.status) {
-      // pending
+        // pending
       case 0:
         return ic_wait;
-      // completed
+        // completed
       case 1:
         return ic_done;
-      // invalid
+        // invalid
       case 2:
         return ic_cancel;
       default:
@@ -75,66 +75,66 @@ class TransactionsModal extends Component {
     const amFloat = Math.round(parseFloat(item.amount / divideBy) * rate * 100) / 100;
 
     return (
-      <View>
-        {visibility ?
-          <Modal
-            onRequestClose={onChatClick}
-            animationType={'fade'}
-            transparent
-            visible={visibility}
-          >
-            <TouchableWithoutFeedback onPress={onCancelClick}>
-              <View style={styles.rootContainer}>
-                <TouchableWithoutFeedback onPress={() => {}}>
-                  <View style={styles.content}>
-                    <View style={styles.header}>
-                      <View style={{ flexDirection: 'row', flex: 1 }}>
-                        <Text style={styles.date}>{item.timestamp ? moment.unix(item.timestamp).format('DD.MM.YYYY, hh:mm:ss') : ''}</Text>
-                        <Image
-                          style={styles.statusImage}
-                          source={this.getTransactionStatusImage(item)}
-                        />
+        <View>
+          {visibility ?
+              <Modal
+                  onRequestClose={onChatClick}
+                  animationType={'fade'}
+                  transparent
+                  visible={visibility}
+              >
+                <TouchableWithoutFeedback onPress={onCancelClick}>
+                  <View style={styles.rootContainer}>
+                    <TouchableWithoutFeedback onPress={() => {}}>
+                      <View style={styles.content}>
+                        <View style={styles.header}>
+                          <View style={{ flexDirection: 'row', flex: 1 }}>
+                            <Text style={styles.date}>{item.timestamp ? moment.unix(item.timestamp).format('DD.MM.YYYY, hh:mm:ss') : ''}</Text>
+                            <Image
+                                style={styles.statusImage}
+                                source={this.getTransactionStatusImage(item)}
+                            />
+                          </View>
+                          <TouchableOpacity onPress={onChatClick}>
+                            <Image
+                                resizeMode="contain"
+                                style={styles.chat}
+                                source={ic_chat}
+                            />
+                          </TouchableOpacity>
+                        </View>
+                        <View style={styles.avatarContainer}>
+                          <Image
+                              style={styles.avatar}
+                              source={user && user.avatar && user.avatar.url
+                                  ? { uri: user.avatar.url }
+                                  : ic_photo_holder}
+                          />
+                          <Image
+                              resizeMode="contain"
+                              style={styles.image2}
+                              source={item.type === 1 ? ic_outgoing : ic_incoming}
+                          />
+                        </View>
+                        {user ? this.renderCredentials(user) : this.renderWallet(item)}
+                        <View style={styles.priceContainer}>
+                          <Text style={styles.priceInt}>
+                            {`${priceBeforePoint}.`}
+                            <Text style={styles.priceDecimal}>
+                              { priceAfterPoint || '00'} HMQ</Text>
+                          </Text>
+                        </View>
+                        <Text style={styles.price}>{`${amFloat} $`}</Text>
                       </View>
-                      <TouchableOpacity onPress={onChatClick}>
-                        <Image
-                          resizeMode="contain"
-                          style={styles.chat}
-                          source={ic_chat}
-                        />
-                      </TouchableOpacity>
-                    </View>
-                    <View style={styles.avatarContainer}>
-                      <Image
-                        style={styles.avatar}
-                        source={user && user.avatar && user.avatar.url
-                            ? { uri: user.avatar.url }
-                            : ic_photo_holder}
-                      />
-                      <Image
-                        resizeMode="contain"
-                        style={styles.image2}
-                        source={item.type === 1 ? ic_outgoing : ic_incoming}
-                      />
-                    </View>
-                    {user ? this.renderCredentials(user) : this.renderWallet(item)}
-                    <View style={styles.priceContainer}>
-                      <Text style={styles.priceInt}>
-                        {`${priceBeforePoint}.`}
-                        <Text style={styles.priceDecimal}>
-                          { priceAfterPoint || '00'} HMQ</Text>
-                      </Text>
-                    </View>
-                    <Text style={styles.price}>{`${amFloat} $`}</Text>
+                    </TouchableWithoutFeedback>
                   </View>
                 </TouchableWithoutFeedback>
-              </View>
-            </TouchableWithoutFeedback>
 
-          </Modal>
+              </Modal>
               : null
           }
 
-      </View>
+        </View>
     );
   }
 
@@ -148,21 +148,21 @@ class TransactionsModal extends Component {
     const userLastName = user && user.person
         ? user.person.last_name : '';
     return (
-      <View style={{alignItems: 'center', justifyContent: 'center'}}>
-        <Text style={styles.name}>{`${userName} ${userLastName}`}</Text>
-        <Text style={styles.phone}>{`+(${countryCode})`} {phone}</Text>
-      </View>
+        <View style={{alignItems: 'center', justifyContent: 'center'}}>
+          <Text style={styles.name}>{`${userName} ${userLastName}`}</Text>
+          <Text style={styles.phone}>{`+(${countryCode})`} {phone}</Text>
+        </View>
     );
   };
 
   renderWallet = (item) => {
     const wallet = item.from_address;
     return (
-      <View style={{ flex: 1, alignSelf: 'center' }}>
-        <Text style={styles.name}>
-          {wallet}
-        </Text>
-      </View>
+        <View style={{ flex: 1, alignSelf: 'center' }}>
+          <Text style={styles.name}>
+            {wallet}
+          </Text>
+        </View>
     );
   };
 }
