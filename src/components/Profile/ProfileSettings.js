@@ -382,7 +382,7 @@ export class ProfileSettings extends Component {
           // log out
           console.log(response)
           if (response.code === 200) {
-            this.navigateTo('Accounts');
+            this.navigateTo('Tutorial');
           }
         })
         .catch((err) => {
