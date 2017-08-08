@@ -78,6 +78,35 @@ function account(state = {
   }
 }
 
+function phoneValidate(state = {
+  isFetching: false,
+  payload: null,
+}, action) {
+  switch (action.type) {
+    case ActionTypes.PHONE_NUMBER_VALIDATE.REQUEST:
+    case ActionTypes.SMS_CODE_REPEAT.REQUEST:
+      return {
+        ...state,
+        isFetching: true,
+        payload: null,
+      };
+    case ActionTypes.PHONE_NUMBER_VALIDATE.SUCCESS:
+      return {
+        ...state,
+        isFetching: false,
+        payload: action.response,
+      };
+    case ActionTypes.PHONE_NUMBER_VALIDATE.FAILURE:
+      return {
+        ...state,
+        isFetching: false,
+        payload: action.error,
+      };
+    default:
+      return state;
+  }
+}
+
 export const user = combineReducers({
   validate: subroutineReducerCreator({
     types: [
@@ -86,6 +115,7 @@ export const user = combineReducers({
       ActionTypes.VALIDATE.FAILURE,
     ],
   }),
+  /*
   phoneValidate: subroutineReducerCreator({
     types: [
       ActionTypes.PHONE_NUMBER_VALIDATE.REQUEST,
@@ -93,6 +123,7 @@ export const user = combineReducers({
       ActionTypes.PHONE_NUMBER_VALIDATE.FAILURE,
     ],
   }),
+  */
   phoneCreate: subroutineReducerCreator({
     types: [
       ActionTypes.PHONE_NUMBER_CREATE.REQUEST,
@@ -121,6 +152,7 @@ export const user = combineReducers({
       ActionTypes.SMS_CODE_REPEAT.FAILURE,
     ],
   }),
+  phoneValidate,
   account,
   photo,
   password,
