@@ -17,10 +17,15 @@ const propTypes = {
   cooldownTime: PropTypes.number,
 };
 
+function str_pad_left(string, pad, length) {
+  return (new Array(length+1).join(pad)+string).slice(-length);
+}
+
 function prettyTime(time) {
-  let minutes = time / 60;
+  let minutes = Math.floor(time / 60);
   let seconds = time % 60;
-  return `${minutes}:${seconds}`;
+  let finalTime = `${str_pad_left(minutes, '0', 2)}:${str_pad_left(seconds, '0', 2)}`;
+  return finalTime;
 }
 export default function RequestSmsButton(props) {
   const disabled = props.disabled;
@@ -57,6 +62,7 @@ const styles = CustomStyleSheet({
     borderWidth: 1,
     borderColor: '$cPaper',
     borderRadius: 3,
+    marginRight: 9,
   },
   cooldownContainer: {
     flexDirection: 'row',
@@ -68,6 +74,7 @@ const styles = CustomStyleSheet({
     marginRight: 4,
   },
   disabled: {
+    borderWidth: 0,
     backgroundColor: '$cPaper',
     opacity: 0.6,
   },
