@@ -17,6 +17,11 @@ const propTypes = {
   cooldownTime: PropTypes.number,
 };
 
+function prettyTime(time) {
+  let minutes = time / 60;
+  let seconds = time % 60;
+  return `${minutes}:${seconds}`;
+}
 export default function RequestSmsButton(props) {
   const disabled = props.disabled;
   const cooldownTime = props.cooldownTime;
@@ -31,7 +36,7 @@ export default function RequestSmsButton(props) {
     >
       {disabled && cooldownTime > 0 ?
         <View style={styles.cooldownContainer}>
-          <Text style={styles.cooldownTxt}>{cooldownTime}</Text>
+          <Text style={styles.cooldownTxt}>{prettyTime(cooldownTime)}</Text>
           <Image source={ic_clock} />
         </View> :
         <Image source={ic_sms} />
