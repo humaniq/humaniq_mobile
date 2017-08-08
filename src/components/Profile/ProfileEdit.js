@@ -37,7 +37,7 @@ export class ProfileEdit extends Component {
     const { user } = this.props.navigation.state.params;
     const { profile } = this.props;
     let name,
-      lastName;
+        lastName;
     if (profile.person) {
       name = profile.person.first_name;
       lastName = profile.person.last_name;
@@ -56,83 +56,83 @@ export class ProfileEdit extends Component {
   render() {
     const { user, profile } = this.state;
     const name = profile.person
-          ? `${profile.person.first_name} ${profile.person.last_name}`
-          : '';
+        ? `${profile.person.first_name} ${profile.person.last_name}`
+        : '';
     const phone = profile.phone_number
-          ? `+(${profile.phone_number.country_code}) ${profile.phone_number.phone_number}`
-          : '';
+        ? `+(${profile.phone_number.country_code}) ${profile.phone_number.phone_number}`
+        : '';
     const userCreds = profile.person
-            ? name
-            : phone;
+        ? name
+        : phone;
 
     const status = user.status === 1 ? 'online' : 'offline';
     const statusTextColor = user.status === 1 ? '#3AA3E4' : '#aaaaaa';
     return (
-      <View style={styles.mainContainer}>
-        <ScrollView>
-          <StatusBar
-            backgroundColor="#598FBA"
-          />
-          <View style={{
-            height: 56,
-            backgroundColor: '#598FBA',
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-          }}
-          />
-          <ToolbarAndroid
-            style={{
+        <View style={styles.mainContainer}>
+          <ScrollView>
+            <StatusBar
+                backgroundColor="#598FBA"
+            />
+            <View style={{
               height: 56,
               backgroundColor: '#598FBA',
-              marginLeft: 5,
-              marginRight: 5,
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
             }}
-            onIconClicked={() => this.handleClose()}
-            onActionSelected={position => this.onActionClick(position)}
-            navIcon={ic_close}
-            actions={[{ title: '', icon: ic_done_white, show: 'always' }]}
-          />
-          <View style={styles.content}>
-            <View
-              style={styles.avatarInfoContainer}
-            >
-              <TouchableOpacity onPress={() => this.onPhotoClick()}>
-                <View style={styles.avatarContainer}>
-                  <Image
-                    style={styles.avatar}
-                    source={this.props.photo
-                        ? { uri: this.props.photo }
-                        : profile.avatar ? { uri: profile.avatar.url } : ic_photo_holder}
-                  />
-                  <View style={[{
-                    position: 'absolute',
-                    backgroundColor: 'rgba(0,0,0,0.4)',
-                  }, styles.avatar]}
-                  />
+            />
+            <ToolbarAndroid
+                style={{
+                  height: 56,
+                  backgroundColor: '#598FBA',
+                  marginLeft: 5,
+                  marginRight: 5,
+                }}
+                onIconClicked={() => this.handleClose()}
+                onActionSelected={position => this.onActionClick(position)}
+                navIcon={ic_close}
+                actions={[{ title: '', icon: ic_done_white, show: 'always' }]}
+            />
+            <View style={styles.content}>
+              <View
+                  style={styles.avatarInfoContainer}
+              >
+                <TouchableOpacity onPress={() => this.onPhotoClick()}>
+                  <View style={styles.avatarContainer}>
+                    <Image
+                        style={styles.avatar}
+                        source={this.props.photo
+                            ? { uri: this.props.photo }
+                            : profile.avatar ? { uri: profile.avatar.url } : ic_photo_holder}
+                    />
+                    <View style={[{
+                      position: 'absolute',
+                      backgroundColor: 'rgba(0,0,0,0.4)',
+                    }, styles.avatar]}
+                    />
 
-                  <Image
-                    style={styles.photoHolder}
-                    source={ic_photo}
-                    resizeMode="contain"
-                  />
-                </View>
-              </TouchableOpacity>
-              <View style={styles.infoContainer}>
-                <Text style={styles.title}>{userCreds}</Text>
-                <View style={styles.statusContainer}>
-                  <Text style={[styles.statusText, { color: statusTextColor }]}>{status}</Text>
-                  {this.getUserStatus(user)}
+                    <Image
+                        style={styles.photoHolder}
+                        source={ic_photo}
+                        resizeMode="contain"
+                    />
+                  </View>
+                </TouchableOpacity>
+                <View style={styles.infoContainer}>
+                  <Text style={styles.title}>{userCreds}</Text>
+                  <View style={styles.statusContainer}>
+                    <Text style={[styles.statusText, { color: statusTextColor }]}>{status}</Text>
+                    {this.getUserStatus(user)}
+                  </View>
                 </View>
               </View>
+              {/* render inputs */}
+              {this.renderInputs()}
             </View>
-            {/* render inputs */}
-            {this.renderInputs()}
-          </View>
-        </ScrollView>
+          </ScrollView>
 
-      </View>
+        </View>
     );
   }
 
@@ -152,49 +152,49 @@ export class ProfileEdit extends Component {
 
   renderInputs() {
     return (
-      <View style={{ marginTop: 20 }}>
-        <TextInput
-          ref="name"
-          value={this.state.name}
-          placeholder="First name"
-          placeholderTextColor="#e0e0e0"
-          onChangeText={text => this.setState({ name: text, fieldChanged: true })}
-          style={[styles.input]}
-          autoCapitalize="sentences"
-        />
-        <TextInput
-          ref="surname"
-          placeholder="Last name"
-          placeholderTextColor="#e0e0e0"
-          value={this.state.surname}
-          onChangeText={text => this.setState({ surname: text, fieldChanged: true })}
-          style={styles.input}
-          autoCapitalize="sentences"
-        />
-      </View>
+        <View style={{ marginTop: 20 }}>
+          <TextInput
+              ref="name"
+              value={this.state.name}
+              placeholder="First name"
+              placeholderTextColor="#e0e0e0"
+              onChangeText={text => this.setState({ name: text, fieldChanged: true })}
+              style={[styles.input]}
+              autoCapitalize="sentences"
+          />
+          <TextInput
+              ref="surname"
+              placeholder="Last name"
+              placeholderTextColor="#e0e0e0"
+              value={this.state.surname}
+              onChangeText={text => this.setState({ surname: text, fieldChanged: true })}
+              style={styles.input}
+              autoCapitalize="sentences"
+          />
+        </View>
     );
   }
 
   getUserStatus(user) {
     switch (user.status) {
-      // offline status
+        // offline status
       case 0:
         return this.offlineView();
-      // online status
+        // online status
       case 1:
         return this.onlineView();
-      // by default online
+        // by default online
       default:
         return this.onlineView();
     }
   }
 
   offlineView = () => (
-    <View style={styles.offlineStatus} />
+      <View style={styles.offlineStatus} />
   );
 
   onlineView = () => (
-    <View style={styles.onlineStatus} />
+      <View style={styles.onlineStatus} />
   );
 
   doneAction = () => {
@@ -212,29 +212,29 @@ export class ProfileEdit extends Component {
 
   convertToBase64 = (path) => {
     RNFetchBlob.fs.readFile(path, 'base64')
-      .then((data) => {
-        HumaniqProfileApiLib.uploadProfileAvatar(this.props.profile.account_id, data)
-          .then((resp) => {
-            if (resp.code === 401) {
-              this.navigateTo('Tutorial');
-            } else {
-              console.warn(JSON.stringify(resp));
-              if (resp.code === 5004) {
-                ToastAndroid.show('Success', ToastAndroid.LONG);
-                const { profile } = this.props;
-                profile.avatar.url = resp.avatar.url;
-                this.props.setProfile({ ...profile });
-                this.props.setAvatarPath(resp.avatar.url);
-              } else if (resp.code === 3013) {
-                // do some stuff
-              }
-            }
-          })
-          .catch((err) => {
-            console.warn(JSON.stringify(err));
-          });
-      })
-      .catch((err) => { console.log(err.message); });
+        .then((data) => {
+          HumaniqProfileApiLib.uploadProfileAvatar(this.props.profile.account_id, data)
+              .then((resp) => {
+                if (resp.code === 401) {
+                  this.navigateTo('Tutorial');
+                } else {
+                  console.warn(JSON.stringify(resp));
+                  if (resp.code === 5004) {
+                    ToastAndroid.show('Success', ToastAndroid.LONG);
+                    const { profile } = this.props;
+                    profile.avatar.url = resp.avatar.url;
+                    this.props.setProfile({ ...profile });
+                    this.props.setAvatarPath(resp.avatar.url);
+                  } else if (resp.code === 3013) {
+                    // do some stuff
+                  }
+                }
+              })
+              .catch((err) => {
+                console.warn(JSON.stringify(err));
+              });
+        })
+        .catch((err) => { console.log(err.message); });
   };
 
   onPhotoClick = () => {
@@ -253,8 +253,8 @@ export class ProfileEdit extends Component {
 
   uploadPerson() {
     HumaniqProfileApiLib.updateUserPerson(
-            this.state.profile.account_id, this.state.name, this.state.surname,
-        )
+        this.state.profile.account_id, this.state.name, this.state.surname,
+    )
         .then((resp) => {
           if (resp.code === 401) {
             this.navigateTo('Tutorial');
@@ -267,9 +267,9 @@ export class ProfileEdit extends Component {
             ToastAndroid.show('Success', ToastAndroid.LONG);
           }
         })
-            .catch((err) => {
-              console.warn(JSON.stringify(err));
-            });
+        .catch((err) => {
+          console.warn(JSON.stringify(err));
+        });
   }
 
   uploadAvatar() {

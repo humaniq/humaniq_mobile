@@ -61,77 +61,97 @@ class TransactionConfirmModal extends Component {
     const contact = contacts.find(cnt => cnt.id === item.contactID);
 
     return (
-      <View>
-        <Modal
-          onRequestClose={onClick}
-          animationType={'fade'}
-          transparent
-          visible={visibility}
-        >
-          <TouchableWithoutFeedback onPress={onCancelClick}>
-            <View style={styles.rootContainer}>
-              <TouchableWithoutFeedback onPress={() => {}}>
-                <View style={styles.content}>
-                  <View style={styles.header} />
-                  <View style={{ alignSelf: 'center', alignItems: 'center' }}>
-                    <View style={styles.avatarContainer}>
-                      <Image
-                        style={styles.avatar}
-                        source={contact && contact.avatar
-                            ? { uri: contact.avatar }
-                            : ic_photo_holder
-                        }
-                      />
-                      <Image
-                        resizeMode="contain"
-                        style={styles.image2}
-                        source={ic_outgoing}
-                      />
-                    </View>
-                    {contact && contact.name ? this.renderCredentials(contact) : this.renderWallet(contact)}
-                    <View style={styles.priceContainer}>
-                      <Text style={styles.priceInt}>
-                        {`${priceBeforePoint}.`}
-                        <Text style={styles.priceDecimal}>
-                          { priceAfterPoint || '00'} HMQ</Text>
-                      </Text>
-                    </View>
-                    <Text style={styles.price}>{`${amFloat} $`}</Text>
+        <View>
+          <Modal
+              onRequestClose={onClick}
+              animationType={'fade'}
+              transparent
+              visible={visibility}
+          >
+            <TouchableWithoutFeedback onPress={onCancelClick}>
+              <View style={styles.rootContainer}>
+                <TouchableWithoutFeedback onPress={() => {}}>
+                  <View style={styles.content}>
+                    <View style={styles.header} />
+                    <View style={{ alignSelf: 'center', alignItems: 'center' }}>
+                      <View style={styles.avatarContainer}>
+                        <Image
+                            style={styles.avatar}
+                            source={contact && contact.avatar
+                                ? { uri: contact.avatar }
+                                : ic_photo_holder
+                            }
+                        />
+                        <Image
+                            resizeMode="contain"
+                            style={styles.image2}
+                            source={ic_outgoing}
+                        />
+                      </View>
+                      {this.showCreds(contact, item)}
+                      <View style={styles.priceContainer}>
+                        <Text style={styles.priceInt}>
+                          {`${priceBeforePoint}.`}
+                          <Text style={styles.priceDecimal}>
+                            { priceAfterPoint || '00'} HMQ</Text>
+                        </Text>
+                      </View>
+                      <Text style={styles.price}>{`${amFloat} $`}</Text>
 
+                    </View>
+
+                    <TouchableOpacity style={styles.button} onPress={onClick}>
+                      <Image source={ic_confirm} />
+                    </TouchableOpacity>
                   </View>
+                </TouchableWithoutFeedback>
+              </View>
+            </TouchableWithoutFeedback>
 
-                  <TouchableOpacity style={styles.button} onPress={onClick}>
-                    <Image source={ic_confirm} />
-                  </TouchableOpacity>
-                </View>
-              </TouchableWithoutFeedback>
-            </View>
-          </TouchableWithoutFeedback>
-
-        </Modal>
-      </View>
+          </Modal>
+        </View>
     );
   }
 
 
   renderCredentials = contact => (
-    <View style={{alignItems: 'center', justifyContent: 'center'}}>
-      <Text style={styles.name}>{`${contact.name}`}</Text>
-      <Text style={styles.phone}>{`${contact.phone}`}</Text>
-    </View>
+      <View style={{ alignItems: 'center', justifyContent: 'center' }}>
+        <Text style={styles.name}>{`${contact.name}`}</Text>
+        <Text style={styles.phone}>{`${contact.phone}`}</Text>
+      </View>
   );
 
-  renderWallet = (contact) => {
-    const wallet = contact.phone
+  renderWallet = (item) => {
+    const wallet = item ? item.adress : '';
     return (
-      <View style={{ flex: 1, alignSelf: 'center' }}>
-        <Text style={styles.name}>
-          {wallet}
-        </Text>
-      </View>
+        <View style={{ alignSelf: 'center', justifyContent: 'center', marginLeft: 16, marginRight: 16 }}>
+          <Text style={styles.name}>
+            {wallet}
+          </Text>
+        </View>
     );
   };
 
+  renderPhone = (item) => {
+    const wallet = item ? item.phone : '';
+    return (
+        <View style={{ alignSelf: 'center', justifyContent: 'center', marginLeft: 16, marginRight: 16 }}>
+          <Text style={styles.name}>
+            {wallet}
+          </Text>
+        </View>
+    );
+  };
+
+  showCreds(contact, item) {
+    if (contact && contact.name) {
+      return this.renderCredentials(contact);
+    } else if (item.phone) {
+      return this.renderPhone(item);
+    } else {
+      return this.renderWallet(item);
+    }
+  }
 }
 
 const styles = CustomStyleSheet({

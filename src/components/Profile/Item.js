@@ -25,13 +25,14 @@ class Item extends Component {
   }
 
   render() {
+    const divideBy = 100000000;
     let sign = '';
     const { item, currentIndex, size, onClick } = this.props;
-    const priceBeforePoint = item.amount.toString().split('.')[0];
-    const priceAfterPoint = item.amount.toString().split('.')[1];
+    const priceBeforePoint = item.amount ? (parseFloat(item.amount / divideBy)).toString().split('.')[0] : '';
+    const priceAfterPoint = item.amount ? (parseFloat(item.amount / divideBy)).toString().split('.')[1] : '';
 
-    const sender = item.from_user ? item.from_user : {};
-    const receiver = item.to_user ? item.to_user : {};
+    const receiver = item.from_user ? item.from_user : {};
+    const sender = item.to_user ? item.to_user : {};
     let user = {};
 
     // type == 0 -> incoming (receive)
@@ -45,58 +46,58 @@ class Item extends Component {
     }
 
     return (
-      <Animated.View style={styles.container}>
-        <TouchableNativeFeedback
-          onPress={onClick}
-        >
-          <Animated.View
-            style={[styles.rootContainer]}
+        <Animated.View style={styles.container}>
+          <TouchableNativeFeedback
+              onPress={onClick}
           >
-            <View style={styles.avatarContainer}>
-              <Image
-                style={styles.image}
-                source={user && user.avatar && user.avatar.url
-                  ? { uri: user.avatar.url }
-                  : ic_photo_holder
-              }
-              />
-              <Image
-                style={styles.image2}
-                source={item.type === 0 ? ic_incoming : ic_outgoing}
-              />
-            </View>
-            <View style={{ flex: 1 }}>
-              <View style={styles.transactionContainer}>
-                {this.renderCredentials(user, item)}
-                <View style={styles.rightContainer}>
-                  <Text style={styles.priceInt}>
-                    {`${sign}${priceBeforePoint}.`}
-                    <Text style={styles.priceDecimal}>
-                      { priceAfterPoint || '00'} HMQ</Text>
-                  </Text>
-                  <Image
-                    style={styles.statusImage}
-                    source={this.getTransactionStatusImage(item)}
-                  />
-                </View>
+            <Animated.View
+                style={[styles.rootContainer]}
+            >
+              <View style={styles.avatarContainer}>
+                <Image
+                    style={styles.image}
+                    source={user && user.avatar && user.avatar.url
+                        ? { uri: user.avatar.url }
+                        : ic_photo_holder
+                    }
+                />
+                <Image
+                    style={styles.image2}
+                    source={item.type === 0 ? ic_incoming : ic_outgoing}
+                />
               </View>
-              {currentIndex !== size - 1 ? this.showDivider() : <View style={{ marginBottom: 20 }} />}
-            </View>
-          </Animated.View>
-        </TouchableNativeFeedback>
-      </Animated.View>
+              <View style={{ flex: 1 }}>
+                <View style={styles.transactionContainer}>
+                  {this.renderCredentials(user, item)}
+                  <View style={styles.rightContainer}>
+                    <Text style={styles.priceInt}>
+                      {`${sign}${priceBeforePoint}.`}
+                      <Text style={styles.priceDecimal}>
+                        { priceAfterPoint || '00'} HMQ</Text>
+                    </Text>
+                    <Image
+                        style={styles.statusImage}
+                        source={this.getTransactionStatusImage(item)}
+                    />
+                  </View>
+                </View>
+                {currentIndex !== size - 1 ? this.showDivider() : <View style={{ marginBottom: 20 }} />}
+              </View>
+            </Animated.View>
+          </TouchableNativeFeedback>
+        </Animated.View>
     );
   }
 
   renderPhone = (user) => {
     const phones = user && user.phone_number
-          ? `+(${user.phone_number.country_code}) ${user.phone_number.phone_number}` : '';
+        ? `+(${user.phone_number.country_code}) ${user.phone_number.phone_number}` : '';
     return (
-      <View style={{ flex: 1, alignSelf: 'center' }}>
-        <Text style={styles.phone}>
-          {phones}
-        </Text>
-      </View>
+        <View style={{ flex: 1, alignSelf: 'center' }}>
+          <Text style={styles.phone}>
+            {phones}
+          </Text>
+        </View>
     );
   };
 
@@ -107,27 +108,27 @@ class Item extends Component {
     const phones = user && user.phone_number
         ? `+(${user.phone_number.country_code}) ${user.phone_number.phone_number}` : '';
     return (
-      <View style={{ flex: 1, alignSelf: 'center' }}>
-        <Text style={styles.name}>
-          {names}
-        </Text>
-        <Text style={styles.phoneSmall}>
-          {phones}
-        </Text>
-      </View>
+        <View style={{ flex: 1, alignSelf: 'center' }}>
+          <Text style={styles.name}>
+            {names}
+          </Text>
+          <Text style={styles.phoneSmall}>
+            {phones}
+          </Text>
+        </View>
     );
   }
 
 
   getTransactionStatusImage = (item) => {
     switch (item.status) {
-      // pending
+        // pending
       case 0:
         return ic_wait;
-      // completed
+        // completed
       case 1:
         return ic_done;
-      // invalid
+        // invalid
       case 2:
         return ic_cancel;
       default:
@@ -139,10 +140,10 @@ class Item extends Component {
     const sender = item.from_user;
     const receiver = item.to_user;
     switch (item.type) {
-      // receive
+        // receive
       case 0:
         return sender.avatar.url;
-      // sent
+        // sent
       case 1:
         return receiver.avatar.url;
       default:
@@ -151,7 +152,7 @@ class Item extends Component {
   };
 
   showDivider = () => (
-    <View style={styles.divider} />
+      <View style={styles.divider} />
   );
 
   renderCredentials(user, item) {
@@ -165,13 +166,13 @@ class Item extends Component {
   }
 
   renderWallet = (item) => {
-    const wallet = item.from_address
+    const wallet = item.from_address;
     return (
-      <View style={{ flex: 1, alignSelf: 'center' }}>
-        <Text style={styles.phone}>
-          {wallet}
-        </Text>
-      </View>
+        <View style={{ flex: 1, alignSelf: 'center' }}>
+          <Text style={styles.phone}>
+            {wallet}
+          </Text>
+        </View>
     );
   };
 }

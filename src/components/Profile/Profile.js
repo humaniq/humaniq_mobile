@@ -93,6 +93,7 @@ export class Profile extends Component {
   offset = 0
   limit = 10
   activity = true
+  divideBy = 100000000
 
   convertToMap = (array) => {
     const categoryMap = {};
@@ -115,7 +116,7 @@ export class Profile extends Component {
   };
 
   componentWillMount() {
-    console.warn(this.props.id)
+    console.warn(this.props.id);
     DeviceEventEmitter.addListener('EVENT_TRANSACTION_ERROR', (event) => {
       console.log('ошибка');
       console.log(event);
@@ -167,7 +168,8 @@ export class Profile extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.newTransaction && nextProps.newTransaction.amount !== 0) {
+    console.warn(JSON.stringify(nextProps.newTransaction))
+    if (nextProps.newTransaction && nextProps.newTransaction.amount !== 0 ) {
       const { newTransaction } = nextProps;
       this.setState({ newTransaction, confirmTransactionVisibility: true });
     }
@@ -175,24 +177,24 @@ export class Profile extends Component {
 
   getUserInfo() {
     HumaniqProfileApiLib.getAccountProfile(this.props.id)
-      .then((response) => {
-        if (this.activity) {
-          if (response.code === 401) {
-            this.navigateTo('Tutorial');
-          } else {
-            this.props.setProfile(response);
+        .then((response) => {
+          if (this.activity) {
+            if (response.code === 401) {
+              this.navigateTo('Tutorial');
+            } else {
+              this.props.setProfile(response);
+            }
           }
-        }
-      })
-      .catch((err) => {
-        console.warn(JSON.stringify(err));
-      });
+        })
+        .catch((err) => {
+          console.warn(JSON.stringify(err));
+        });
   }
 
   navigateTo = (screen, params) => {
     const resetAction = NavigationActions.reset({
       index: 0,
-      actions: [NavigationActions.navigate({ routeName: screen, params: params })],
+      actions: [NavigationActions.navigate({ routeName: screen, params })],
     });
     this.props.navigation.dispatch(resetAction);
   };
@@ -200,32 +202,32 @@ export class Profile extends Component {
   getBalance() {
     // get Balance
     HumaniqProfileApiLib.getBalance(this.props.id)
-      .then((addressState) => {
-        if (this.activity) {
-          if (addressState.code === 401) {
-            this.navigateTo('Tutorial');
-          } else {
-            const { balance } = this.state;
-            if (addressState) {
-              balance.token.currency = addressState.token.currency;
-              balance.token.amount = addressState.token.amount.toString();
-              // if local currency is null, use default currency
-              if (addressState.local) {
-                balance.price.currency = addressState.local.currency;
-                balance.price.amount = addressState.local.amount.toString();
-              } else {
-                balance.price.currency = addressState.default.currency;
-                balance.price.amount = addressState.default.amount.toString();
+        .then((addressState) => {
+          if (this.activity) {
+            if (addressState.code === 401) {
+              this.navigateTo('Tutorial');
+            } else {
+              const { balance } = this.state;
+              if (addressState) {
+                balance.token.currency = addressState.token.currency;
+                balance.token.amount = (parseFloat(addressState.token.amount / this.divideBy)).toString();
+                // if local currency is null, use default currency
+                if (addressState.local) {
+                  balance.price.currency = addressState.local.currency;
+                  balance.price.amount = (parseFloat(addressState.local.amount / this.divideBy)).toString();
+                } else {
+                  balance.price.currency = addressState.default.currency;
+                  balance.price.amount = (parseFloat(addressState.default.amount / this.divideBy)).toString();
+                }
               }
+              this.setState({ balance });
             }
-            this.setState({ balance });
           }
-        }
-      })
-      .catch((err) => {
-        // handle error
-        console.log(err);
-      });
+        })
+        .catch((err) => {
+          // handle error
+          console.log(err);
+        });
   }
 
   handleClose = () => {
@@ -242,28 +244,28 @@ export class Profile extends Component {
         initial ? 0 : this.state.transactions.length,
         this.limit,
     )
-      .then((array) => {
-        const oldArray = this.state.transactions;
-        if (this.activity) {
-          let newArray = [];
-          if (shouldRefresh) {
-            newArray = array;
-          } else {
-            newArray = oldArray.concat(array);
+        .then((array) => {
+          const oldArray = this.state.transactions;
+          if (this.activity) {
+            let newArray = [];
+            if (shouldRefresh) {
+              newArray = array;
+            } else {
+              newArray = oldArray.concat(array);
+            }
+            const map = this.convertToMap(newArray);
+            this.setState({
+              transactions: newArray,
+              dataSource: this.state.dataSource.cloneWithRowsAndSections(map),
+              refreshing: false,
+            });
           }
-          const map = this.convertToMap(newArray);
-          this.setState({
-            transactions: newArray,
-            dataSource: this.state.dataSource.cloneWithRowsAndSections(map),
-            refreshing: false,
-          });
-        }
-      })
-      .catch((err) => {
-        // handle error
-        console.log(err);
-        this.setState({ refreshing: false });
-      });
+        })
+        .catch((err) => {
+          // handle error
+          console.log(err);
+          this.setState({ refreshing: false });
+        });
   }
 
   // animation in order to make collapse effects
@@ -307,86 +309,86 @@ export class Profile extends Component {
   render() {
     const { user, balance } = this.state;
     const { profile } = this.props;
-        // break amount into two values to use them separately
+    // break amount into two values to use them separately
     const hmqInt = balance && balance.token && balance.token.amount
-            ? balance.token.amount.toString().split('.')[0] : '0';
+        ? balance.token.amount.toString().split('.')[0] : '0';
     const hmqDec = balance && balance.token && balance.token.amount
-            ? balance.token.amount.toString().split('.')[1] : '00';
-        // break amount into two values to use them separately
+        ? balance.token.amount.toString().split('.')[1] : '00';
+    // break amount into two values to use them separately
     const currencyInt = balance && balance.price && balance.price.amount
-            ? balance.price.amount.toString().split('.')[0] : '0';
+        ? balance.price.amount.toString().split('.')[0] : '0';
     const currencyDec = balance && balance.price && balance.price.amount
-            ? balance.price.amount.toString().split('.')[1] : '00';
+        ? balance.price.amount.toString().split('.')[1] : '00';
 
     return (
-      <View style={styles.mainContainer}>
-        {/* render status bar */}
-        <StatusBar
-          backgroundColor="#598FBA"
-        />
-        {/* render list */}
-        { this.state.transactions.length > 0 ? this.renderContent() : this.renderEmptyView()}
-        {/* render collapse layout */}
-        <Animated.View
-          style={[styles.collapseContainer, {
-            transform: [{ translateY: this.getAnimationType(constants.HEADER_TRANSLATE) }],
-          }]}
-        >
+        <View style={styles.mainContainer}>
+          {/* render status bar */}
+          <StatusBar
+              backgroundColor="#598FBA"
+          />
+          {/* render list */}
+          { this.state.transactions.length > 0 ? this.renderContent() : this.renderEmptyView()}
+          {/* render collapse layout */}
           <Animated.View
-            style={[styles.bar, {
-              transform: [
-                  { scale: this.getAnimationType(constants.VIEW_TRANSLATE) },
-                  { translateY: this.getAnimationType(constants.VIEWY_TRANSLATE) },
-              ],
-            }]}
+              style={[styles.collapseContainer, {
+                transform: [{ translateY: this.getAnimationType(constants.HEADER_TRANSLATE) }],
+              }]}
           >
             <Animated.View
-              style={styles.avatarInfoContainer}
+                style={[styles.bar, {
+                  transform: [
+                    { scale: this.getAnimationType(constants.VIEW_TRANSLATE) },
+                    { translateY: this.getAnimationType(constants.VIEWY_TRANSLATE) },
+                  ],
+                }]}
             >
-              <Animated.Image
-                style={styles.avatar}
-                source={profile.avatar ? { uri: profile.avatar.url } : ic_photo_holder}
-              />
-              <Animated.View style={styles.infoContainer}>
-                <Text style={styles.title}>{`${hmqInt}.`}
-                  <Text style={styles.titleDec}>
-                    {hmqDec || '00'} {balance.token.currency}
+              <Animated.View
+                  style={styles.avatarInfoContainer}
+              >
+                <Animated.Image
+                    style={styles.avatar}
+                    source={profile.avatar ? { uri: profile.avatar.url } : ic_photo_holder}
+                />
+                <Animated.View style={styles.infoContainer}>
+                  <Text style={styles.title}>{`${hmqInt}.`}
+                    <Text style={styles.titleDec}>
+                      {hmqDec || '00'} {balance.token.currency}
+                    </Text>
                   </Text>
-                </Text>
-                <Text style={styles.titleDec2}>
-                  {`${currencyInt}.`}{currencyDec || '00'} {balance.price.currency}
-                </Text>
+                  <Text style={styles.titleDec2}>
+                    {`${currencyInt}.`}{currencyDec || '00'} {balance.price.currency}
+                  </Text>
+                </Animated.View>
               </Animated.View>
             </Animated.View>
+            {/* render toolbar */}
+            <Animated.View style={[{
+              transform: [{ translateY: this.getAnimationType(constants.HEADER_TRANSLATE2) }],
+            }]}
+            >
+              <ToolbarAndroid
+                  onActionSelected={position => this.onActionClick(position)}
+                  style={{
+                    height: TOOLBAR_HEIGHT,
+                    backgroundColor: 'transparent',
+                    marginLeft: 5,
+                    marginRight: 5,
+                  }}
+                  actions={[{
+                    title: '',
+                    icon: ic_settings_white,
+                    show: 'always',
+                  }]}
+              />
+            </Animated.View>
           </Animated.View>
-          {/* render toolbar */}
-          <Animated.View style={[{
-            transform: [{ translateY: this.getAnimationType(constants.HEADER_TRANSLATE2) }],
-          }]}
-          >
-            <ToolbarAndroid
-              onActionSelected={position => this.onActionClick(position)}
-              style={{
-                height: TOOLBAR_HEIGHT,
-                backgroundColor: 'transparent',
-                marginLeft: 5,
-                marginRight: 5,
-              }}
-              actions={[{
-                title: '',
-                icon: ic_settings_white,
-                show: 'always',
-              }]}
-            />
-          </Animated.View>
-        </Animated.View>
-        {/* render fab button */}
-        {this.renderFabButton()}
-        {/* render transaction modal */}
-        {this.showTransactionsModal()}
-        {this.showNewTransactionsModal()}
-        {this.state.confirmTransactionVisibility ? this.showConfirmTransactionModal() : null}
-      </View>
+          {/* render fab button */}
+          {this.renderFabButton()}
+          {/* render transaction modal */}
+          {this.showTransactionsModal()}
+          {this.showNewTransactionsModal()}
+          {this.state.confirmTransactionVisibility ? this.showConfirmTransactionModal() : null}
+        </View>
     );
   }
 
@@ -395,18 +397,18 @@ export class Profile extends Component {
   };
 
   renderRow = child => (
-    <Item
-      item={child}
-      currentIndex={0}
-      size={2}
-      onClick={() => this.onItemClick(child)}
-    />
-    );
+      <Item
+          item={child}
+          currentIndex={0}
+          size={2}
+          onClick={() => this.onItemClick(child)}
+      />
+  );
 
   renderSectionHeader = (map, category) => (
-    <Text style={[styles.headerSection]}>
-      {category}
-    </Text>
+      <Text style={[styles.headerSection]}>
+        {category}
+      </Text>
   );
 
   _onRefresh() {
@@ -433,56 +435,57 @@ export class Profile extends Component {
   }
 
   renderContent = () => (
-    <ListView
-      enableEmptySections
-      onEndReachedThreshold={14}
-      onEndReached={() => this.onEndReached()}
-      dataSource={this.state.dataSource}
-      renderHeader={() => <View style={{ marginTop: HEADER_MAX_HEIGHT }} />}
-      renderRow={this.renderRow}
-      renderSectionHeader={this.renderSectionHeader}
-      style={{
-        backgroundColor: '#fff',
-      }}
-      showsVerticalScrollIndicator={false}
-      onScroll={Animated.event(
-          [{ nativeEvent: { contentOffset: { y: this.state.scrollY } } }],
-      )}
-      refreshControl={
-        <RefreshControl
-          progressViewOffset={150}
-          refreshing={this.state.refreshing}
-          onRefresh={() => this._onRefresh()}
-        />
-      }
-    />
+      <ListView
+          enableEmptySections
+          onEndReachedThreshold={14}
+          onEndReached={() => this.onEndReached()}
+          dataSource={this.state.dataSource}
+          renderHeader={() => <View style={{ marginTop: HEADER_MAX_HEIGHT }} />}
+          renderRow={this.renderRow}
+          renderSectionHeader={this.renderSectionHeader}
+          style={{
+            backgroundColor: '#fff',
+          }}
+          showsVerticalScrollIndicator={false}
+          onScroll={Animated.event(
+              [{ nativeEvent: { contentOffset: { y: this.state.scrollY } } }],
+          )}
+          refreshControl={
+            <RefreshControl
+                progressViewOffset={150}
+                refreshing={this.state.refreshing}
+                onRefresh={() => this._onRefresh()}
+            />
+          }
+      />
   );
 
   // render Empty View, if array is empty
   renderEmptyView = () => (
-    <ScrollView
-      contentContainerStyle={{ backgroundColor: '#fff', flex: 1, alignItems: 'center', justifyContent: 'center' }}
-      refreshControl={
-        <RefreshControl
-          progressViewOffset={150}
-          refreshing={this.state.refreshing}
-          onRefresh={() => this._onRefresh()}
-        />
-        }
-    >
-      <View style={styles.emptyViewContainer}>
-        <Image
-          resizeMode="contain"
-          style={styles.emptyImage}
-          source={ic_empty}
-        />
-      </View>
+      <ScrollView
+          contentContainerStyle={{ backgroundColor: '#fff', flex: 1, alignItems: 'center', justifyContent: 'center' }}
+          refreshControl={
+            <RefreshControl
+                progressViewOffset={150}
+                refreshing={this.state.refreshing}
+                onRefresh={() => this._onRefresh()}
+            />
+          }
+      >
+        <View style={styles.emptyViewContainer}>
+          <Image
+              resizeMode="contain"
+              style={styles.emptyImage}
+              source={ic_empty}
+          />
+        </View>
 
-    </ScrollView>
+      </ScrollView>
   );
 
   // on transaction item click handler
   onItemClick = (item) => {
+    console.warn(JSON.stringify(item));
     this.setState({
       item,
       modalVisibility: true,
@@ -498,12 +501,12 @@ export class Profile extends Component {
 
   // rendering fab button
   renderFabButton = () => (
-    <Fab
-      onClick={() => this.onFabButtonPress()}
-      source={ic_fab}
-      scroll={this.state.scrollY}
-      opacity={this.getAnimationType(constants.IMAGE_OPACITY)}
-    />);
+      <Fab
+          onClick={() => this.onFabButtonPress()}
+          source={ic_fab}
+          scroll={this.state.scrollY}
+          opacity={this.getAnimationType(constants.IMAGE_OPACITY)}
+      />);
 
   // to load more data
   loadMoreData() {
@@ -513,8 +516,8 @@ export class Profile extends Component {
   componentWillUnmount() {
     // to prevent null pointers
     this.activity = false;
-    DeviceEventEmitter.removeListener('EVENT_TRANSACTION_ERROR');
-    DeviceEventEmitter.removeListener('EVENT_TRANSACTION_CHANGED');
+    // DeviceEventEmitter.removeListener('EVENT_TRANSACTION_ERROR');
+    // DeviceEventEmitter.removeListener('EVENT_TRANSACTION_CHANGED');
     // DeviceEventEmitter.removeAllListeners()
   }
 
@@ -530,66 +533,69 @@ export class Profile extends Component {
 
   showConfirmTransactionModal() {
     return (
-      <TransactionConfirmModal
-        onCancelClick={() => this.setState({ confirmTransactionVisibility: false })}
-        onClick={() => this.onTransactionConfirmClick()}
-        item={this.state.newTransaction}
-        visibility={this.state.confirmTransactionVisibility}
-        contacts={this.props.contacts}
-      />
+        <TransactionConfirmModal
+            onCancelClick={() => {
+              this.emptyTransaction()
+              this.setState({ confirmTransactionVisibility: false })
+            }}
+            onClick={() => this.onTransactionConfirmClick()}
+            item={this.state.newTransaction}
+            visibility={this.state.confirmTransactionVisibility}
+            contacts={this.props.contacts}
+        />
     );
   }
 
   showTransactionsModal() {
     return (
-      <TransactionsModal
-        onCancelClick={() => this.setState({ modalVisibility: false })}
-        onChatClick={() => this.onChatClick()}
-        item={this.state.item}
-        visibility={this.state.modalVisibility}
-        currency={this.state.balance.price.currency}
-        rate={this.state.rate}
-      />
+        <TransactionsModal
+            onCancelClick={() => this.setState({ modalVisibility: false })}
+            onChatClick={() => this.onChatClick()}
+            item={this.state.item}
+            visibility={this.state.modalVisibility}
+            currency={this.state.balance.price.currency}
+            rate={this.state.rate}
+        />
     );
   }
 
   showNewTransactionsModal() {
     return (
-      <Modal
-        style={{ margin: 0 }}
-        isVisible={this.state.newTransactionModalVisibility}
-      >
-        <TouchableWithoutFeedback onPress={() => this.dismissModal()}>
-          <View style={styles2.rootContainer}>
-            <TouchableWithoutFeedback onPress={() => {}}>
-              <View style={styles2.content}>
+        <Modal
+            style={{ margin: 0 }}
+            isVisible={this.state.newTransactionModalVisibility}
+        >
+          <TouchableWithoutFeedback onPress={() => this.dismissModal()}>
+            <View style={styles2.rootContainer}>
+              <TouchableWithoutFeedback onPress={() => {}}>
+                <View style={styles2.content}>
 
-                <View style={styles2.imageContainer}>
-                  {/* <TouchableNativeFeedback onPress={() => this.dismissModal()}> */}
-                  {/* <View style={styles.transactionImageContainer}> */}
-                  {/* <Image source={ic_incoming_transaction} /> */}
-                  {/* </View> */}
-                  {/* </TouchableNativeFeedback> */}
+                  <View style={styles2.imageContainer}>
+                    {/* <TouchableNativeFeedback onPress={() => this.dismissModal()}> */}
+                    {/* <View style={styles.transactionImageContainer}> */}
+                    {/* <Image source={ic_incoming_transaction} /> */}
+                    {/* </View> */}
+                    {/* </TouchableNativeFeedback> */}
 
-                  <TouchableNativeFeedback onPress={() => this.openTransactionCreate()}>
-                    <View style={styles2.transactionImageContainer}>
-                      <Image source={ic_outgoing_transaction} />
+                    <TouchableNativeFeedback onPress={() => this.openTransactionCreate()}>
+                      <View style={styles2.transactionImageContainer}>
+                        <Image source={ic_outgoing_transaction} />
+                      </View>
+                    </TouchableNativeFeedback>
+                  </View>
+
+                  <View style={{ backgroundColor: '#e0e0e0', height: 1 }} />
+                  <TouchableNativeFeedback onPress={() => this.dismissModal()}>
+                    <View style={styles2.closeButtonContainer}>
+                      <Image source={ic_close_black} />
                     </View>
                   </TouchableNativeFeedback>
                 </View>
+              </TouchableWithoutFeedback>
 
-                <View style={{ backgroundColor: '#e0e0e0', height: 1 }} />
-                <TouchableNativeFeedback onPress={() => this.dismissModal()}>
-                  <View style={styles2.closeButtonContainer}>
-                    <Image source={ic_close_black} />
-                  </View>
-                </TouchableNativeFeedback>
-              </View>
-            </TouchableWithoutFeedback>
-
-          </View>
-        </TouchableWithoutFeedback>
-      </Modal>
+            </View>
+          </TouchableWithoutFeedback>
+        </Modal>
     );
   }
 
@@ -627,28 +633,34 @@ export class Profile extends Component {
 
   onTransactionConfirmClick() {
     const { newTransaction, transactionsId } = this.state;
+
     let toUserId = null;
     let toUserAddress = null;
-    if (newTransaction.contactID !== 0) {
+    if (newTransaction.contactID !== 0 && newTransaction.contactID !== '') {
       toUserId = newTransaction.contactID;
     } else if (newTransaction.adress) {
       toUserAddress = newTransaction.adress;
     }
+
+    console.warn(newTransaction.adress)
+
     HumaniqProfileApiLib.createTransaction(this.props.id, toUserId, toUserAddress, (newTransaction.amount * 100000000))
-      .then((resp) => {
-        if (resp.code === 401) {
-          this.navigateTo('Tutorial');
-        } else {
-          // do your stuff
-          console.log('create transaction::', resp);
-          transactionsId.push(resp);
-          this.setState({ transactionsId });
-        }
-      })
-      .catch((err) => {
-        // handle error
-        console.log('create transaction error::', err);
-      });
+        .then((resp) => {
+          console.warn(JSON.stringify(resp))
+          if (resp.code === 401) {
+            this.navigateTo('Tutorial');
+          } else {
+            // do your stuff
+            console.log('create transaction::', resp);
+            transactionsId.push(resp);
+            this.setState({ transactionsId });
+          }
+        })
+        .catch((err) => {
+          // handle error
+          console.warn(JSON.stringify(err))
+          console.log('create transaction error::', err);
+        });
     this.emptyTransaction();
     this.setState({ confirmTransactionVisibility: false });
   }
