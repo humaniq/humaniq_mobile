@@ -112,7 +112,7 @@ export class Password extends Component {
             token: nextProps.user.account.payload.payload.token,
             account_id: registeredAcc.account_id,
             facial_image_id: this.props.user.validate.payload.payload.facial_image_id,
-            password,
+            password: this.state.password,
             device_imei: IMEI.getImei(),
           };
           HumaniqTokenApiLib.saveCredentials(map2)
@@ -143,7 +143,7 @@ export class Password extends Component {
             token: nextProps.user.account.payload.payload.token,
             account_id: nextProps.user.account.payload.payload.account_id,
             facial_image_id: this.props.user.validate.payload.payload.facial_image_id,
-            password,
+            password: this.state.password,
             device_imei: IMEI.getImei(),
           };
           HumaniqTokenApiLib.saveCredentials(map)
