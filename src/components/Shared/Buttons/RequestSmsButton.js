@@ -14,7 +14,7 @@ const ic_clock = require('../../../assets/icons/ic_clock.png');
 const propTypes = {
   onPress: PropTypes.func.isRequired,
   disabled: PropTypes.bool,
-  cooldownTime: PropTypes.string,
+  cooldownTime: PropTypes.number,
 };
 
 export default function RequestSmsButton(props) {
