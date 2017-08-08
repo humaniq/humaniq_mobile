@@ -35,7 +35,7 @@ export class TelInput extends Component {
         isFetching: PropTypes.bool,
       }).isRequired,
       photo: PropTypes.string.isRequired,
-      phoneNumber: PropTypes.string,
+      phoneNumber: PropTypes.object,
     }).isRequired,
 
     phoneNumberCreate: PropTypes.func.isRequired,
