@@ -25,13 +25,14 @@ class Item extends Component {
   }
 
   render() {
+    const divideBy = 100000000;
     let sign = '';
     const { item, currentIndex, size, onClick } = this.props;
-    const priceBeforePoint = item.amount.toString().split('.')[0];
-    const priceAfterPoint = item.amount.toString().split('.')[1];
+    const priceBeforePoint = item.amount ? (parseFloat(item.amount / divideBy)).toString().split('.')[0] : '';
+    const priceAfterPoint = item.amount ? (parseFloat(item.amount / divideBy)).toString().split('.')[1] : '';
 
-    const sender = item.from_user ? item.from_user : {};
-    const receiver = item.to_user ? item.to_user : {};
+    const receiver = item.from_user ? item.from_user : {};
+    const sender = item.to_user ? item.to_user : {};
     let user = {};
 
     // type == 0 -> incoming (receive)
@@ -165,7 +166,7 @@ class Item extends Component {
   }
 
   renderWallet = (item) => {
-    const wallet = item.from_address
+    const wallet = item.from_address;
     return (
       <View style={{ flex: 1, alignSelf: 'center' }}>
         <Text style={styles.phone}>

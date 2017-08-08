@@ -88,7 +88,7 @@ class TransactionConfirmModal extends Component {
                         source={ic_outgoing}
                       />
                     </View>
-                    {contact && contact.name ? this.renderCredentials(contact) : this.renderWallet(contact)}
+                    {this.showCreds(contact, item)}
                     <View style={styles.priceContainer}>
                       <Text style={styles.priceInt}>
                         {`${priceBeforePoint}.`}
@@ -115,16 +115,16 @@ class TransactionConfirmModal extends Component {
 
 
   renderCredentials = contact => (
-    <View style={{alignItems: 'center', justifyContent: 'center'}}>
+    <View style={{ alignItems: 'center', justifyContent: 'center' }}>
       <Text style={styles.name}>{`${contact.name}`}</Text>
       <Text style={styles.phone}>{`${contact.phone}`}</Text>
     </View>
   );
 
-  renderWallet = (contact) => {
-    const wallet = contact.phone
+  renderWallet = (item) => {
+    const wallet = item ? item.adress : '';
     return (
-      <View style={{ flex: 1, alignSelf: 'center' }}>
+      <View style={{ alignSelf: 'center', justifyContent: 'center', marginLeft: 16, marginRight: 16 }}>
         <Text style={styles.name}>
           {wallet}
         </Text>
@@ -132,6 +132,26 @@ class TransactionConfirmModal extends Component {
     );
   };
 
+  renderPhone = (item) => {
+    const wallet = item ? item.phone : '';
+    return (
+      <View style={{ alignSelf: 'center', justifyContent: 'center', marginLeft: 16, marginRight: 16 }}>
+        <Text style={styles.name}>
+          {wallet}
+        </Text>
+      </View>
+    );
+  };
+
+  showCreds(contact, item) {
+    if (contact && contact.name) {
+      return this.renderCredentials(contact);
+    } else if (item.phone) {
+      return this.renderPhone(item);
+    } else {
+      return this.renderWallet(item);
+    }
+  }
 }
 
 const styles = CustomStyleSheet({

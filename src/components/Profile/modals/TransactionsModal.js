@@ -53,6 +53,7 @@ class TransactionsModal extends Component {
   };
 
   render() {
+    const divideBy = 100000000;
     const {
       onChatClick,
       visibility,
@@ -61,17 +62,17 @@ class TransactionsModal extends Component {
       currency,
       rate,
     } = this.props;
-    const sender = item.from_user;
-    const receiver = item.to_user;
+    const receiver = item.from_user;
+    const sender = item.to_user;
     let user = {};
     if (item.type === 0) {
       user = receiver;
     } else if (item.type === 1) {
       user = sender;
     }
-    const priceBeforePoint = item.amount ? item.amount.toString().split('.')[0] : '';
-    const priceAfterPoint = item.amount ? item.amount.toString().split('.')[1] : '';
-    const amFloat = Math.round(parseFloat(item.amount) * rate * 100) / 100;
+    const priceBeforePoint = item.amount ? (parseFloat(item.amount / divideBy)).toString().split('.')[0] : '';
+    const priceAfterPoint = item.amount ? (parseFloat(item.amount / divideBy)).toString().split('.')[1] : '';
+    const amFloat = Math.round(parseFloat(item.amount / divideBy) * rate * 100) / 100;
 
     return (
       <View>

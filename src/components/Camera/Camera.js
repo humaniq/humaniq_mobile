@@ -154,7 +154,7 @@ export class Cam extends Component {
             this.setState({ animation: doneAnimation });
             this.animate(1000, 0, 1, () => {
               this.setState({ animation: pressAnimation });
-              this.props.navigation.navigate('Tutorial', { nextScene: 'Password' });
+              this.navigateTo('Tutorial', { nextScene: 'Password' });
             });
           }
 
@@ -213,18 +213,13 @@ export class Cam extends Component {
     ) {
       this.state.progress.stopAnimation();
       this.state.progress.setValue(0);
-      let code = 0;
-      if (nextProps.user.faceEmotionValidate.payload.errors) {
-        code = Number(nextProps.user.faceEmotionValidate.payload.errors[0].code);
-      } else {
-        code = nextProps.user.faceEmotionValidate.payload.code;
-      }
+      const code = nextProps.user.faceEmotionValidate.payload.code;
       console.log('validateFacialRecognitionValidationReceiveProps', code);
       if (code === 3008) {
         // reduce emotions there
         this.setState({ animation: doneAnimation });
         this.animate(1000, 0, 1, () => {
-          this.props.navigation.navigate('Tutorial', { nextScene: 'Password' });
+          this.navigateTo('Tutorial', { nextScene: 'Password' });
         });
       } else {
         this.setState({
@@ -314,7 +309,7 @@ export class Cam extends Component {
   navigateTo = (screen, params) => {
     const resetAction = NavigationActions.reset({
       index: 0,
-      actions: [NavigationActions.navigate({ routeName: screen, params: params })],
+      actions: [NavigationActions.navigate({ routeName: screen , params: params })],
     });
     this.props.navigation.dispatch(resetAction);
   };
@@ -362,7 +357,7 @@ export class Cam extends Component {
         } }
         style={styles.camera}
         aspect={Camera.constants.Aspect.fill}
-        captureQuality={Camera.constants.CaptureQuality.low}
+        captureQuality={Camera.constants.CaptureQuality.medium}
         type={camtype}
         captureTarget={Camera.constants.CaptureTarget.disk}
         onBarCodeRead={onBarCode}
@@ -384,7 +379,7 @@ export class Cam extends Component {
     const { params = {} } = this.props.navigation.state;
     const { mode } = params;
     const isQR = mode === 'qr'
-    const fn = ()=>null;
+    const fn = () => null;
     return (
       <View style={styles.container}>
         <Modal

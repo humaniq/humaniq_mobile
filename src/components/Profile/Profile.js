@@ -93,6 +93,7 @@ export class Profile extends Component {
   offset = 0
   limit = 10
   activity = true
+  divideBy = 100000000
 
   convertToMap = (array) => {
     const categoryMap = {};
@@ -115,7 +116,7 @@ export class Profile extends Component {
   };
 
   componentWillMount() {
-    console.warn(this.props.id)
+    console.warn(this.props.id);
     DeviceEventEmitter.addListener('EVENT_TRANSACTION_ERROR', (event) => {
       console.log('ошибка');
       console.log(event);
@@ -167,7 +168,8 @@ export class Profile extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.newTransaction && nextProps.newTransaction.amount !== 0) {
+    console.warn(JSON.stringify(nextProps.newTransaction))
+    if (nextProps.newTransaction && nextProps.newTransaction.amount !== 0 ) {
       const { newTransaction } = nextProps;
       this.setState({ newTransaction, confirmTransactionVisibility: true });
     }
@@ -192,7 +194,7 @@ export class Profile extends Component {
   navigateTo = (screen, params) => {
     const resetAction = NavigationActions.reset({
       index: 0,
-      actions: [NavigationActions.navigate({ routeName: screen, params: params })],
+      actions: [NavigationActions.navigate({ routeName: screen, params })],
     });
     this.props.navigation.dispatch(resetAction);
   };
@@ -208,14 +210,14 @@ export class Profile extends Component {
             const { balance } = this.state;
             if (addressState) {
               balance.token.currency = addressState.token.currency;
-              balance.token.amount = addressState.token.amount.toString();
+              balance.token.amount = (parseFloat(addressState.token.amount / this.divideBy)).toString();
               // if local currency is null, use default currency
               if (addressState.local) {
                 balance.price.currency = addressState.local.currency;
-                balance.price.amount = addressState.local.amount.toString();
+                balance.price.amount = (parseFloat(addressState.local.amount / this.divideBy)).toString();
               } else {
                 balance.price.currency = addressState.default.currency;
-                balance.price.amount = addressState.default.amount.toString();
+                balance.price.amount = (parseFloat(addressState.default.amount / this.divideBy)).toString();
               }
             }
             this.setState({ balance });
@@ -483,6 +485,7 @@ export class Profile extends Component {
 
   // on transaction item click handler
   onItemClick = (item) => {
+    console.warn(JSON.stringify(item));
     this.setState({
       item,
       modalVisibility: true,
@@ -513,8 +516,8 @@ export class Profile extends Component {
   componentWillUnmount() {
     // to prevent null pointers
     this.activity = false;
-    DeviceEventEmitter.removeListener('EVENT_TRANSACTION_ERROR');
-    DeviceEventEmitter.removeListener('EVENT_TRANSACTION_CHANGED');
+    // DeviceEventEmitter.removeListener('EVENT_TRANSACTION_ERROR');
+    // DeviceEventEmitter.removeListener('EVENT_TRANSACTION_CHANGED');
     // DeviceEventEmitter.removeAllListeners()
   }
 
@@ -531,7 +534,10 @@ export class Profile extends Component {
   showConfirmTransactionModal() {
     return (
       <TransactionConfirmModal
-        onCancelClick={() => this.setState({ confirmTransactionVisibility: false })}
+        onCancelClick={() => {
+          this.emptyTransaction()
+          this.setState({ confirmTransactionVisibility: false })
+        }}
         onClick={() => this.onTransactionConfirmClick()}
         item={this.state.newTransaction}
         visibility={this.state.confirmTransactionVisibility}
@@ -627,15 +633,20 @@ export class Profile extends Component {
 
   onTransactionConfirmClick() {
     const { newTransaction, transactionsId } = this.state;
+
     let toUserId = null;
     let toUserAddress = null;
-    if (newTransaction.contactID !== 0) {
+    if (newTransaction.contactID !== 0 && newTransaction.contactID !== '') {
       toUserId = newTransaction.contactID;
     } else if (newTransaction.adress) {
       toUserAddress = newTransaction.adress;
     }
+
+    console.warn(newTransaction.adress)
+
     HumaniqProfileApiLib.createTransaction(this.props.id, toUserId, toUserAddress, (newTransaction.amount * 100000000))
       .then((resp) => {
+      console.warn(JSON.stringify(resp))
         if (resp.code === 401) {
           this.navigateTo('Tutorial');
         } else {
@@ -647,6 +658,7 @@ export class Profile extends Component {
       })
       .catch((err) => {
         // handle error
+        console.warn(JSON.stringify(err))
         console.log('create transaction error::', err);
       });
     this.emptyTransaction();
