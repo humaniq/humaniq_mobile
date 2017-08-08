@@ -38,7 +38,7 @@ function password(state = '', action) {
   }
 }
 
-function phoneNumber(state = '', action) {
+function phoneNumber(state = {}, action) {
   switch (action.type) {
     case ActionTypes.SAVE_PHONE:
       return action.number;
