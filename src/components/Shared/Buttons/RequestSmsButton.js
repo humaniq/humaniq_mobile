@@ -24,12 +24,12 @@ export default function RequestSmsButton(props) {
   return (
     // using TouchH instead TouchO to disable pressing when prop active == false
     <TouchableHighlight
-      style={styles.container}
+      style={[styles.container, disabled && cooldownTime == 0 ? styles.disabled : null]}
       onPress={disabled ? null : props.onPress}
       underlayColor={'transparent'}
       activeOpacity={0.5}
     >
-      {disabled ?
+      {disabled && cooldownTime > 0 ?
         <View style={styles.cooldownContainer}>
           <Text style={styles.cooldownTxt}>{cooldownTime}</Text>
           <Image source={ic_clock} />
@@ -63,6 +63,7 @@ const styles = CustomStyleSheet({
     marginRight: 4,
   },
   disabled: {
+    backgroundColor: '$cPaper',
     opacity: 0.6,
   },
 });
