@@ -19,7 +19,6 @@ import Modal from '../Shared/Components/Modal';
 import { vw } from '../../utils/units';
 import { phoneNumberValidate, smsCodeRepeat } from '../../actions';
 
-
 export class CodeInput extends Component {
   static propTypes = {
     user: PropTypes.shape({
@@ -32,7 +31,7 @@ export class CodeInput extends Component {
         isFetching: PropTypes.bool,
       }).isRequired,
       photo: PropTypes.string.isRequired,
-      phoneNumber: PropTypes.string,
+      phoneNumber: PropTypes.object.isRequired,
     }).isRequired,
 
     phoneNumberValidate: PropTypes.func.isRequired,
@@ -50,9 +49,21 @@ export class CodeInput extends Component {
     modalVisible: false,
     errorCode: null,
     cooldownTime: 0,
+    noAttempts: false,
   };
 
   componentDidMount() {
+    this.setState({ cooldownTime: 120 });
+    let interval;
+    let cooldown = () => {
+      if (this.state.cooldownTime > 0) {
+        this.setState({ cooldownTime: this.state.cooldownTime -= 1 });
+      } else {
+        clearInterval(interval);
+      }
+    };
+    interval = setInterval(cooldown, 1000);
+
     this.listener = SmsListener.addListener((message) => {
       const body = message.body;
       const hmqRegEx = /humaniq/gi;
@@ -74,64 +85,88 @@ export class CodeInput extends Component {
   componentWillReceiveProps(nextProps) {
     // TODO: MOVE TO SAGA TO PREVENT LAG
     // console.log('📞 nextProps', nextProps.user.validate);
+    if (nextProps.user.smsCodeRepeat.payload) {
+      console.log('✷✷✷✷✷ code', nextProps.user.smsCodeRepeat);
+      let code = nextProps.user.smsCodeRepeat.payload.code;
+      if (code == 4008 || code == 4010) {
+        this.setState({
+          noAttempts: true,
+        });
+      } else if (code == 4007) {
+        // too quick request, on first attempt;
+        alert('timeout 120 sec');
+      } else if (code == 4006) {
+        // run interval
+        this.setState({ cooldownTime: 120 });
+        let interval;
+        let cooldown = () => {
+          if (this.state.cooldownTime > 0) {
+            this.setState({ cooldownTime: this.state.cooldownTime -= 1 });
+          } else {
+            clearInterval(interval);
+          }
+        };
+        interval = setInterval(cooldown, 1000);
+      }
+    }
+
     if (nextProps.user.phoneValidate.payload) {
-      const code = nextProps.user.phoneValidate.payload.code;
+      let code = nextProps.user.phoneValidate.payload.code;
+      switch (code) {
+        case 6000:
+          // alert(nextProps.user.validate.payload.message);
+          this.setState({
+            modalVisible: true,
+            errorCode: code,
+          });
+          break;
 
-      if (true) {
-        switch (code) {
-          case 6000:
-            // alert(nextProps.user.validate.payload.message);
-            this.setState({
-              modalVisible: true,
-              errorCode: code,
-            });
-            break;
+        case 4002:
+          this.setState({ code }, () => this.props.navigation.navigate('Profile'));
+          break;
 
-          case 4002:
-            this.setState({ code }, () => this.props.navigation.navigate('Profile'));
-            break;
+        case 4004:
+          this.setState({
+            modalVisible: true,
+            errorCode: code,
+          });
+          break;
 
-          case 4004:
-            this.setState({
-              modalVisible: true,
-              errorCode: code,
-            });
-            break;
+        case 4003:
+          this.setState({
+            modalVisible: true,
+            errorCode: code,
+          });
+          break;
 
-          case 4003:
-            this.setState({
-              modalVisible: true,
-              errorCode: code,
-            });
-            break;
+        case 4010:
+          this.setState({
+            // noAttempts: true,
+            modalVisible: true,
+            errorCode: code,
+          });
+          break;
 
-          case 4010:
-            this.setState({
-              modalVisible: true,
-              errorCode: code,
-            });
-            break;
+        case 4001:
+          this.setState({
+            modalVisible: true,
+            errorCode: code,
+          });
+          break;
 
-          case 4001:
-            this.setState({
-              modalVisible: true,
-              errorCode: code,
-            });
-            break;
+        case 4009:
+          this.setState({
+            noAttempts: true,
+            // modalVisible: true,
+            // errorCode: code,
+          });
+          break;
 
-          case 4009:
-            this.setState({
-              modalVisible: true,
-              errorCode: code,
-            });
-            break;
-
-          default:
-            this.setState({
-              modalVisible: true,
-              errorCode: code,
-            });
-        }
+        default:
+          this.setState({
+            modalVisible: true,
+            errorCode: code,
+          });
       }
     }
   }
@@ -226,16 +261,6 @@ export class CodeInput extends Component {
       imei: IMEI.getImei().toString(),
     });
     // set cooldown
-    this.setState({ cooldownTime: 45 });
-    let interval;
-    let cooldown = () => {
-      if (this.state.cooldownTime > 0) {
-        this.setState({ cooldownTime: this.state.cooldownTime -= 1 });
-      } else {
-        clearInterval(interval);
-      }
-    };
-    interval = setInterval(cooldown, 1000);
   };
 
   render() {
@@ -254,12 +279,12 @@ export class CodeInput extends Component {
         <View style={styles.buttonsContainer}>
           <RequestSmsButton
             onPress={this.handleRequestSms}
-            disabled={this.state.cooldownTime > 0}
+            disabled={this.state.cooldownTime > 0 || this.state.noAttempts}
             cooldownTime={this.state.cooldownTime}
           />
           <ConfirmButton
             onPress={this.handleCodeConfirm}
-            disabled={this.state.code.length < 6}
+            disabled={this.state.code.length < 6 || this.state.noAttempts}
           />
         </View>
         <PhoneKeyboard
