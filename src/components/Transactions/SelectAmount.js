@@ -5,7 +5,7 @@ import { View, TouchableOpacity, Image, Text } from 'react-native';
 import VMasker from 'vanilla-masker';
 import PropTypes from 'prop-types';
 
-import { HumaniqProfileApiLib } from 'react-native-android-library-humaniq-api';
+import { HumaniqProfileApiLib, HumaniqContactsApiLib } from 'react-native-android-library-humaniq-api';
 
 import { connect } from 'react-redux';
 import { NavigationActions } from 'react-navigation';
@@ -51,6 +51,14 @@ class SelectAmount extends React.Component {
       amount: '00000',
       maskedAmount: VMasker.toPattern(0, pattern),
     };
+  }
+
+  componentWillMount() {
+    const { newTransaction } = this.props;
+    console.warn(JSON.stringify(newTransaction));
+    if (newTransaction.phone && !newTransaction.adress) {
+      this.getAccount(newTransaction);
+    }
   }
 
   componentDidMount() {
@@ -187,6 +195,32 @@ class SelectAmount extends React.Component {
         {this.renderContent()}
       </View>
     );
+  }
+
+  getAccount(newTransaction) {
+    HumaniqContactsApiLib.extractSinglePhoneNumber(newTransaction.phone)
+      .then((contacts) => {
+        console.warn(JSON.stringify(contacts));
+        if (contacts.length > 0) {
+          if (contacts[0].accountId) {
+            this.props.setTrContact(contacts[0].accountId);
+          }
+        } else {
+          // show modal or alert message
+        }
+      })
+      .catch(err => console.warn(JSON.stringify(err)));
+  }
+
+  getProfileInfo(accountId) {
+    HumaniqProfileApiLib.getAccountProfile(accountId)
+      .then((profile) => {
+        //this.props.setTrContact
+        console.warn(JSON.stringify(profile));
+      })
+      .catch((err) => {
+        console.warn(JSON.stringify(err));
+      });
   }
 }
 
