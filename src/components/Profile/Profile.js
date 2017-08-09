@@ -169,6 +169,7 @@ export class Profile extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
+    console.warn(JSON.stringify(nextProps.newTransaction));
     if (nextProps.newTransaction && nextProps.newTransaction.amount !== 0) {
       const { newTransaction } = nextProps;
       this.setState({ newTransaction, confirmTransactionVisibility: true });
@@ -458,8 +459,9 @@ export class Profile extends Component {
           progressViewOffset={150}
           refreshing={this.state.refreshing}
           onRefresh={() => this._onRefresh()}
+          colors={['#2586C6']}
         />
-          }
+      }
     />
   );
 
@@ -472,8 +474,9 @@ export class Profile extends Component {
           progressViewOffset={150}
           refreshing={this.state.refreshing}
           onRefresh={() => this._onRefresh()}
+          colors={['#2586C6']}
         />
-          }
+      }
     >
       <View style={styles.emptyViewContainer}>
         <Image
@@ -649,7 +652,7 @@ export class Profile extends Component {
           if (resp.code === 401) {
             this.navigateTo('Tutorial');
           } else {
-            // do your stuff
+            // save transaction id in array
             console.log('create transaction::', resp);
             transactionsId.push(resp);
             this.setState({ transactionsId });
