@@ -52,7 +52,7 @@ export class Accounts extends Component {
             >
               <View style={styles.accountInfoContainer}>
                 {acc.photo.length > 0 &&
-                <Image style={styles.profilePhoto} source={{ uri: acc.photo }}/>
+                <Image style={styles.profilePhoto} source={{ uri: acc.photo }} />
                 }
                 <Text style={styles.id}>{`${acc.accountId} / phone: ${acc.phone}`}</Text>
               </View>
@@ -85,11 +85,11 @@ const styles = CustomStyleSheet({
     backgroundColor: '$cBrand_dark',
     borderBottomWidth: 1,
     borderColor: 'lightgray',
-    elevation: 2
+    elevation: 2,
   },
   illustration: {
     width: 360,
-    height: 147
+    height: 147,
   },
   accountBtn: {
     flexDirection: 'row',

@@ -13,15 +13,14 @@ import DeviceInfo from 'react-native-device-info';
 import IMEI from 'react-native-imei';
 import { HumaniqTokenApiLib } from 'react-native-android-library-humaniq-api';
 
-import Keyboard from '../Shared/Components/Keyboard';
+import { NavigationActions } from 'react-navigation';
+import { login, signup, setPassword, addPrimaryAccount, addSecondaryAccount } from '../../actions';
+import Modal from '../Shared/Components/Modal';
 import CustomStyleSheet from '../../utils/customStylesheet';
+import Keyboard from '../Shared/Components/Keyboard';
+import { vw } from '../../utils/units';
 
 const spinner = require('../../assets/animations/s-spiner.json');
-
-import { login, signup, setPassword, addPrimaryAccount, addSecondaryAccount } from '../../actions';
-import { NavigationActions } from 'react-navigation';
-import Modal from "../Shared/Components/Modal";
-import { vw } from '../../utils/units';
 
 export class Password extends Component {
   static propTypes = {
@@ -40,7 +39,7 @@ export class Password extends Component {
       photo: PropTypes.string.isRequired,
     }).isRequired,
 
-    setPassword: PropTypes.func.isRequired,
+    // setPassword: PropTypes.func.isRequired,
     login: PropTypes.func.isRequired,
     signup: PropTypes.func.isRequired,
     navigation: PropTypes.shape({
@@ -64,24 +63,6 @@ export class Password extends Component {
     errorCode: null,
   };
 
-  componentDidMount() {
-  }
-
-  animateCycle = (time, fr = 0, to = 1, callback) => {
-    Animated.loop(
-      Animated.sequence([
-        Animated.timing(this.state.progress, {
-          toValue: 1,
-          duration: 2000,
-        }),
-        Animated.timing(this.state.progress, {
-          toValue: 0,
-          duration: 0,
-        }),
-      ]),
-    ).start();
-  }
-
   componentWillReceiveProps(nextProps) {
     if (!this.props.user.account.isFetching && nextProps.user.account.isFetching) {
       this.animateCycle(2000, 0, 1);
@@ -94,7 +75,7 @@ export class Password extends Component {
       }
 
       const code = nextProps.user.account.payload.code;
-      const password = nextProps.user.password;
+      // const password = nextProps.user.password;
 
       switch (code) {
         case 6000:
@@ -106,7 +87,7 @@ export class Password extends Component {
 
         case 1001:
           const registeredAcc = nextProps.user.account.payload.payload.account_information;
-          console.log('registeredAccount ::', registeredAcc)
+          console.log('registeredAccount ::', registeredAcc);
           // this.props.navigation.navigate('TelInput');
           const map2 = {
             token: nextProps.user.account.payload.payload.token,
@@ -116,7 +97,7 @@ export class Password extends Component {
             device_imei: IMEI.getImei(),
           };
           HumaniqTokenApiLib.saveCredentials(map2)
-              .then((res) => console.log(res))
+              .then(res => console.log(res))
               .catch(err => console.log(err));
           // TODO: replace with validated??
           if (registeredAcc.phone_number.country_code) {
@@ -147,7 +128,7 @@ export class Password extends Component {
             device_imei: IMEI.getImei(),
           };
           HumaniqTokenApiLib.saveCredentials(map)
-              .then((res) => {console.log(res)})
+              .then((res) => { console.log(res); })
               .catch(err => console.log(err));
           this.navigateTo('Profile');
           break;
@@ -178,10 +159,25 @@ export class Password extends Component {
     }
   }
 
+  animateCycle = (/* time, fr = 0, to = 1, callback */) => {
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(this.state.progress, {
+          toValue: 1,
+          duration: 2000,
+        }),
+        Animated.timing(this.state.progress, {
+          toValue: 0,
+          duration: 0,
+        }),
+      ]),
+    ).start();
+  };
+
   navigateTo = (screen, params) => {
     const resetAction = NavigationActions.reset({
       index: 0,
-      actions: [NavigationActions.navigate({ routeName: screen, params: params })],
+      actions: [NavigationActions.navigate({ routeName: screen, params })],
     });
     this.props.navigation.dispatch(resetAction);
   };
@@ -239,7 +235,7 @@ export class Password extends Component {
       // TODO: go to tel input with reset
       this.createRegistration(password);
     } else {
-      this.props.navigation.navigate('Password', { password: password });
+      this.props.navigation.navigate('Password', { password });
     }
   };
 
@@ -257,8 +253,8 @@ export class Password extends Component {
     // TODO: set real ID;
     const isEmulator = DeviceInfo.isEmulator();
     const randomImei = Math.floor((10000000 + Math.random()) * 90000000).toString();
-    // const imei = isEmulator ? randomImei : IMEI.getImei();
-    const imei = randomImei.toString();
+    const imei = isEmulator ? randomImei : IMEI.getImei();
+    // const imei = randomImei.toString();
     // const imei = '1111111111925';
 
     this.props.signup({
@@ -266,6 +262,31 @@ export class Password extends Component {
       device_imei: imei,
       password,
     });
+  };
+
+  animatePasswordError = () => {
+    Animated.sequence([
+      Animated.timing(this.state.passwordError, {
+        toValue: vw(-30),
+        duration: 50,
+      }),
+      Animated.timing(this.state.passwordError, {
+        toValue: vw(30),
+        duration: 100,
+      }),
+      Animated.timing(this.state.passwordError, {
+        toValue: vw(-30),
+        duration: 100,
+      }),
+      Animated.timing(this.state.passwordError, {
+        toValue: vw(30),
+        duration: 100,
+      }),
+      Animated.timing(this.state.passwordError, {
+        toValue: vw(0),
+        duration: 50,
+      }),
+    ]).start(() => { this.setState({ error: null }); });
   };
 
   renderPassMask = () => {
@@ -296,31 +317,6 @@ export class Password extends Component {
     );
   };
 
-  animatePasswordError = () => {
-    Animated.sequence([
-      Animated.timing(this.state.passwordError, {
-        toValue: vw(-30),
-        duration: 50,
-      }),
-      Animated.timing(this.state.passwordError, {
-        toValue: vw(30),
-        duration: 100,
-      }),
-      Animated.timing(this.state.passwordError, {
-        toValue: vw(-30),
-        duration: 100,
-      }),
-      Animated.timing(this.state.passwordError, {
-        toValue: vw(30),
-        duration: 100,
-      }),
-      Animated.timing(this.state.passwordError, {
-        toValue: vw(0),
-        duration: 50,
-      }),
-    ]).start(() => { this.setState({ error: null }); });
-  }
-
   renderInputStep = () => {
     // 3002 - registered
     // 3003 - new user
@@ -346,14 +342,14 @@ export class Password extends Component {
           onPress={this.handleDismissModal}
           code={this.state.errorCode}
           visible={this.state.error != null && this.state.errorCode != null}
-          />
+        />
         <View style={styles.header}>
           <View style={styles.animationContainer}>
             <Animation
               style={styles.animation}
               source={spinner}
               progress={this.state.progress}
-              />
+            />
           </View>
           <Image style={styles.userPhoto} source={{ uri: this.props.user.photo }} />
           {this.renderInputStep() }
@@ -364,8 +360,7 @@ export class Password extends Component {
             isBackspaceEnabled={(this.state.password.length > 0) && !this.props.user.account.isFetching}
             onNumberPress={this.handleNumberPress}
             onBackspacePress={this.handleBackspacePress}
-            // onHelpPress={this.handleHelpPress}
-            />
+          />
         </View>
       </View>
     );
