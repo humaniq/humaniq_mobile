@@ -28,10 +28,10 @@ const whiteMask = require('../../assets/icons/white_mask.png');
 const repeat = require('../../assets/icons/repeat.png');
 // eslint-disable-next-line import/no-unresolved
 
-//Emoji assetss
+// Emoji assetss
 const emojiHappy = require('../../assets/icons/emojiHappy.png');
 
-//Button animations
+// Button animations
 const emergeAnimation = require('../../assets/animations/emerge.json');
 const pressAnimation = require('../../assets/animations/press.json');
 const scaleAnimation = require('../../assets/animations/scale.json');
@@ -91,11 +91,10 @@ export class Cam extends Component {
     };
   }
 
-  componentWillMount() {
-    // console.log('props camera', this.props);
-  }
-
-  componentDidMount() {
+  componentWillReceiveProps(nextProps) {
+    // TODO: MOVE TO SAGA TO PREVENT LAG
+    // console.log('📞 nextProps', nextProps.user.validate);
+    this[`${this.state.photoGoal}ReceiveProps`](nextProps);
   }
 
   animateEmoji = (callback) => {
@@ -103,7 +102,7 @@ export class Cam extends Component {
       toValue: 1,
       duration: 2000,
     }).start(callback);
-  }
+  };
 
   replayEmoji = () => {
     this.setState({ isButtonVisible: false });
@@ -112,16 +111,10 @@ export class Cam extends Component {
       this.setState({ isButtonVisible: true, animation: emergeAnimation });
       this.animate(1000, 0, 1, () => {
         this.state.progress.setValue(0);
-        this.setState({ animation: pressAnimation })
+        this.setState({ animation: pressAnimation });
       });
-    })
-  }
-
-  componentWillReceiveProps(nextProps) {
-    // TODO: MOVE TO SAGA TO PREVENT LAG
-    // console.log('📞 nextProps', nextProps.user.validate);
-    this[`${this.state.photoGoal}ReceiveProps`](nextProps);
-  }
+    });
+  };
 
   isRegisteredReceiveProps = (nextProps) => {
     if (nextProps.user.validate.payload && this.props.user.validate.isFetching && !nextProps.user.validate.isFetching) {
@@ -154,7 +147,7 @@ export class Cam extends Component {
             this.setState({ animation: doneAnimation });
             this.animate(1000, 0, 1, () => {
               this.setState({ animation: pressAnimation });
-              this.navigateTo('Tutorial', { nextScene: 'Password' });
+              this.props.navigation.navigate('Tutorial', { nextScene: 'Password' });
             });
           }
 
@@ -166,7 +159,7 @@ export class Cam extends Component {
             error: true,
             errorCode: code,
             path: '',
-            animation: pressAnimation
+            animation: pressAnimation,
           });
       }
     }
@@ -190,7 +183,7 @@ export class Cam extends Component {
             path: '',
             photoGoal: 'validateFacialRecognitionValidation',
             requiredEmotions: nextProps.user.faceEmotionCreate.payload.payload.required_emotions,
-            isButtonVisible: false
+            isButtonVisible: false,
           });
           // After state is updated, need to animate emoji there
           this.replayEmoji();
@@ -200,7 +193,7 @@ export class Cam extends Component {
           error: true,
           errorCode: code,
           path: '',
-          animation: doneAnimation
+          animation: doneAnimation,
         });
       }
     }
@@ -213,13 +206,18 @@ export class Cam extends Component {
     ) {
       this.state.progress.stopAnimation();
       this.state.progress.setValue(0);
-      const code = nextProps.user.faceEmotionValidate.payload.code;
+      let code = 0;
+      if (nextProps.user.faceEmotionValidate.payload.errors) {
+        code = Number(nextProps.user.faceEmotionValidate.payload.errors[0].code);
+      } else {
+        code = nextProps.user.faceEmotionValidate.payload.code;
+      }
       console.log('validateFacialRecognitionValidationReceiveProps', code);
       if (code === 3008) {
         // reduce emotions there
         this.setState({ animation: doneAnimation });
         this.animate(1000, 0, 1, () => {
-          this.navigateTo('Tutorial', { nextScene: 'Password' });
+          this.props.navigation.navigate('Tutorial', { nextScene: 'Password' });
         });
       } else {
         this.setState({
@@ -282,7 +280,6 @@ export class Cam extends Component {
     // console.log('this.props.validate', this.props);
   };
 
-  // TODO: вынести
   convertToBase64 = (path) => {
     console.log('Camera::convertToBase64', path);
     RNFetchBlob.fs.readFile(path, 'base64')
@@ -309,7 +306,7 @@ export class Cam extends Component {
   navigateTo = (screen, params) => {
     const resetAction = NavigationActions.reset({
       index: 0,
-      actions: [NavigationActions.navigate({ routeName: screen , params: params })],
+      actions: [NavigationActions.navigate({ routeName: screen, params })],
     });
     this.props.navigation.dispatch(resetAction);
   };
@@ -322,24 +319,19 @@ export class Cam extends Component {
       duration: time,
     }).start(callback);
     this.setState({ animationref });
-  }
+  };
 
-  renderImage() {
-    return (
-      <Image
-        // resizeMode={'center'}
-        source={{ uri: this.state.path }}
-        style={styles.previewImage}
-        />
-    );
-  }
+  handleDismissModal = () => {
+    this.state.progress.stopAnimation();
+    this.setState({ error: false, errorCode: null, animation: pressAnimation });
+  };
 
   renderCamera() {
     const { params = {} } = this.props.navigation.state;
     const { mode } = params;
     const { qr } = this.state;
     const { setTrAdress } = this.props;
-    const camtype = mode === 'qr' ? 'back' : Camera.constants.Type.front
+    const camtype = mode === 'qr' ? 'back' : Camera.constants.Type.front;
     const { navigate } = this.props.navigation;
     oncetrig.setFunction(() => { navigate('Input', { mode: 'adress' }); });
     const onBarCode = (code) => {
@@ -349,27 +341,24 @@ export class Cam extends Component {
           oncetrig.callFunction();
         }
       }
-    }
+    };
     return (
       <Camera
         ref={(cam) => {
           this.camera = cam;
-        } }
+        }}
         style={styles.camera}
         aspect={Camera.constants.Aspect.fill}
-        captureQuality={Camera.constants.CaptureQuality.medium}
+        captureQuality={Camera.constants.CaptureQuality.low}
         type={camtype}
         captureTarget={Camera.constants.CaptureTarget.disk}
         onBarCodeRead={onBarCode}
-        // captureTarget={Camera.constants.CaptureTarget.memory}
-        />
+      />
     );
   }
 
-  handleDismissModal = () => {
-    this.state.progress.stopAnimation();
-    this.setState({ error: false, errorCode: null, animation: pressAnimation });
-  };
+
+  renderImage = () => (<Image source={{ uri: this.state.path }} style={styles.previewImage} />);
 
   render() {
     const isFetching =
@@ -378,7 +367,7 @@ export class Cam extends Component {
       this.props.user.faceEmotionValidate.isFetching;
     const { params = {} } = this.props.navigation.state;
     const { mode } = params;
-    const isQR = mode === 'qr'
+    const isQR = mode === 'qr';
     const fn = () => null;
     return (
       <View style={styles.container}>
@@ -386,7 +375,7 @@ export class Cam extends Component {
           onPress={this.handleDismissModal}
           code={this.state.errorCode}
           visible={this.state.error}
-          />
+        />
         <View style={styles.cameraImageContainer}>
           {this.state.path ? this.renderImage() : this.renderCamera() }
         </View>
@@ -397,18 +386,20 @@ export class Cam extends Component {
           <View style={styles.navbar}>
             <TouchableOpacity
               style={styles.closeBtn}
-              onPress={this.handleCameraClose}>
+              onPress={this.handleCameraClose}
+            >
               <Image source={close} />
             </TouchableOpacity>
           </View>
           {
-            this.state.isButtonVisible ? <View/> :
-              <Animated.Image
-                source={ emojiHappy }
-                style={[styles.emojiImage, {
-                  transform: [{ scale: this.state.emojiAnimation }],
-                  opacity: this.state.emojiAnimation
-                }]}/>
+            this.state.isButtonVisible ? <View /> :
+            <Animated.Image
+              source={emojiHappy}
+              style={[styles.emojiImage, {
+                transform: [{ scale: this.state.emojiAnimation }],
+                opacity: this.state.emojiAnimation,
+              }]}
+            />
           }
           <View style={styles.captureContainer}>
             {
@@ -416,23 +407,24 @@ export class Cam extends Component {
                 activeOpacity={1}
                 style={[styles.captureBtn, this.state.path && styles.uploadBtn]}
                 onPress={isQR ? fn : this.handleImageCapture}
-                onPressIn={() => !this.state.path && this.animate(200, 0, 0.7) }
-                onPressOut={() => !this.state.path && this.animate(200, 0.7, 0) }
-                >
+                onPressIn={() => !this.state.path && this.animate(200, 0, 0.7)}
+                onPressOut={() => !this.state.path && this.animate(200, 0.7, 0)}
+              >
                 {
                   <Animation
                     style={styles.animationStyle}
                     source={this.state.animation}
-                    progress={this.state.progress}/>
+                    progress={this.state.progress}
+                  />
                 }
-              </TouchableWithoutFeedback> : <View/>
+              </TouchableWithoutFeedback> : <View />
 
             }
             {
-              this.state.requiredEmotions.length != 0 && this.state.isButtonVisible ?
+              this.state.requiredEmotions.length !== 0 && this.state.isButtonVisible ?
                 <TouchableOpacity style={styles.repeat} onPress={this.replayEmoji}>
-                  <Image source={repeat}/>
-                </TouchableOpacity> : <View/>
+                  <Image source={repeat} />
+                </TouchableOpacity> : <View />
             }
           </View>
         </View>
@@ -500,7 +492,7 @@ const styles = CustomStyleSheet({
     width: 360,
   },
   emojiImage: {
-    alignSelf: 'center'
+    alignSelf: 'center',
   },
   captureContainer: {
     backgroundColor: 'white',
@@ -513,7 +505,7 @@ const styles = CustomStyleSheet({
   captureBtn: {
     width: 79,
     height: 79,
-    alignSelf: 'center'
+    alignSelf: 'center',
   },
   uploadBtn: {
     alignItems: 'center',
@@ -522,7 +514,7 @@ const styles = CustomStyleSheet({
   repeat: {
     position: 'absolute',
     right: 68,
-    alignSelf: 'center'
+    alignSelf: 'center',
   },
   closeBtn: {
     marginTop: 16,

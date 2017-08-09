@@ -30,11 +30,16 @@ export class CodeInput extends Component {
         payload: PropTypes.object,
         isFetching: PropTypes.bool,
       }).isRequired,
+      smsCodeRepeat: PropTypes.shape({
+        payload: PropTypes.object,
+        isFetching: PropTypes.bool,
+      }).isRequired,
       photo: PropTypes.string.isRequired,
       phoneNumber: PropTypes.object.isRequired,
     }).isRequired,
 
     phoneNumberValidate: PropTypes.func.isRequired,
+    smsCodeRepeat: PropTypes.func.isRequired,
     navigation: PropTypes.shape({
       navigate: PropTypes.func.isRequired,
       dispatch: PropTypes.func.isRequired,
@@ -48,14 +53,15 @@ export class CodeInput extends Component {
     // for modal
     modalVisible: false,
     errorCode: null,
-    cooldownTime: 0,
+    cooldownTime: 120,
+    // cooldownTime: 0,
     noAttempts: false,
   };
 
   componentDidMount() {
-    this.setState({ cooldownTime: 120 });
+    // this.setState({ cooldownTime: 120 });
     let interval;
-    let cooldown = () => {
+    const cooldown = () => {
       if (this.state.cooldownTime > 0) {
         this.setState({ cooldownTime: this.state.cooldownTime -= 1 });
       } else {
@@ -83,23 +89,19 @@ export class CodeInput extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    // TODO: MOVE TO SAGA TO PREVENT LAG
     // console.log('📞 nextProps', nextProps.user.validate);
     if (nextProps.user.smsCodeRepeat.payload) {
       console.log('✷✷✷✷✷ code', nextProps.user.smsCodeRepeat);
-      let code = nextProps.user.smsCodeRepeat.payload.code;
-      if (code == 4008 || code == 4010) {
+      const code = parseInt(nextProps.user.smsCodeRepeat.payload.code, 10);
+      if (code === 4008 || code === 4010) {
         this.setState({
           noAttempts: true,
         });
-      } else if (code == 4007) {
-        // too quick request, on first attempt;
-        alert('timeout 120 sec');
-      } else if (code == 4006) {
+      } else if (code === 4006) {
         // run interval
         this.setState({ cooldownTime: 120 });
         let interval;
-        let cooldown = () => {
+        const cooldown = () => {
           if (this.state.cooldownTime > 0) {
             this.setState({ cooldownTime: this.state.cooldownTime -= 1 });
           } else {
@@ -111,7 +113,7 @@ export class CodeInput extends Component {
     }
 
     if (nextProps.user.phoneValidate.payload) {
-      let code = nextProps.user.phoneValidate.payload.code;
+      const code = nextProps.user.phoneValidate.payload.code;
       switch (code) {
         case 6000:
           // alert(nextProps.user.validate.payload.message);
@@ -224,9 +226,22 @@ export class CodeInput extends Component {
     ]).start(() => { this.setState({ error: null }); });
   };
 
+  handleDismissModal = () => {
+    this.setState({ modalVisible: false, errorCode: null });
+  };
+
+  handleRequestSms = () => {
+    this.props.smsCodeRepeat({
+      account_id: this.props.user.account.payload.payload.account_information.account_id,
+      phone_number: this.props.user.phoneNumber,
+      imei: IMEI.getImei().toString(),
+    });
+    // set cooldown
+  };
+
   renderInput = () => (
     VMasker.toPattern(this.state.code, { pattern: '999999', placeholder: '0' }).split('').map((o, i) => {
-      if (i == 2) {
+      if (i === 2) {
         return [
           <View style={[styles.numberContainer, this.state.error ? styles.errorContainer : null]}>
             <Text style={[styles.codeInput, this.state.error ? styles.errorText : null]}>
@@ -249,19 +264,6 @@ export class CodeInput extends Component {
       );
     })
   );
-
-  handleDismissModal = () => {
-    this.setState({ modalVisible: false, errorCode: null });
-  };
-
-  handleRequestSms = () => {
-    this.props.smsCodeRepeat({
-      account_id: this.props.user.account.payload.payload.account_information.account_id,
-      phone_number: this.props.user.phoneNumber,
-      imei: IMEI.getImei().toString(),
-    });
-    // set cooldown
-  };
 
   render() {
     return (

@@ -25,12 +25,13 @@ function callApi(endpoint, body) {
       console.log('API response', response);
       return response.json();
     })
-    .then(response =>
+    .then((response) => {
       // let code = response.code.toString();
       // if (code.slice(0, 1) == 4) {
       //   return Promise.reject(response);
       // }
-       ({ response }))
+      return { response };
+    })
     .catch(error => ({ response: { error: error.toString() } }));
 }
 

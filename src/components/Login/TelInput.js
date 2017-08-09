@@ -13,14 +13,14 @@ import VMasker from 'vanilla-masker';
 import phoneFormat from 'phoneformat-react-native';
 
 import CustomStyleSheet from '../../utils/customStylesheet';
-import Confirm from '../Shared/Buttons/Confirm';
+// import Confirm from '../Shared/Buttons/Confirm';
 import PhoneKeyboard from '../Shared/Components/PhoneKeyboard';
 import ConfirmButton from '../Shared/Buttons/ConfirmButton';
 import HelpButton from '../Shared/Buttons/HelpButton';
 import { phoneNumberCreate, savePhone } from '../../actions';
 import { vw } from '../../utils/units';
 
-const ic_user = require('../../assets/icons/ic_user.png');
+// const ic_user = require('../../assets/icons/ic_user.png');
 const arrowDownWhite = require('../../assets/icons/arrow_down_white.png');
 
 export class TelInput extends Component {
