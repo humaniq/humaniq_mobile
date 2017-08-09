@@ -571,7 +571,6 @@ export class Profile extends Component {
           <View style={styles2.rootContainer}>
             <TouchableWithoutFeedback onPress={() => {}}>
               <View style={styles2.content}>
-
                 <View style={styles2.imageContainer}>
                   {/* <TouchableNativeFeedback onPress={() => this.dismissModal()}> */}
                   {/* <View style={styles.transactionImageContainer}> */}
