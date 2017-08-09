@@ -5,7 +5,7 @@ import { View, TouchableOpacity, Image, Text } from 'react-native';
 import VMasker from 'vanilla-masker';
 import PropTypes from 'prop-types';
 
-import { HumaniqProfileApiLib } from 'react-native-android-library-humaniq-api';
+import { HumaniqProfileApiLib, HumaniqContactsApiLib } from 'react-native-android-library-humaniq-api';
 
 import { connect } from 'react-redux';
 import { NavigationActions } from 'react-navigation';
@@ -51,6 +51,14 @@ class SelectAmount extends React.Component {
       amount: '00000',
       maskedAmount: VMasker.toPattern(0, pattern),
     };
+  }
+
+  componentWillMount() {
+    const { newTransaction } = this.props
+    console.warn(JSON.stringify(newTransaction))
+    if (newTransaction.phone) {
+      //this.getAccount(newTransaction);
+    }
   }
 
   componentDidMount() {
@@ -187,6 +195,12 @@ class SelectAmount extends React.Component {
         {this.renderContent()}
       </View>
     );
+  }
+
+  getAccount(newTransaction) {
+    HumaniqContactsApiLib.extractSinglePhoneNumber(newTransaction.phone)
+        .then((contact) => console.warn(JSON.stringify(contact)))
+        .catch((err) => console.warn(JSON.stringify(err)))
   }
 }
 
