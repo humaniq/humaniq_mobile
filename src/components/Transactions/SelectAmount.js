@@ -54,10 +54,10 @@ class SelectAmount extends React.Component {
   }
 
   componentWillMount() {
-    const { newTransaction } = this.props
-    console.warn(JSON.stringify(newTransaction))
-    if (newTransaction.phone) {
-      //this.getAccount(newTransaction);
+    const { newTransaction } = this.props;
+    console.warn(JSON.stringify(newTransaction));
+    if (newTransaction.phone && !newTransaction.adress) {
+      this.getAccount(newTransaction);
     }
   }
 
@@ -199,8 +199,28 @@ class SelectAmount extends React.Component {
 
   getAccount(newTransaction) {
     HumaniqContactsApiLib.extractSinglePhoneNumber(newTransaction.phone)
-        .then((contact) => console.warn(JSON.stringify(contact)))
-        .catch((err) => console.warn(JSON.stringify(err)))
+      .then((contacts) => {
+        console.warn(JSON.stringify(contacts));
+        if (contacts.length > 0) {
+          if (contacts[0].accountId) {
+            this.props.setTrContact(contacts[0].accountId);
+          }
+        } else {
+          // show modal or alert message
+        }
+      })
+      .catch(err => console.warn(JSON.stringify(err)));
+  }
+
+  getProfileInfo(accountId) {
+    HumaniqProfileApiLib.getAccountProfile(accountId)
+      .then((profile) => {
+        //this.props.setTrContact
+        console.warn(JSON.stringify(profile));
+      })
+      .catch((err) => {
+        console.warn(JSON.stringify(err));
+      });
   }
 }
 
