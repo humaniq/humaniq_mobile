@@ -87,6 +87,7 @@ export class Profile extends Component {
       newTransaction: {},
       rate: 0,
       transactionsId: [],
+      isFetching: false,
     };
   }
 
@@ -137,7 +138,7 @@ export class Profile extends Component {
     this.setState({ refreshing: true });
     // first call transactions and balance
     this.getUserInfo();
-    this.getTransactions(false);
+    this.getTransactions(true, true);
     this.getBalance();
     this.getExchangeValue();
 
@@ -186,7 +187,7 @@ export class Profile extends Component {
           }
         })
         .catch((err) => {
-          console.log('get user info error: ',err);
+          console.log('get user info error: ', err);
         });
   }
 
@@ -244,26 +245,26 @@ export class Profile extends Component {
         this.limit,
     )
         .then((array) => {
-          const oldArray = this.state.transactions;
+          let { transactions } = this.state;
           if (this.activity) {
-            let newArray = [];
             if (shouldRefresh) {
-              newArray = array;
+              transactions = array;
             } else {
-              newArray = oldArray.concat(array);
+              transactions = transactions.concat(array);
             }
-            const map = this.convertToMap(newArray);
+            const map = this.convertToMap(transactions);
             this.setState({
-              transactions: newArray,
+              transactions,
               dataSource: this.state.dataSource.cloneWithRowsAndSections(map),
               refreshing: false,
+              isFetching: false,
             });
           }
         })
         .catch((err) => {
           // handle error
           console.log(err);
-          this.setState({ refreshing: false });
+          this.setState({ refreshing: false, isFetching: false });
         });
   }
 
@@ -430,7 +431,10 @@ export class Profile extends Component {
   };
 
   onEndReached() {
-    this.getTransactions(false);
+    if (!this.state.isFetching) {
+      this.setState({ isFetching: true });
+      this.getTransactions(false);
+    }
   }
 
   renderContent = () => (
