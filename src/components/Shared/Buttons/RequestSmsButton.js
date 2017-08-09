@@ -18,23 +18,23 @@ const propTypes = {
 };
 
 function str_pad_left(string, pad, length) {
-  return (new Array(length+1).join(pad)+string).slice(-length);
+  return (new Array(length + 1).join(pad) + string).slice(-length);
 }
 
 function prettyTime(time) {
-  let minutes = Math.floor(time / 60);
-  let seconds = time % 60;
-  let finalTime = `${str_pad_left(minutes, '0', 2)}:${str_pad_left(seconds, '0', 2)}`;
-  return finalTime;
+  const minutes = Math.floor(time / 60);
+  const seconds = time % 60;
+  return `${str_pad_left(minutes, '0', 2)}:${str_pad_left(seconds, '0', 2)}`;
 }
+
 export default function RequestSmsButton(props) {
   const disabled = props.disabled;
-  const cooldownTime = props.cooldownTime;
-  console.log('disabled for button', disabled);
+  const cooldownTime = parseInt(props.cooldownTime, 10);
+
   return (
     // using TouchH instead TouchO to disable pressing when prop active == false
     <TouchableHighlight
-      style={[styles.container, disabled && cooldownTime == 0 ? styles.disabled : null]}
+      style={[styles.container, disabled && cooldownTime === 0 ? styles.disabled : null]}
       onPress={disabled ? null : props.onPress}
       underlayColor={'transparent'}
       activeOpacity={0.5}
