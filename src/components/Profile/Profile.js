@@ -87,6 +87,7 @@ export class Profile extends Component {
       newTransaction: {},
       rate: 0,
       transactionsId: [],
+      isFetching: false,
     };
   }
 
@@ -116,7 +117,7 @@ export class Profile extends Component {
   };
 
   componentWillMount() {
-    console.warn(this.props.id);
+    console.log('profile_id', this.props.id);
     DeviceEventEmitter.addListener('EVENT_TRANSACTION_ERROR', (event) => {
       console.log('ошибка');
       console.log(event);
@@ -137,7 +138,7 @@ export class Profile extends Component {
     this.setState({ refreshing: true });
     // first call transactions and balance
     this.getUserInfo();
-    this.getTransactions(false);
+    this.getTransactions(true, true);
     this.getBalance();
     this.getExchangeValue();
 
@@ -168,8 +169,7 @@ export class Profile extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    console.warn(JSON.stringify(nextProps.newTransaction))
-    if (nextProps.newTransaction && nextProps.newTransaction.amount !== 0 ) {
+    if (nextProps.newTransaction && nextProps.newTransaction.amount !== 0) {
       const { newTransaction } = nextProps;
       this.setState({ newTransaction, confirmTransactionVisibility: true });
     }
@@ -187,7 +187,7 @@ export class Profile extends Component {
           }
         })
         .catch((err) => {
-          console.warn(JSON.stringify(err));
+          console.log('get user info error: ', err);
         });
   }
 
@@ -245,26 +245,26 @@ export class Profile extends Component {
         this.limit,
     )
         .then((array) => {
-          const oldArray = this.state.transactions;
+          let { transactions } = this.state;
           if (this.activity) {
-            let newArray = [];
             if (shouldRefresh) {
-              newArray = array;
+              transactions = array;
             } else {
-              newArray = oldArray.concat(array);
+              transactions = transactions.concat(array);
             }
-            const map = this.convertToMap(newArray);
+            const map = this.convertToMap(transactions);
             this.setState({
-              transactions: newArray,
+              transactions,
               dataSource: this.state.dataSource.cloneWithRowsAndSections(map),
               refreshing: false,
+              isFetching: false,
             });
           }
         })
         .catch((err) => {
           // handle error
           console.log(err);
-          this.setState({ refreshing: false });
+          this.setState({ refreshing: false, isFetching: false });
         });
   }
 
@@ -321,74 +321,74 @@ export class Profile extends Component {
         ? balance.price.amount.toString().split('.')[1] : '00';
 
     return (
-        <View style={styles.mainContainer}>
-          {/* render status bar */}
-          <StatusBar
-              backgroundColor="#598FBA"
-          />
-          {/* render list */}
-          { this.state.transactions.length > 0 ? this.renderContent() : this.renderEmptyView()}
-          {/* render collapse layout */}
+      <View style={styles.mainContainer}>
+        {/* render status bar */}
+        <StatusBar
+          backgroundColor="#598FBA"
+        />
+        {/* render list */}
+        { this.state.transactions.length > 0 ? this.renderContent() : this.renderEmptyView()}
+        {/* render collapse layout */}
+        <Animated.View
+          style={[styles.collapseContainer, {
+            transform: [{ translateY: this.getAnimationType(constants.HEADER_TRANSLATE) }],
+          }]}
+        >
           <Animated.View
-              style={[styles.collapseContainer, {
-                transform: [{ translateY: this.getAnimationType(constants.HEADER_TRANSLATE) }],
-              }]}
-          >
-            <Animated.View
-                style={[styles.bar, {
-                  transform: [
+            style={[styles.bar, {
+              transform: [
                     { scale: this.getAnimationType(constants.VIEW_TRANSLATE) },
                     { translateY: this.getAnimationType(constants.VIEWY_TRANSLATE) },
-                  ],
-                }]}
+              ],
+            }]}
+          >
+            <Animated.View
+              style={styles.avatarInfoContainer}
             >
-              <Animated.View
-                  style={styles.avatarInfoContainer}
-              >
-                <Animated.Image
-                    style={styles.avatar}
-                    source={profile.avatar ? { uri: profile.avatar.url } : ic_photo_holder}
-                />
-                <Animated.View style={styles.infoContainer}>
-                  <Text style={styles.title}>{`${hmqInt}.`}
-                    <Text style={styles.titleDec}>
-                      {hmqDec || '00'} {balance.token.currency}
-                    </Text>
+              <Animated.Image
+                style={styles.avatar}
+                source={profile.avatar ? { uri: profile.avatar.url } : ic_photo_holder}
+              />
+              <Animated.View style={styles.infoContainer}>
+                <Text style={styles.title}>{`${hmqInt}.`}
+                  <Text style={styles.titleDec}>
+                    {hmqDec || '00'} {balance.token.currency}
                   </Text>
-                  <Text style={styles.titleDec2}>
-                    {`${currencyInt}.`}{currencyDec || '00'} {balance.price.currency}
-                  </Text>
-                </Animated.View>
+                </Text>
+                <Text style={styles.titleDec2}>
+                  {`${currencyInt}.`}{currencyDec || '00'} {balance.price.currency}
+                </Text>
               </Animated.View>
             </Animated.View>
-            {/* render toolbar */}
-            <Animated.View style={[{
-              transform: [{ translateY: this.getAnimationType(constants.HEADER_TRANSLATE2) }],
-            }]}
-            >
-              <ToolbarAndroid
-                  onActionSelected={position => this.onActionClick(position)}
-                  style={{
-                    height: TOOLBAR_HEIGHT,
-                    backgroundColor: 'transparent',
-                    marginLeft: 5,
-                    marginRight: 5,
-                  }}
-                  actions={[{
-                    title: '',
-                    icon: ic_settings_white,
-                    show: 'always',
-                  }]}
-              />
-            </Animated.View>
           </Animated.View>
-          {/* render fab button */}
-          {this.renderFabButton()}
-          {/* render transaction modal */}
-          {this.showTransactionsModal()}
-          {this.showNewTransactionsModal()}
-          {this.state.confirmTransactionVisibility ? this.showConfirmTransactionModal() : null}
-        </View>
+          {/* render toolbar */}
+          <Animated.View style={[{
+            transform: [{ translateY: this.getAnimationType(constants.HEADER_TRANSLATE2) }],
+          }]}
+          >
+            <ToolbarAndroid
+              onActionSelected={position => this.onActionClick(position)}
+              style={{
+                height: TOOLBAR_HEIGHT,
+                backgroundColor: 'transparent',
+                marginLeft: 5,
+                marginRight: 5,
+              }}
+              actions={[{
+                title: '',
+                icon: ic_settings_white,
+                show: 'always',
+              }]}
+            />
+          </Animated.View>
+        </Animated.View>
+        {/* render fab button */}
+        {this.renderFabButton()}
+        {/* render transaction modal */}
+        {this.showTransactionsModal()}
+        {this.showNewTransactionsModal()}
+        {this.state.confirmTransactionVisibility ? this.showConfirmTransactionModal() : null}
+      </View>
     );
   }
 
@@ -397,18 +397,18 @@ export class Profile extends Component {
   };
 
   renderRow = child => (
-      <Item
-          item={child}
-          currentIndex={0}
-          size={2}
-          onClick={() => this.onItemClick(child)}
-      />
+    <Item
+      item={child}
+      currentIndex={0}
+      size={2}
+      onClick={() => this.onItemClick(child)}
+    />
   );
 
   renderSectionHeader = (map, category) => (
-      <Text style={[styles.headerSection]}>
-        {category}
-      </Text>
+    <Text style={[styles.headerSection]}>
+      {category}
+    </Text>
   );
 
   _onRefresh() {
@@ -431,61 +431,63 @@ export class Profile extends Component {
   };
 
   onEndReached() {
-    this.getTransactions(false);
+    if (!this.state.isFetching) {
+      this.setState({ isFetching: true });
+      this.getTransactions(false);
+    }
   }
 
   renderContent = () => (
-      <ListView
-          enableEmptySections
-          onEndReachedThreshold={14}
-          onEndReached={() => this.onEndReached()}
-          dataSource={this.state.dataSource}
-          renderHeader={() => <View style={{ marginTop: HEADER_MAX_HEIGHT }} />}
-          renderRow={this.renderRow}
-          renderSectionHeader={this.renderSectionHeader}
-          style={{
-            backgroundColor: '#fff',
-          }}
-          showsVerticalScrollIndicator={false}
-          onScroll={Animated.event(
+    <ListView
+      enableEmptySections
+      onEndReachedThreshold={14}
+      onEndReached={() => this.onEndReached()}
+      dataSource={this.state.dataSource}
+      renderHeader={() => <View style={{ marginTop: HEADER_MAX_HEIGHT }} />}
+      renderRow={this.renderRow}
+      renderSectionHeader={this.renderSectionHeader}
+      style={{
+        backgroundColor: '#fff',
+      }}
+      showsVerticalScrollIndicator={false}
+      onScroll={Animated.event(
               [{ nativeEvent: { contentOffset: { y: this.state.scrollY } } }],
           )}
-          refreshControl={
-            <RefreshControl
-                progressViewOffset={150}
-                refreshing={this.state.refreshing}
-                onRefresh={() => this._onRefresh()}
-            />
+      refreshControl={
+        <RefreshControl
+          progressViewOffset={150}
+          refreshing={this.state.refreshing}
+          onRefresh={() => this._onRefresh()}
+        />
           }
-      />
+    />
   );
 
   // render Empty View, if array is empty
   renderEmptyView = () => (
-      <ScrollView
-          contentContainerStyle={{ backgroundColor: '#fff', flex: 1, alignItems: 'center', justifyContent: 'center' }}
-          refreshControl={
-            <RefreshControl
-                progressViewOffset={150}
-                refreshing={this.state.refreshing}
-                onRefresh={() => this._onRefresh()}
-            />
+    <ScrollView
+      contentContainerStyle={{ backgroundColor: '#fff', flex: 1, alignItems: 'center', justifyContent: 'center' }}
+      refreshControl={
+        <RefreshControl
+          progressViewOffset={150}
+          refreshing={this.state.refreshing}
+          onRefresh={() => this._onRefresh()}
+        />
           }
-      >
-        <View style={styles.emptyViewContainer}>
-          <Image
-              resizeMode="contain"
-              style={styles.emptyImage}
-              source={ic_empty}
-          />
-        </View>
+    >
+      <View style={styles.emptyViewContainer}>
+        <Image
+          resizeMode="contain"
+          style={styles.emptyImage}
+          source={ic_empty}
+        />
+      </View>
 
-      </ScrollView>
+    </ScrollView>
   );
 
   // on transaction item click handler
   onItemClick = (item) => {
-    console.warn(JSON.stringify(item));
     this.setState({
       item,
       modalVisibility: true,
@@ -501,12 +503,12 @@ export class Profile extends Component {
 
   // rendering fab button
   renderFabButton = () => (
-      <Fab
-          onClick={() => this.onFabButtonPress()}
-          source={ic_fab}
-          scroll={this.state.scrollY}
-          opacity={this.getAnimationType(constants.IMAGE_OPACITY)}
-      />);
+    <Fab
+      onClick={() => this.onFabButtonPress()}
+      source={ic_fab}
+      scroll={this.state.scrollY}
+      opacity={this.getAnimationType(constants.IMAGE_OPACITY)}
+    />);
 
   // to load more data
   loadMoreData() {
@@ -533,69 +535,69 @@ export class Profile extends Component {
 
   showConfirmTransactionModal() {
     return (
-        <TransactionConfirmModal
-            onCancelClick={() => {
-              this.emptyTransaction()
-              this.setState({ confirmTransactionVisibility: false })
-            }}
-            onClick={() => this.onTransactionConfirmClick()}
-            item={this.state.newTransaction}
-            visibility={this.state.confirmTransactionVisibility}
-            contacts={this.props.contacts}
-        />
+      <TransactionConfirmModal
+        onCancelClick={() => {
+          this.emptyTransaction();
+          this.setState({ confirmTransactionVisibility: false });
+        }}
+        onClick={() => this.onTransactionConfirmClick()}
+        item={this.state.newTransaction}
+        visibility={this.state.confirmTransactionVisibility}
+        contacts={this.props.contacts}
+      />
     );
   }
 
   showTransactionsModal() {
     return (
-        <TransactionsModal
-            onCancelClick={() => this.setState({ modalVisibility: false })}
-            onChatClick={() => this.onChatClick()}
-            item={this.state.item}
-            visibility={this.state.modalVisibility}
-            currency={this.state.balance.price.currency}
-            rate={this.state.rate}
-        />
+      <TransactionsModal
+        onCancelClick={() => this.setState({ modalVisibility: false })}
+        onChatClick={() => this.onChatClick()}
+        item={this.state.item}
+        visibility={this.state.modalVisibility}
+        currency={this.state.balance.price.currency}
+        rate={this.state.rate}
+      />
     );
   }
 
   showNewTransactionsModal() {
     return (
-        <Modal
-            style={{ margin: 0 }}
-            isVisible={this.state.newTransactionModalVisibility}
-        >
-          <TouchableWithoutFeedback onPress={() => this.dismissModal()}>
-            <View style={styles2.rootContainer}>
-              <TouchableWithoutFeedback onPress={() => {}}>
-                <View style={styles2.content}>
+      <Modal
+        style={{ margin: 0 }}
+        isVisible={this.state.newTransactionModalVisibility}
+      >
+        <TouchableWithoutFeedback onPress={() => this.dismissModal()}>
+          <View style={styles2.rootContainer}>
+            <TouchableWithoutFeedback onPress={() => {}}>
+              <View style={styles2.content}>
 
-                  <View style={styles2.imageContainer}>
-                    {/* <TouchableNativeFeedback onPress={() => this.dismissModal()}> */}
-                    {/* <View style={styles.transactionImageContainer}> */}
-                    {/* <Image source={ic_incoming_transaction} /> */}
-                    {/* </View> */}
-                    {/* </TouchableNativeFeedback> */}
+                <View style={styles2.imageContainer}>
+                  {/* <TouchableNativeFeedback onPress={() => this.dismissModal()}> */}
+                  {/* <View style={styles.transactionImageContainer}> */}
+                  {/* <Image source={ic_incoming_transaction} /> */}
+                  {/* </View> */}
+                  {/* </TouchableNativeFeedback> */}
 
-                    <TouchableNativeFeedback onPress={() => this.openTransactionCreate()}>
-                      <View style={styles2.transactionImageContainer}>
-                        <Image source={ic_outgoing_transaction} />
-                      </View>
-                    </TouchableNativeFeedback>
-                  </View>
-
-                  <View style={{ backgroundColor: '#e0e0e0', height: 1 }} />
-                  <TouchableNativeFeedback onPress={() => this.dismissModal()}>
-                    <View style={styles2.closeButtonContainer}>
-                      <Image source={ic_close_black} />
+                  <TouchableNativeFeedback onPress={() => this.openTransactionCreate()}>
+                    <View style={styles2.transactionImageContainer}>
+                      <Image source={ic_outgoing_transaction} />
                     </View>
                   </TouchableNativeFeedback>
                 </View>
-              </TouchableWithoutFeedback>
 
-            </View>
-          </TouchableWithoutFeedback>
-        </Modal>
+                <View style={{ backgroundColor: '#e0e0e0', height: 1 }} />
+                <TouchableNativeFeedback onPress={() => this.dismissModal()}>
+                  <View style={styles2.closeButtonContainer}>
+                    <Image source={ic_close_black} />
+                  </View>
+                </TouchableNativeFeedback>
+              </View>
+            </TouchableWithoutFeedback>
+
+          </View>
+        </TouchableWithoutFeedback>
+      </Modal>
     );
   }
 
@@ -642,11 +644,8 @@ export class Profile extends Component {
       toUserAddress = newTransaction.adress;
     }
 
-    console.warn(newTransaction.adress)
-
     HumaniqProfileApiLib.createTransaction(this.props.id, toUserId, toUserAddress, (newTransaction.amount * 100000000))
         .then((resp) => {
-          console.warn(JSON.stringify(resp))
           if (resp.code === 401) {
             this.navigateTo('Tutorial');
           } else {
@@ -658,7 +657,6 @@ export class Profile extends Component {
         })
         .catch((err) => {
           // handle error
-          console.warn(JSON.stringify(err))
           console.log('create transaction error::', err);
         });
     this.emptyTransaction();

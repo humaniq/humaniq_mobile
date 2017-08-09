@@ -14,7 +14,7 @@ import {
   ToastAndroid,
 } from 'react-native';
 
-import CustomStyleSheet from '../../utils/customStylesheet'
+import CustomStyleSheet from '../../utils/customStylesheet';
 import { HumaniqBlockchainApiLib } from 'react-native-android-library-humaniq-api';
 import * as actions from '../../actions/index';
 import { NavigationActions } from 'react-navigation';
@@ -68,11 +68,11 @@ export class ProfileSettings extends Component {
 
   renderScrollViewContent() {
     return (
-        <View style={styles.scrollViewContent}>
-          {this.renderFirstSection()}
-          {this.renderSecondSection()}
-          <View style={[styles.divider, { height: 1 }]} />
-        </View>
+      <View style={styles.scrollViewContent}>
+        {this.renderFirstSection()}
+        {this.renderSecondSection()}
+        <View style={[styles.divider, { height: 1 }]} />
+      </View>
     );
   }
 
@@ -115,14 +115,14 @@ export class ProfileSettings extends Component {
   };
 
   renderContent = () => (
-      <Animated.ScrollView
-          scrollEventThrottle={15}
-          onScroll={Animated.event(
+    <Animated.ScrollView
+      scrollEventThrottle={15}
+      onScroll={Animated.event(
               [{ nativeEvent: { contentOffset: { y: this.state.scrollY } } }],
           )}
-      >
-        {this.renderScrollViewContent()}
-      </Animated.ScrollView>
+    >
+      {this.renderScrollViewContent()}
+    </Animated.ScrollView>
   );
 
   render() {
@@ -130,62 +130,62 @@ export class ProfileSettings extends Component {
     const { profile } = this.props;
     const status = user.status === 1 ? 'online' : 'offline';
     return (
-        <View style={styles.mainContainer}>
-          {/* render status bar */}
-          <StatusBar
-              backgroundColor="#598FBA"
-          />
-          {/* render scroll content */}
-          {this.renderContent()}
-          {/* render collapse view */}
+      <View style={styles.mainContainer}>
+        {/* render status bar */}
+        <StatusBar
+          backgroundColor="#598FBA"
+        />
+        {/* render scroll content */}
+        {this.renderContent()}
+        {/* render collapse view */}
+        <Animated.View
+          style={[styles.collapseContainer, {
+            transform: [{ translateY: this.getAnimationType(constants.HEADER_TRANSLATE) }] }]}
+        >
           <Animated.View
-              style={[styles.collapseContainer, {
-                transform: [{ translateY: this.getAnimationType(constants.HEADER_TRANSLATE) }] }]}
-          >
-            <Animated.View
-                style={[styles.bar, {
-                  transform: [
+            style={[styles.bar, {
+              transform: [
                     { scale: this.getAnimationType(constants.VIEW_TRANSLATE) },
                     { translateY: this.getAnimationType(constants.VIEWY_TRANSLATE) }] }]}
+          >
+            <Animated.View
+              style={styles.avatarInfoContainer}
             >
-              <Animated.View
-                  style={styles.avatarInfoContainer}
-              >
-                <Animated.Image
-                    style={styles.avatar}
-                    source={profile.avatar ? { uri: profile.avatar.url } : ic_photo_holder }
-                />
-                <Animated.View style={styles.infoContainer}>
-                  <Text style={styles.title}>{this.showPhoneIfExist(profile, false)}</Text>
-                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                    <Text style={styles.statusText}>{status}</Text>
-                    {this.getUserStatus(user)}
-                  </View>
-                </Animated.View>
+              <Animated.Image
+                style={styles.avatar}
+                source={profile.avatar ? { uri: profile.avatar.url } : ic_photo_holder}
+              />
+              <Animated.View style={styles.infoContainer}>
+                <Text style={styles.title}>{this.showPhoneIfExist(profile, false)}</Text>
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                  <Text style={styles.statusText}>{status}</Text>
+                  {this.getUserStatus(user)}
+                </View>
               </Animated.View>
             </Animated.View>
-            {/* render toolbar */}
-            <Animated.View style={[{
-              transform: [{ translateY: this.getAnimationType(constants.HEADER_TRANSLATE2) }] }]}
-            >
-              <ToolbarAndroid
-                  onActionSelected={position => this.onActionClick(position)}
-                  style={{
-                    height: TOOLBAR_HEIGHT,
-                    backgroundColor: 'transparent',
-                    marginLeft: 5,
-                    marginRight: 5,
-                  }}
-                  onIconClicked={() => this.handleClose()}
-                  navIcon={ic_close}
-                  actions={[{ title: '', icon: ic_edit, show: 'always' }]}
-              />
-            </Animated.View>
           </Animated.View>
-          {/* render fab button */}
-          {this.renderFabButton()}
-          {this.state.modalVisibility ? this.showQrModal() : null}
-        </View>
+          {/* render toolbar */}
+          <Animated.View style={[{
+            transform: [{ translateY: this.getAnimationType(constants.HEADER_TRANSLATE2) }] }]}
+          >
+            <ToolbarAndroid
+              onActionSelected={position => this.onActionClick(position)}
+              style={{
+                height: TOOLBAR_HEIGHT,
+                backgroundColor: 'transparent',
+                marginLeft: 5,
+                marginRight: 5,
+              }}
+              onIconClicked={() => this.handleClose()}
+              navIcon={ic_close}
+              actions={[{ title: '', icon: ic_edit, show: 'always' }]}
+            />
+          </Animated.View>
+        </Animated.View>
+        {/* render fab button */}
+        {this.renderFabButton()}
+        {this.state.modalVisibility ? this.showQrModal() : null}
+      </View>
     );
   }
 
@@ -204,12 +204,12 @@ export class ProfileSettings extends Component {
   }
 
   renderFabButton = () => (
-      <Fab
-          onClick={() => this.onFabButtonPress()}
-          source={ic_fab}
-          scroll={this.state.scrollY}
-          opacity={this.getAnimationType(constants.IMAGE_OPACITY)}
-      />
+    <Fab
+      onClick={() => this.onFabButtonPress()}
+      source={ic_fab}
+      scroll={this.state.scrollY}
+      opacity={this.getAnimationType(constants.IMAGE_OPACITY)}
+    />
   );
 
   handleClose = () => {
@@ -235,81 +235,81 @@ export class ProfileSettings extends Component {
     const { user } = this.state;
     const { profile } = this.props;
     return (
-        <View style={styles.firstSection}>
-          <View style={styles.firstSubSection}>
-            <Image
-                source={ic_info}
-                style={styles.info}
-            />
-            <View style={styles.phoneContainer}>
-              <View style={{ flex: 1 }}>
-                <Text style={styles.phoneText}>
-                  {this.showPhoneIfExist(profile, true)}
-                </Text>
-                <Image
-                    source={profile.phone_number && profile.phone_number.phone_number ? ic_phone : ic_lock}
-                    style={styles.phoneImage}
-                />
-              </View>
-              {/* <TouchableOpacity onPress={() => this.onPhoneEditPress()}> */}
-              {/* <Image */}
-              {/* source={ic_editBlue} */}
-              {/* style={styles.editImage} */}
-              {/* /> */}
-              {/* </TouchableOpacity> */}
-            </View>
-          </View>
-          <View style={styles.divider} />
-          <View style={styles.secondSubSection}>
+      <View style={styles.firstSection}>
+        <View style={styles.firstSubSection}>
+          <Image
+            source={ic_info}
+            style={styles.info}
+          />
+          <View style={styles.phoneContainer}>
             <View style={{ flex: 1 }}>
-              <Text style={styles.passwordText}>
-                {secureText(this.props.password.length)}
+              <Text style={styles.phoneText}>
+                {this.showPhoneIfExist(profile, true)}
               </Text>
               <Image
-                  source={ic_lock}
-                  style={styles.lockImage}
+                source={profile.phone_number && profile.phone_number.phone_number ? ic_phone : ic_lock}
+                style={styles.phoneImage}
               />
             </View>
-            <TouchableOpacity onPress={() => this.onPasswordEditPress()}>
-              <Image
-                  source={ic_editBlue}
-                  style={styles.editImage}
-              />
-            </TouchableOpacity>
+            {/* <TouchableOpacity onPress={() => this.onPhoneEditPress()}> */}
+            {/* <Image */}
+            {/* source={ic_editBlue} */}
+            {/* style={styles.editImage} */}
+            {/* /> */}
+            {/* </TouchableOpacity> */}
           </View>
-          <View style={[styles.divider, { height: 1 }]} />
         </View>
+        <View style={styles.divider} />
+        <View style={styles.secondSubSection}>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.passwordText}>
+              {secureText(this.props.password.length)}
+            </Text>
+            <Image
+              source={ic_lock}
+              style={styles.lockImage}
+            />
+          </View>
+          <TouchableOpacity onPress={() => this.onPasswordEditPress()}>
+            <Image
+              source={ic_editBlue}
+              style={styles.editImage}
+            />
+          </TouchableOpacity>
+        </View>
+        <View style={[styles.divider, { height: 1 }]} />
+      </View>
     );
   }
 
   renderSecondSection() {
     return (
-        <View style={styles.secondSection}>
-          <View style={[styles.divider, { height: 1 }]} />
-          <View>
-            <TouchableNativeFeedback
-                delayPressIn={5}
-            >
-              <View style={styles.personContainer}>
-                <Image
-                    source={ic_person_blue}
-                    style={styles.profileImage}
-                />
-              </View>
-            </TouchableNativeFeedback>
-            <TouchableNativeFeedback
-                delayPressIn={5}
-                onPress={() => this.onLogoutPress()}
-            >
-              <View style={styles.logoutContainer}>
-                <Image
-                    source={ic_exit_red}
-                    style={styles.logoutImage}
-                />
-              </View>
-            </TouchableNativeFeedback>
-          </View>
+      <View style={styles.secondSection}>
+        <View style={[styles.divider, { height: 1 }]} />
+        <View>
+          <TouchableNativeFeedback
+            delayPressIn={5}
+          >
+            <View style={styles.personContainer}>
+              <Image
+                source={ic_person_blue}
+                style={styles.profileImage}
+              />
+            </View>
+          </TouchableNativeFeedback>
+          <TouchableNativeFeedback
+            delayPressIn={5}
+            onPress={() => this.onLogoutPress()}
+          >
+            <View style={styles.logoutContainer}>
+              <Image
+                source={ic_exit_red}
+                style={styles.logoutImage}
+              />
+            </View>
+          </TouchableNativeFeedback>
         </View>
+      </View>
     );
   }
 
@@ -328,11 +328,11 @@ export class ProfileSettings extends Component {
   }
 
   offlineView = () => (
-      <View style={styles.offlineStatus} />
+    <View style={styles.offlineStatus} />
   );
 
   onlineView = () => (
-      <View style={styles.onlineStatus} />
+    <View style={styles.onlineStatus} />
   );
 
   onPhoneEditPress = () => {
@@ -380,7 +380,7 @@ export class ProfileSettings extends Component {
     HumaniqProfileApiLib.deauthenticateUser(this.props.profile.account_id)
         .then((response) => {
           // log out
-          console.log(response)
+          console.log(response);
           if (response.code === 200) {
             this.navigateTo('Tutorial');
           }
@@ -393,30 +393,34 @@ export class ProfileSettings extends Component {
   navigateTo = (screen, params) => {
     const resetAction = NavigationActions.reset({
       index: 0,
-      actions: [NavigationActions.navigate({ routeName: screen, params: params })],
+      actions: [NavigationActions.navigate({ routeName: screen, params })],
     });
     this.props.navigation.dispatch(resetAction);
   };
 
   showQrModal() {
     return (
-        <QrModal
-            onCancelClick={() => { this.setState({ modalVisibility: false }); }}
-            wallet={this.state.wallet}
-            onClipboardClick={() => this.onClipboardClick()}
-            visibility={this.state.modalVisibility}
-            profile={this.props.profile}
-        />
+      <QrModal
+        onCancelClick={() => { this.setState({ modalVisibility: false }); }}
+        wallet={this.state.wallet}
+        onClipboardClick={() => this.onClipboardClick()}
+        visibility={this.state.modalVisibility}
+        profile={this.props.profile}
+      />
     );
   }
 
   getWalletAddress() {
+    console.log('getting wallet address::');
     HumaniqBlockchainApiLib.getUserAddressState(this.props.profile.account_id)
         .then((response) => {
+          console.log('wallet address::>>', response);
           this.setState({ wallet: response });
         })
         .catch((err) => {
           // handle error
+          console.log('err::>>', err);
+          this.setState({ wallet: { address: '' } });
         });
   }
 }

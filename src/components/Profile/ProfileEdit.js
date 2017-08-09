@@ -37,7 +37,7 @@ export class ProfileEdit extends Component {
     const { user } = this.props.navigation.state.params;
     const { profile } = this.props;
     let name,
-        lastName;
+      lastName;
     if (profile.person) {
       name = profile.person.first_name;
       lastName = profile.person.last_name;
@@ -50,6 +50,9 @@ export class ProfileEdit extends Component {
       fieldChanged: false,
       localPath: '',
       uploading: false,
+      count: 0,
+      isAvatarUploading: false,
+      isCredsUploading: false,
     };
   }
 
@@ -68,71 +71,70 @@ export class ProfileEdit extends Component {
     const status = user.status === 1 ? 'online' : 'offline';
     const statusTextColor = user.status === 1 ? '#3AA3E4' : '#aaaaaa';
     return (
-        <View style={styles.mainContainer}>
-          <ScrollView>
-            <StatusBar
-                backgroundColor="#598FBA"
-            />
-            <View style={{
+      <View style={styles.mainContainer}>
+        <ScrollView>
+          <StatusBar
+            backgroundColor="#598FBA"
+          />
+          <View style={{
+            height: 56,
+            backgroundColor: '#598FBA',
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+          }}
+          />
+          <ToolbarAndroid
+            style={{
               height: 56,
               backgroundColor: '#598FBA',
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              right: 0,
+              marginLeft: 5,
+              marginRight: 5,
             }}
-            />
-            <ToolbarAndroid
-                style={{
-                  height: 56,
-                  backgroundColor: '#598FBA',
-                  marginLeft: 5,
-                  marginRight: 5,
-                }}
-                onIconClicked={() => this.handleClose()}
-                onActionSelected={position => this.onActionClick(position)}
-                navIcon={ic_close}
-                actions={[{ title: '', icon: ic_done_white, show: 'always' }]}
-            />
-            <View style={styles.content}>
-              <View
-                  style={styles.avatarInfoContainer}
-              >
-                <TouchableOpacity onPress={() => this.onPhotoClick()}>
-                  <View style={styles.avatarContainer}>
-                    <Image
-                        style={styles.avatar}
-                        source={this.props.photo
+            onIconClicked={() => this.handleClose()}
+            onActionSelected={position => this.onActionClick(position)}
+            navIcon={ic_close}
+            actions={[{ title: '', icon: ic_done_white, show: 'always' }]}
+          />
+          <View style={styles.content}>
+            <View
+              style={styles.avatarInfoContainer}
+            >
+              <TouchableOpacity onPress={() => this.onPhotoClick()}>
+                <View style={styles.avatarContainer}>
+                  <Image
+                    style={styles.avatar}
+                    source={this.props.photo
                             ? { uri: this.props.photo }
                             : profile.avatar ? { uri: profile.avatar.url } : ic_photo_holder}
-                    />
-                    <View style={[{
-                      position: 'absolute',
-                      backgroundColor: 'rgba(0,0,0,0.4)',
-                    }, styles.avatar]}
-                    />
+                  />
+                  <View style={[{
+                    position: 'absolute',
+                    backgroundColor: 'rgba(0,0,0,0.4)',
+                  }, styles.avatar]}
+                  />
 
-                    <Image
-                        style={styles.photoHolder}
-                        source={ic_photo}
-                        resizeMode="contain"
-                    />
-                  </View>
-                </TouchableOpacity>
-                <View style={styles.infoContainer}>
-                  <Text style={styles.title}>{userCreds}</Text>
-                  <View style={styles.statusContainer}>
-                    <Text style={[styles.statusText, { color: statusTextColor }]}>{status}</Text>
-                    {this.getUserStatus(user)}
-                  </View>
+                  <Image
+                    style={styles.photoHolder}
+                    source={ic_photo}
+                    resizeMode="contain"
+                  />
+                </View>
+              </TouchableOpacity>
+              <View style={styles.infoContainer}>
+                <Text style={styles.title}>{userCreds}</Text>
+                <View style={styles.statusContainer}>
+                  <Text style={[styles.statusText, { color: statusTextColor }]}>{status}</Text>
+                  {this.getUserStatus(user)}
                 </View>
               </View>
-              {/* render inputs */}
-              {this.renderInputs()}
             </View>
-          </ScrollView>
-
-        </View>
+            {/* render inputs */}
+            {this.renderInputs()}
+          </View>
+        </ScrollView>
+      </View>
     );
   }
 
@@ -152,26 +154,26 @@ export class ProfileEdit extends Component {
 
   renderInputs() {
     return (
-        <View style={{ marginTop: 20 }}>
-          <TextInput
-              ref="name"
-              value={this.state.name}
-              placeholder="First name"
-              placeholderTextColor="#e0e0e0"
-              onChangeText={text => this.setState({ name: text, fieldChanged: true })}
-              style={[styles.input]}
-              autoCapitalize="sentences"
-          />
-          <TextInput
-              ref="surname"
-              placeholder="Last name"
-              placeholderTextColor="#e0e0e0"
-              value={this.state.surname}
-              onChangeText={text => this.setState({ surname: text, fieldChanged: true })}
-              style={styles.input}
-              autoCapitalize="sentences"
-          />
-        </View>
+      <View style={{ marginTop: 20 }}>
+        <TextInput
+          ref="name"
+          value={this.state.name}
+          placeholder="First name"
+          placeholderTextColor="#e0e0e0"
+          onChangeText={text => this.setState({ name: text, fieldChanged: true })}
+          style={[styles.input]}
+          autoCapitalize="sentences"
+        />
+        <TextInput
+          ref="surname"
+          placeholder="Last name"
+          placeholderTextColor="#e0e0e0"
+          value={this.state.surname}
+          onChangeText={text => this.setState({ surname: text, fieldChanged: true })}
+          style={styles.input}
+          autoCapitalize="sentences"
+        />
+      </View>
     );
   }
 
@@ -190,16 +192,15 @@ export class ProfileEdit extends Component {
   }
 
   offlineView = () => (
-      <View style={styles.offlineStatus} />
+    <View style={styles.offlineStatus} />
   );
 
   onlineView = () => (
-      <View style={styles.onlineStatus} />
+    <View style={styles.onlineStatus} />
   );
 
   doneAction = () => {
     // make request
-    console.warn(this.props.photo)
     if (this.props.photo !== '') {
       // upload avatar if temp path exists
       this.uploadAvatar();
@@ -218,20 +219,24 @@ export class ProfileEdit extends Component {
                 if (resp.code === 401) {
                   this.navigateTo('Tutorial');
                 } else {
-                  console.warn(JSON.stringify(resp));
                   if (resp.code === 5004) {
+                    this.setState({ count: this.state.count += 1 });
                     ToastAndroid.show('Success', ToastAndroid.LONG);
                     const { profile } = this.props;
                     profile.avatar.url = resp.avatar.url;
                     this.props.setProfile({ ...profile });
                     this.props.setAvatarPath(resp.avatar.url);
+                    if (this.state.count === 2) {
+                      this.handleClose();
+                    } else if (!this.state.fieldChanged) {
+                      this.handleClose();
+                    }
                   } else if (resp.code === 3013) {
                     // do some stuff
                   }
                 }
               })
               .catch((err) => {
-                console.warn(JSON.stringify(err));
               });
         })
         .catch((err) => { console.log(err.message); });
@@ -246,7 +251,7 @@ export class ProfileEdit extends Component {
   navigateTo = (screen, params) => {
     const resetAction = NavigationActions.reset({
       index: 0,
-      actions: [NavigationActions.navigate({ routeName: screen, params: params })],
+      actions: [NavigationActions.navigate({ routeName: screen, params })],
     });
     this.props.navigation.dispatch(resetAction);
   };
@@ -259,16 +264,21 @@ export class ProfileEdit extends Component {
           if (resp.code === 401) {
             this.navigateTo('Tutorial');
           } else {
+            this.setState({ count: this.state.count += 1 });
             const { profile } = this.props;
             profile.person.first_name = resp.payload.person.first_name;
             profile.person.last_name = resp.payload.person.last_name;
             this.props.setProfile({ ...profile });
             this.setState({ fieldChanged: false });
             ToastAndroid.show('Success', ToastAndroid.LONG);
+            if (this.state.count === 2) {
+              this.handleClose();
+            } else if (!this.props.photo) {
+              this.handleClose();
+            }
           }
         })
         .catch((err) => {
-          console.warn(JSON.stringify(err));
         });
   }
 
