@@ -116,7 +116,7 @@ export class Profile extends Component {
   };
 
   componentWillMount() {
-    console.warn(this.props.id);
+    console.log('profile_id', this.props.id);
     DeviceEventEmitter.addListener('EVENT_TRANSACTION_ERROR', (event) => {
       console.log('ошибка');
       console.log(event);
@@ -168,7 +168,6 @@ export class Profile extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    console.warn(JSON.stringify(nextProps.newTransaction));
     if (nextProps.newTransaction && nextProps.newTransaction.amount !== 0) {
       const { newTransaction } = nextProps;
       this.setState({ newTransaction, confirmTransactionVisibility: true });
@@ -187,7 +186,7 @@ export class Profile extends Component {
           }
         })
         .catch((err) => {
-          console.warn(JSON.stringify(err));
+          console.log('get user info error: ',err);
         });
   }
 
@@ -485,7 +484,6 @@ export class Profile extends Component {
 
   // on transaction item click handler
   onItemClick = (item) => {
-    console.warn(JSON.stringify(item));
     this.setState({
       item,
       modalVisibility: true,
@@ -642,11 +640,8 @@ export class Profile extends Component {
       toUserAddress = newTransaction.adress;
     }
 
-    console.warn(newTransaction.adress);
-
     HumaniqProfileApiLib.createTransaction(this.props.id, toUserId, toUserAddress, (newTransaction.amount * 100000000))
         .then((resp) => {
-          console.warn(JSON.stringify(resp));
           if (resp.code === 401) {
             this.navigateTo('Tutorial');
           } else {
@@ -658,7 +653,6 @@ export class Profile extends Component {
         })
         .catch((err) => {
           // handle error
-          console.warn(JSON.stringify(err));
           console.log('create transaction error::', err);
         });
     this.emptyTransaction();

@@ -201,7 +201,6 @@ export class ProfileEdit extends Component {
 
   doneAction = () => {
     // make request
-    console.warn(this.props.photo);
     if (this.props.photo !== '') {
       // upload avatar if temp path exists
       this.uploadAvatar();
@@ -220,7 +219,6 @@ export class ProfileEdit extends Component {
                 if (resp.code === 401) {
                   this.navigateTo('Tutorial');
                 } else {
-                  console.warn(JSON.stringify(resp));
                   if (resp.code === 5004) {
                     this.setState({ count: this.state.count += 1 });
                     ToastAndroid.show('Success', ToastAndroid.LONG);
@@ -239,7 +237,6 @@ export class ProfileEdit extends Component {
                 }
               })
               .catch((err) => {
-                console.warn(JSON.stringify(err));
               });
         })
         .catch((err) => { console.log(err.message); });
@@ -282,7 +279,6 @@ export class ProfileEdit extends Component {
           }
         })
         .catch((err) => {
-          console.warn(JSON.stringify(err));
         });
   }
 
