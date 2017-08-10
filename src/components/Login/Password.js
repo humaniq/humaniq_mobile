@@ -86,6 +86,7 @@ export class Password extends Component {
           break;
 
         case 1001:
+          this.props.setPassword(this.state.password);
           const registeredAcc = nextProps.user.account.payload.payload.account_information;
           console.log('registeredAccount ::', registeredAcc);
           // this.props.navigation.navigate('TelInput');
@@ -131,6 +132,7 @@ export class Password extends Component {
               .then((res) => { console.log(res); })
               .catch(err => console.log(err));
           this.navigateTo('Profile');
+          this.props.setPassword(this.state.password);
           break;
 
         case 2002:
@@ -241,11 +243,18 @@ export class Password extends Component {
 
   authenticate = (password) => {
     // image_id, password, imei
-    this.props.login({
-      facial_image_id: this.props.user.validate.payload.payload.facial_image_id,
-      device_imei: this.state.imei,
-      password,
-    });
+    if (this.props.password === password) {
+      this.props.login({
+        facial_image_id: this.props.user.validate.payload.payload.facial_image_id,
+        device_imei: this.state.imei,
+        password,
+      });
+    } else {
+      setTimeout(() => {
+        this.setState({ error: true });
+        this.animatePasswordError();
+      }, 100);
+    }
   };
 
   createRegistration = (password) => {
@@ -286,7 +295,7 @@ export class Password extends Component {
         toValue: vw(0),
         duration: 50,
       }),
-    ]).start(() => { this.setState({ error: null }); });
+    ]).start(() => { this.setState({ error: null, password: '' }); });
   };
 
   renderPassMask = () => {
@@ -369,6 +378,7 @@ export class Password extends Component {
 
 const mapStateToProps = state => ({
   user: state.user,
+  password: state.user.password,
 });
 
 export default connect(mapStateToProps, {

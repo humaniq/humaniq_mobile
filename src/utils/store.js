@@ -15,6 +15,7 @@ import rootSaga from '../sagas';
 const reducer = compose(mergePersistedState())(rootReducer);
 const sagaMiddleware = createSagaMiddleware();
 const storage = compose(filter([
+  'user',
   'accounts',
 ]))(adapter(AsyncStorage));
 

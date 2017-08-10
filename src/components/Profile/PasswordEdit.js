@@ -68,9 +68,9 @@ export class PasswordEdit extends Component {
     if (this.state.password.length < this.state.maxPasswordLength) {
       this.setState({ password: this.state.password += number });
     }
-    if (this.state.password.length == this.state.maxPasswordLength) {
+    if (this.state.password.length === this.state.maxPasswordLength) {
       if (this.state.firstStep) {
-        if (this.state.old_password == this.state.password) {
+        if (this.state.old_password === this.state.password) {
           setTimeout(() => {
             this.setState({ firstStep: false, password: '' });
           }, 100);
