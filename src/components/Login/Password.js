@@ -99,7 +99,7 @@ export class Password extends Component {
             device_imei: IMEI.getImei(),
           };
           HumaniqTokenApiLib.saveCredentials(map2)
-            .then((res) => console.log(res))
+            .then(res => console.log(res))
             .catch(err => console.log(err));
           // TODO: replace with validated??
           if (registeredAcc.phone_number.country_code) {
@@ -130,17 +130,17 @@ export class Password extends Component {
             device_imei: IMEI.getImei(),
           };
           HumaniqTokenApiLib.saveCredentials(map)
-            .then((res) => { console.log(res) })
+            .then((res) => { console.log(res); })
             .catch(err => console.log(err));
           this.navigateTo('Profile');
           break;
 
         case 2002:
           // Authentication Failed
-          /*this.setState({
+          /* this.setState({
             error: true,
             errorCode: nextProps.user.account.payload.code,
-          });*/
+          }); */
           this.setState({
             error: true,
           });
@@ -253,11 +253,11 @@ export class Password extends Component {
         this.props.login({ facial_image: base64, device_imei: this.state.imei, password });
       })
       .catch((err) => { console.log(err.message); });
-    /*this.props.login({
+    /* this.props.login({
       facial_image_id: this.props.user.validate.payload.payload.facial_image_id,
       device_imei: this.state.imei,
       password,
-    });*/
+    }); */
   };
 
   createRegistration = (password) => {
@@ -298,7 +298,7 @@ export class Password extends Component {
         toValue: vw(0),
         duration: 50,
       }),
-    ]).start(() => { this.setState({ error: null }); });
+    ]).start(() => { this.setState({ error: null, password: '' }); });
   };
 
   renderPassMask = () => {
