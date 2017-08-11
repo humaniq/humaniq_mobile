@@ -10,6 +10,7 @@ import PropTypes from 'prop-types';
 import Animation from 'lottie-react-native';
 import { connect } from 'react-redux';
 import DeviceInfo from 'react-native-device-info';
+import RNFetchBlob from 'react-native-fetch-blob';
 import IMEI from 'react-native-imei';
 import { HumaniqTokenApiLib } from 'react-native-android-library-humaniq-api';
 
@@ -70,6 +71,7 @@ export class Password extends Component {
       this.state.progress.stopAnimation();
       this.state.progress.setValue(0);
 
+      console.log(nextProps.user.account);
       if (!nextProps.user.account.payload) {
         return;
       }
@@ -97,8 +99,8 @@ export class Password extends Component {
             device_imei: IMEI.getImei(),
           };
           HumaniqTokenApiLib.saveCredentials(map2)
-              .then(res => console.log(res))
-              .catch(err => console.log(err));
+            .then((res) => console.log(res))
+            .catch(err => console.log(err));
           // TODO: replace with validated??
           if (registeredAcc.phone_number.country_code) {
             // secondary user, redirect to dash
@@ -128,18 +130,21 @@ export class Password extends Component {
             device_imei: IMEI.getImei(),
           };
           HumaniqTokenApiLib.saveCredentials(map)
-              .then((res) => { console.log(res); })
-              .catch(err => console.log(err));
+            .then((res) => { console.log(res) })
+            .catch(err => console.log(err));
           this.navigateTo('Profile');
           break;
 
         case 2002:
           // Authentication Failed
-          this.setState({
-            password: '',
+          /*this.setState({
             error: true,
             errorCode: nextProps.user.account.payload.code,
+          });*/
+          this.setState({
+            error: true,
           });
+          this.animatePasswordError();
           break;
 
         case 3003:
@@ -155,6 +160,8 @@ export class Password extends Component {
             error: true,
             errorCode: nextProps.user.account.payload.code,
           });
+          this.animatePasswordError();
+          break;
       }
     }
   }
@@ -208,7 +215,7 @@ export class Password extends Component {
         this.handlePasswordConfirm(false, res);
       }
     } else if (res.length === this.state.maxPasswordLength) {
-        // Auth
+      // Auth
       console.log('authenticate');
       this.handlePasswordConfirm(false, res);
     }
@@ -241,11 +248,16 @@ export class Password extends Component {
 
   authenticate = (password) => {
     // image_id, password, imei
-    this.props.login({
+    RNFetchBlob.fs.readFile(this.props.user.photo, 'base64')
+      .then((base64) => {
+        this.props.login({ facial_image: base64, device_imei: this.state.imei, password });
+      })
+      .catch((err) => { console.log(err.message); });
+    /*this.props.login({
       facial_image_id: this.props.user.validate.payload.payload.facial_image_id,
       device_imei: this.state.imei,
       password,
-    });
+    });*/
   };
 
   createRegistration = (password) => {
@@ -352,8 +364,8 @@ export class Password extends Component {
             />
           </View>
           <Image style={styles.userPhoto} source={{ uri: this.props.user.photo }} />
-          {this.renderInputStep() }
-          {this.renderPassMask() }
+          {this.renderInputStep()}
+          {this.renderPassMask()}
         </View>
         <View style={styles.keyboardContainer}>
           <Keyboard
