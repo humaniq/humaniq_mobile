@@ -6,6 +6,7 @@ import {
   Text,
   TouchableOpacity,
 } from 'react-native';
+import Ripple from 'react-native-material-ripple';
 
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
@@ -35,7 +36,7 @@ export class Accounts extends Component {
 
   render() {
     const accounts = this.props.accounts;
-    const allAccounts = [accounts.primaryAccount, ...accounts.secondaryAccounts];
+    const allAccounts = [accounts.primaryAccount];
 
     return (
       <ScrollView contentContainerStyle={styles.container}>
@@ -44,25 +45,43 @@ export class Accounts extends Component {
         </View>
 
         <View style={styles.accountsContainer}>
-          {allAccounts.map(acc => (
-            <TouchableOpacity
-              style={styles.accountBtn}
-              onPress={this.validateUser}
-              key={acc.accountId}
-            >
-              <View style={styles.accountInfoContainer}>
-                {acc.photo.length > 0 &&
-                <Image style={styles.profilePhoto} source={{ uri: acc.photo }}/>
-                }
-                <Text style={styles.id}>{`${acc.accountId} / phone: ${acc.phone}`}</Text>
-              </View>
-              <Image source={ic_chevrone_right} />
-            </TouchableOpacity>
-          )) }
+          {allAccounts.map((acc) => {
+            const name = acc.person
+                ? `${acc.person.first_name} ${acc.person.last_name}`
+                : '';
+            const p_code = (acc.phone_number && acc.phone_number.country_code)
+                ? `+(${acc.phone_number.country_code})` : '';
+            const p_num = (acc.phone_number && acc.phone_number.phone_number)
+                ? acc.phone_number.phone_number : '';
+            const phone = acc.phone || acc.phone_number
+                ? `${p_code} ${p_num}`
+                : '';
+            return (
+              <Ripple
+                onPress={this.validateUser}
+                key={acc.accountId}
+              >
+                <View style={styles.accountBtn}>
+                  <View style={styles.accountInfoContainer}>
+                    {acc.photo.length > 0 &&
+                    <Image style={styles.profilePhoto} source={{ uri: acc.photo }} />
+                    }
+                    {
+                      name ?
+                        <View style={{ flexDirection: 'column' }}>
+                          <Text style={styles.nameRow}>{name}</Text>
+                          <Text style={styles.phoneRow}>{phone}</Text>
+                        </View>
+                      :
+                        <Text style={styles.phone}>{phone}</Text>
+                    }
+                  </View>
+                  <Image source={ic_chevrone_right} />
+                </View>
+              </Ripple>
+            );
+          }) }
         </View>
-        <TouchableOpacity style={styles.newUserBtn} onPress={this.validateUser}>
-          <Image source={ic_add_user} />
-        </TouchableOpacity>
       </ScrollView>
     );
   }
@@ -70,6 +89,7 @@ export class Accounts extends Component {
 
 const mapStateToProps = state => ({
   accounts: state.accounts,
+  user: state.user,
 });
 
 export default connect(mapStateToProps)(Accounts);
@@ -85,11 +105,11 @@ const styles = CustomStyleSheet({
     backgroundColor: '$cBrand_dark',
     borderBottomWidth: 1,
     borderColor: 'lightgray',
-    elevation: 2
+    elevation: 2,
   },
   illustration: {
     width: 360,
-    height: 147
+    height: 147,
   },
   accountBtn: {
     flexDirection: 'row',
@@ -104,15 +124,31 @@ const styles = CustomStyleSheet({
     alignItems: 'center',
   },
   profilePhoto: {
-    round: 41,
+    height: 41,
+    width: 41,
     marginRight: 11,
     borderRadius: 20,
     backgroundColor: '$cBrand',
   },
-  id: {
+  phone: {
+    fontFamily: 'Roboto',
     fontSize: 15,
-    color: '$cPaper',
-    fontWeight: '700',
+    fontWeight: '500',
+    textAlign: 'left',
+    color: 'white',
+  },
+  nameRow: {
+    fontFamily: 'Roboto',
+    fontSize: 15,
+    fontWeight: '500',
+    textAlign: 'left',
+    color: 'white',
+  },
+  phoneRow: {
+    fontFamily: 'Roboto',
+    fontSize: 12,
+    textAlign: 'left',
+    color: 'rgba(255, 255, 255, 0.5)',
   },
   newUserBtn: {
     alignSelf: 'flex-start',

@@ -50,20 +50,23 @@ export class ProfileEdit extends Component {
       fieldChanged: false,
       localPath: '',
       uploading: false,
+      count: 0,
+      isAvatarUploading: false,
+      isCredsUploading: false,
     };
   }
 
   render() {
     const { user, profile } = this.state;
     const name = profile.person
-          ? `${profile.person.first_name} ${profile.person.last_name}`
-          : '';
+        ? `${profile.person.first_name} ${profile.person.last_name}`
+        : '';
     const phone = profile.phone_number
-          ? `+(${profile.phone_number.country_code}) ${profile.phone_number.phone_number}`
-          : '';
+        ? `+(${profile.phone_number.country_code}) ${profile.phone_number.phone_number}`
+        : '';
     const userCreds = profile.person
-            ? name
-            : phone;
+        ? name
+        : phone;
 
     const status = user.status === 1 ? 'online' : 'offline';
     const statusTextColor = user.status === 1 ? '#3AA3E4' : '#aaaaaa';
@@ -103,8 +106,8 @@ export class ProfileEdit extends Component {
                   <Image
                     style={styles.avatar}
                     source={this.props.photo
-                        ? { uri: this.props.photo }
-                        : profile.avatar ? { uri: profile.avatar.url } : ic_photo_holder}
+                            ? { uri: this.props.photo }
+                            : profile.avatar ? { uri: profile.avatar.url } : ic_photo_holder}
                   />
                   <View style={[{
                     position: 'absolute',
@@ -131,7 +134,6 @@ export class ProfileEdit extends Component {
             {this.renderInputs()}
           </View>
         </ScrollView>
-
       </View>
     );
   }
@@ -177,13 +179,13 @@ export class ProfileEdit extends Component {
 
   getUserStatus(user) {
     switch (user.status) {
-      // offline status
+        // offline status
       case 0:
         return this.offlineView();
-      // online status
+        // online status
       case 1:
         return this.onlineView();
-      // by default online
+        // by default online
       default:
         return this.onlineView();
     }
@@ -199,7 +201,6 @@ export class ProfileEdit extends Component {
 
   doneAction = () => {
     // make request
-    console.warn(this.props.photo)
     if (this.props.photo !== '') {
       // upload avatar if temp path exists
       this.uploadAvatar();
@@ -212,29 +213,33 @@ export class ProfileEdit extends Component {
 
   convertToBase64 = (path) => {
     RNFetchBlob.fs.readFile(path, 'base64')
-      .then((data) => {
-        HumaniqProfileApiLib.uploadProfileAvatar(this.props.profile.account_id, data)
-          .then((resp) => {
-            if (resp.code === 401) {
-              this.navigateTo('Tutorial');
-            } else {
-              console.warn(JSON.stringify(resp));
-              if (resp.code === 5004) {
-                ToastAndroid.show('Success', ToastAndroid.LONG);
-                const { profile } = this.props;
-                profile.avatar.url = resp.avatar.url;
-                this.props.setProfile({ ...profile });
-                this.props.setAvatarPath(resp.avatar.url);
-              } else if (resp.code === 3013) {
-                // do some stuff
-              }
-            }
-          })
-          .catch((err) => {
-            console.warn(JSON.stringify(err));
-          });
-      })
-      .catch((err) => { console.log(err.message); });
+        .then((data) => {
+          HumaniqProfileApiLib.uploadProfileAvatar(this.props.profile.account_id, data)
+              .then((resp) => {
+                if (resp.code === 401) {
+                  this.navigateTo('Tutorial');
+                } else {
+                  if (resp.code === 5004) {
+                    this.setState({ count: this.state.count += 1 });
+                    ToastAndroid.show('Success', ToastAndroid.LONG);
+                    const { profile } = this.props;
+                    profile.avatar.url = resp.avatar.url;
+                    this.props.setProfile({ ...profile });
+                    this.props.setAvatarPath(resp.avatar.url);
+                    if (this.state.count === 2) {
+                      this.handleClose();
+                    } else if (!this.state.fieldChanged) {
+                      this.handleClose();
+                    }
+                  } else if (resp.code === 3013) {
+                    // do some stuff
+                  }
+                }
+              })
+              .catch((err) => {
+              });
+        })
+        .catch((err) => { console.log(err.message); });
   };
 
   onPhotoClick = () => {
@@ -246,30 +251,44 @@ export class ProfileEdit extends Component {
   navigateTo = (screen, params) => {
     const resetAction = NavigationActions.reset({
       index: 0,
-      actions: [NavigationActions.navigate({ routeName: screen, params: params })],
+      actions: [NavigationActions.navigate({ routeName: screen, params })],
     });
     this.props.navigation.dispatch(resetAction);
   };
 
   uploadPerson() {
+    const { addPrimaryAccount, accounts } = this.props;
+
     HumaniqProfileApiLib.updateUserPerson(
-            this.state.profile.account_id, this.state.name, this.state.surname,
-        )
+        this.state.profile.account_id, this.state.name, this.state.surname,
+    )
         .then((resp) => {
           if (resp.code === 401) {
             this.navigateTo('Tutorial');
           } else {
+            this.setState({ count: this.state.count += 1 });
             const { profile } = this.props;
             profile.person.first_name = resp.payload.person.first_name;
             profile.person.last_name = resp.payload.person.last_name;
             this.props.setProfile({ ...profile });
+
+            addPrimaryAccount({
+              ...accounts.primaryAccount,
+              person: profile.person,
+              phone_number: profile.phone_number,
+            });
+
             this.setState({ fieldChanged: false });
             ToastAndroid.show('Success', ToastAndroid.LONG);
+            if (this.state.count === 2) {
+              this.handleClose();
+            } else if (!this.props.photo) {
+              this.handleClose();
+            }
           }
         })
-            .catch((err) => {
-              console.warn(JSON.stringify(err));
-            });
+        .catch((err) => {
+        });
   }
 
   uploadAvatar() {
@@ -375,10 +394,12 @@ export default connect(
       user: state.user,
       profile: state.user.profile || {},
       photo: state.user.tempPhoto,
+      accounts: state.accounts,
     }),
     dispatch => ({
       setProfile: profile => dispatch(actions.setProfile(profile)),
       setLocalPath: path => dispatch(actions.setTempLocalPath(path)),
       setAvatarPath: path => dispatch(actions.setAvatarLocalPath(path)),
+      addPrimaryAccount: account => dispatch(actions.addPrimaryAccount(account)),
     }),
 )(ProfileEdit);

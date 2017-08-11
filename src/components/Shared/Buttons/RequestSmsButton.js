@@ -14,24 +14,34 @@ const ic_clock = require('../../../assets/icons/ic_clock.png');
 const propTypes = {
   onPress: PropTypes.func.isRequired,
   disabled: PropTypes.bool,
-  cooldownTime: PropTypes.string,
+  cooldownTime: PropTypes.number,
 };
+
+function str_pad_left(string, pad, length) {
+  return (new Array(length + 1).join(pad) + string).slice(-length);
+}
+
+function prettyTime(time) {
+  const minutes = Math.floor(time / 60);
+  const seconds = time % 60;
+  return `${str_pad_left(minutes, '0', 2)}:${str_pad_left(seconds, '0', 2)}`;
+}
 
 export default function RequestSmsButton(props) {
   const disabled = props.disabled;
-  const cooldownTime = props.cooldownTime;
-  console.log('disabled for button', disabled);
+  const cooldownTime = parseInt(props.cooldownTime, 10);
+
   return (
     // using TouchH instead TouchO to disable pressing when prop active == false
     <TouchableHighlight
-      style={styles.container}
+      style={[styles.container, disabled && cooldownTime === 0 ? styles.disabled : null]}
       onPress={disabled ? null : props.onPress}
       underlayColor={'transparent'}
       activeOpacity={0.5}
     >
-      {disabled ?
+      {disabled && cooldownTime > 0 ?
         <View style={styles.cooldownContainer}>
-          <Text style={styles.cooldownTxt}>{cooldownTime}</Text>
+          <Text style={styles.cooldownTxt}>{prettyTime(cooldownTime)}</Text>
           <Image source={ic_clock} />
         </View> :
         <Image source={ic_sms} />
@@ -52,6 +62,7 @@ const styles = CustomStyleSheet({
     borderWidth: 1,
     borderColor: '$cPaper',
     borderRadius: 3,
+    marginRight: 9,
   },
   cooldownContainer: {
     flexDirection: 'row',
@@ -63,6 +74,8 @@ const styles = CustomStyleSheet({
     marginRight: 4,
   },
   disabled: {
+    borderWidth: 0,
+    backgroundColor: '$cPaper',
     opacity: 0.6,
   },
 });

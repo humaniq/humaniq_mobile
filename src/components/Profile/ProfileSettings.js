@@ -14,7 +14,7 @@ import {
   ToastAndroid,
 } from 'react-native';
 
-import CustomStyleSheet from '../../utils/customStylesheet'
+import CustomStyleSheet from '../../utils/customStylesheet';
 import { HumaniqBlockchainApiLib } from 'react-native-android-library-humaniq-api';
 import * as actions from '../../actions/index';
 import { NavigationActions } from 'react-navigation';
@@ -118,8 +118,8 @@ export class ProfileSettings extends Component {
     <Animated.ScrollView
       scrollEventThrottle={15}
       onScroll={Animated.event(
-          [{ nativeEvent: { contentOffset: { y: this.state.scrollY } } }],
-      )}
+              [{ nativeEvent: { contentOffset: { y: this.state.scrollY } } }],
+          )}
     >
       {this.renderScrollViewContent()}
     </Animated.ScrollView>
@@ -145,15 +145,15 @@ export class ProfileSettings extends Component {
           <Animated.View
             style={[styles.bar, {
               transform: [
-                { scale: this.getAnimationType(constants.VIEW_TRANSLATE) },
-                { translateY: this.getAnimationType(constants.VIEWY_TRANSLATE) }] }]}
+                    { scale: this.getAnimationType(constants.VIEW_TRANSLATE) },
+                    { translateY: this.getAnimationType(constants.VIEWY_TRANSLATE) }] }]}
           >
             <Animated.View
               style={styles.avatarInfoContainer}
             >
               <Animated.Image
                 style={styles.avatar}
-                source={profile.avatar ? { uri: profile.avatar.url } : ic_photo_holder }
+                source={profile.avatar ? { uri: profile.avatar.url } : ic_photo_holder}
               />
               <Animated.View style={styles.infoContainer}>
                 <Text style={styles.title}>{this.showPhoneIfExist(profile, false)}</Text>
@@ -315,13 +315,13 @@ export class ProfileSettings extends Component {
 
   getUserStatus(user) {
     switch (user.status) {
-      // offline status
+        // offline status
       case 0:
         return this.offlineView();
-      // online status
+        // online status
       case 1:
         return this.onlineView();
-      // by default online
+        // by default online
       default:
         return this.onlineView();
     }
@@ -378,22 +378,22 @@ export class ProfileSettings extends Component {
   logOutUser = () => {
     // deauthenticate user
     HumaniqProfileApiLib.deauthenticateUser(this.props.profile.account_id)
-      .then((response) => {
-        // log out
-        console.log(response)
-        if (response.code === 200) {
-          this.navigateTo('Accounts');
-        }
-      })
-      .catch((err) => {
-        // handle error
-      });
+        .then((response) => {
+          // log out
+          console.log(response);
+          if (response.code === 200) {
+            this.navigateTo('Tutorial');
+          }
+        })
+        .catch((err) => {
+          // handle error
+        });
   }
 
   navigateTo = (screen, params) => {
     const resetAction = NavigationActions.reset({
       index: 0,
-      actions: [NavigationActions.navigate({ routeName: screen, params: params })],
+      actions: [NavigationActions.navigate({ routeName: screen, params })],
     });
     this.props.navigation.dispatch(resetAction);
   };
@@ -411,13 +411,17 @@ export class ProfileSettings extends Component {
   }
 
   getWalletAddress() {
+    console.log('getting wallet address::');
     HumaniqBlockchainApiLib.getUserAddressState(this.props.profile.account_id)
-      .then((response) => {
-        this.setState({ wallet: response });
-      })
-      .catch((err) => {
-        // handle error
-      });
+        .then((response) => {
+          console.log('wallet address::>>', response);
+          this.setState({ wallet: response });
+        })
+        .catch((err) => {
+          // handle error
+          console.log('err::>>', err);
+          this.setState({ wallet: { address: '' } });
+        });
   }
 }
 

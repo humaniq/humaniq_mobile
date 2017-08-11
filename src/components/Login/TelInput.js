@@ -13,14 +13,14 @@ import VMasker from 'vanilla-masker';
 import phoneFormat from 'phoneformat-react-native';
 
 import CustomStyleSheet from '../../utils/customStylesheet';
-import Confirm from '../Shared/Buttons/Confirm';
+// import Confirm from '../Shared/Buttons/Confirm';
 import PhoneKeyboard from '../Shared/Components/PhoneKeyboard';
 import ConfirmButton from '../Shared/Buttons/ConfirmButton';
 import HelpButton from '../Shared/Buttons/HelpButton';
 import { phoneNumberCreate, savePhone } from '../../actions';
 import { vw } from '../../utils/units';
 
-const ic_user = require('../../assets/icons/ic_user.png');
+// const ic_user = require('../../assets/icons/ic_user.png');
 const arrowDownWhite = require('../../assets/icons/arrow_down_white.png');
 
 export class TelInput extends Component {
@@ -35,7 +35,7 @@ export class TelInput extends Component {
         isFetching: PropTypes.bool,
       }).isRequired,
       photo: PropTypes.string.isRequired,
-      phoneNumber: PropTypes.string,
+      phoneNumber: PropTypes.object,
     }).isRequired,
 
     phoneNumberCreate: PropTypes.func.isRequired,
@@ -49,11 +49,11 @@ export class TelInput extends Component {
   state = {
     maxPhoneLength: 10,
     phone: '',
-    maskedPhone: VMasker.toPattern(0, { pattern: "(999) 999-9999", placeholder: "0" }),
+    maskedPhone: VMasker.toPattern(0, { pattern: '(999) 999-9999', placeholder: '0' }),
     code: '+1',
-    countryCode: "US",
+    countryCode: 'US',
     flag: 'united_states',
-    phoneError: new Animated.Value(0)
+    phoneError: new Animated.Value(0),
   };
 
   componentWillReceiveProps(nextProps) {
@@ -66,15 +66,15 @@ export class TelInput extends Component {
           alert(nextProps.user.phoneCreate.payload.message);
           break;
 
-          case 4005:
+        case 4005:
             // registered user
             // Account Phone Number Created Successfully. Validation Code Sent
-            this.props.savePhone({
-              country_code: VMasker.toNumber(this.state.code),
-              phone_number: VMasker.toNumber(this.state.phone),
-            });
-            this.props.navigation.navigate('CodeInput');
-            break;
+          this.props.savePhone({
+            country_code: VMasker.toNumber(this.state.code),
+            phone_number: VMasker.toNumber(this.state.phone),
+          });
+          this.props.navigation.navigate('CodeInput');
+          break;
 
         case 4011:
           // The Account Already Has A Phone Number
@@ -93,14 +93,14 @@ export class TelInput extends Component {
     if (this.state.phone.length < this.state.maxPhoneLength) {
       let inputVal = this.state.phone;
       inputVal += number;
-      let m = VMasker.toPattern(inputVal, { pattern: "(999) 999-9999", placeholder: "0" });
+      const m = VMasker.toPattern(inputVal, { pattern: '(999) 999-9999', placeholder: '0' });
       this.setState({ phone: inputVal, maskedPhone: m });
     }
   };
 
   handleBackspacePress = () => {
-    let inputVal = this.state.phone.slice(0, -1);
-    let m = VMasker.toPattern(inputVal, { pattern: "(999) 999-9999", placeholder: "0" });
+    const inputVal = this.state.phone.slice(0, -1);
+    const m = VMasker.toPattern(inputVal, { pattern: '(999) 999-9999', placeholder: '0' });
     this.setState({ phone: inputVal, maskedPhone: m });
   };
 
@@ -122,10 +122,10 @@ export class TelInput extends Component {
     }
   };
 
-  phonenumber = (inputtxt, code) => {
-    //let phoneno = /^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/;
-    return phoneFormat.isValidNumber(inputtxt, code);
-  }
+  phonenumber = (inputtxt, code) => (
+    // let phoneno = /^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/;
+    phoneFormat.isValidNumber(inputtxt, code)
+  );
 
   animatePasswordError = () => {
     Animated.sequence([
@@ -135,7 +135,7 @@ export class TelInput extends Component {
       }),
       Animated.timing(this.state.phoneError, {
         toValue: vw(-30),
-        duration: 100
+        duration: 100,
       }),
       Animated.timing(this.state.phoneError, {
         toValue: vw(30),
@@ -149,26 +149,25 @@ export class TelInput extends Component {
         toValue: vw(0),
         duration: 50,
       }),
-    ]).start(() => { this.setState({ error: null }) });
-  }
-
-  renderInput = () => {
-    return (
-      <View style={styles.telInput}>
-        <TouchableOpacity
-          style={styles.countryCodeContainer}
-          onPress={() => {
-            this.props.navigation.navigate('CountryCode',
-              { refresh: (dialCode, code, flag) => { dialCode != null ? this.setState({ code: dialCode, countryCode: code, flag: flag }) : null } })
-          } }>
-          <Image style={styles.flag} source={{ uri: this.state.flag }}/>
-          <Text style={[styles.code, this.state.error ? styles.error : null]}>{this.state.code}</Text>
-          <Image style={[styles.arrow, this.state.error ? { tintColor: 'red' } : null]} source={arrowDownWhite}/>
-        </TouchableOpacity>
-        <Text style={[styles.number, this.state.error ? styles.error : null]}>{this.state.maskedPhone}</Text>
-      </View>
-    );
+    ]).start(() => { this.setState({ error: null }); });
   };
+
+  renderInput = () => (
+    <View style={styles.telInput}>
+      <TouchableOpacity
+        style={styles.countryCodeContainer}
+        onPress={() => {
+          this.props.navigation.navigate('CountryCode',
+              { refresh: (dialCode, code, flag) => { dialCode != null ? this.setState({ code: dialCode, countryCode: code, flag }) : null; } });
+        }}
+      >
+        <Image style={styles.flag} source={{ uri: this.state.flag }} />
+        <Text style={[styles.code, this.state.error ? styles.error : null]}>{this.state.code}</Text>
+        <Image style={[styles.arrow, this.state.error ? { tintColor: 'red' } : null]} source={arrowDownWhite} />
+      </TouchableOpacity>
+      <Text style={[styles.number, this.state.error ? styles.error : null]}>{this.state.maskedPhone}</Text>
+    </View>
+    );
 
   render() {
     return (
@@ -209,29 +208,29 @@ const styles = CustomStyleSheet({
   header: {
     flex: 1,
     paddingTop: 120,
-    paddingLeft: 16
+    paddingLeft: 16,
   },
   countryCodeContainer: {
     flexDirection: 'row',
     height: 72,
     alignItems: 'center',
-    justifyContent: 'center'
+    justifyContent: 'center',
   },
   flag: {
     width: 32,
-    height: 28
+    height: 28,
   },
   arrow: {
     marginTop: 28.5,
     marginBottom: 24.5,
     width: 19,
-    height: 19
+    height: 19,
   },
   code: {
     fontSize: 25,
     color: 'white',
     marginLeft: 4.5,
-    lineHeight: 29
+    lineHeight: 29,
   },
   passContainer: {
     flexDirection: 'row',
@@ -247,7 +246,7 @@ const styles = CustomStyleSheet({
     textAlign: 'center',
     fontSize: 25,
     marginLeft: 10,
-    color: 'white'
+    color: 'white',
   },
   buttonsContainer: {
     height: 61,
@@ -255,9 +254,9 @@ const styles = CustomStyleSheet({
     justifyContent: 'space-between',
     flexDirection: 'row',
     paddingLeft: 16,
-    paddingRight: 16
+    paddingRight: 16,
   },
   error: {
-    color: "#f01434"
-  }
+    color: '#f01434',
+  },
 });

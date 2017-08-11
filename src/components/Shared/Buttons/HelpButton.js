@@ -32,7 +32,7 @@ export default class HelpButton extends Component {
       toValue: to,
       duration: time,
     }).start(callback);
-  }
+  };
 
   render() {
     return (
@@ -40,14 +40,15 @@ export default class HelpButton extends Component {
       <TouchableWithoutFeedback
         style={styles.container}
         onPress={this.props.onPress}
-        onPressIn={() => this.animate(500, 0, 1) }>
+        onPressIn={() => this.animate(500, 0, 1)}
+      >
         <View style={styles.container}>
-          <Image source={ic_help} style={styles.icon}/>
+          <Image source={ic_help} style={styles.icon} />
           <Animation
             style={styles.animationStyle}
             source={btnRipple}
             progress={this.state.progress}
-            />
+          />
         </View>
       </TouchableWithoutFeedback>
     );
@@ -65,8 +66,8 @@ const styles = CustomStyleSheet({
     borderRadius: 3,
   },
   icon: {
-    position: "absolute",
-    alignSelf: 'center'
+    position: 'absolute',
+    alignSelf: 'center',
   },
   animationStyle: {
     width: 155,

@@ -69,9 +69,9 @@ export const phoneNumberValidate = {
 };
 
 export const smsCodeRepeat = {
-  request: request => action(PHONE_NUMBER_VALIDATE[REQUEST], request),
-  success: response => action(PHONE_NUMBER_VALIDATE[SUCCESS], { response }),
-  failure: error => action(PHONE_NUMBER_VALIDATE[FAILURE], { error }),
+  request: request => action(SMS_CODE_REPEAT[REQUEST], request),
+  success: response => action(SMS_CODE_REPEAT[SUCCESS], { response }),
+  failure: error => action(SMS_CODE_REPEAT[FAILURE], { error }),
 };
 
 export const faceEmotionCreate = {
