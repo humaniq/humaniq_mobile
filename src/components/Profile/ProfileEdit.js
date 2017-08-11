@@ -257,6 +257,8 @@ export class ProfileEdit extends Component {
   };
 
   uploadPerson() {
+    const { addPrimaryAccount, accounts } = this.props;
+
     HumaniqProfileApiLib.updateUserPerson(
         this.state.profile.account_id, this.state.name, this.state.surname,
     )
@@ -269,6 +271,13 @@ export class ProfileEdit extends Component {
             profile.person.first_name = resp.payload.person.first_name;
             profile.person.last_name = resp.payload.person.last_name;
             this.props.setProfile({ ...profile });
+
+            addPrimaryAccount({
+              ...accounts.primaryAccount,
+              person: profile.person,
+              phone_number: profile.phone_number,
+            });
+
             this.setState({ fieldChanged: false });
             ToastAndroid.show('Success', ToastAndroid.LONG);
             if (this.state.count === 2) {
@@ -385,10 +394,12 @@ export default connect(
       user: state.user,
       profile: state.user.profile || {},
       photo: state.user.tempPhoto,
+      accounts: state.accounts,
     }),
     dispatch => ({
       setProfile: profile => dispatch(actions.setProfile(profile)),
       setLocalPath: path => dispatch(actions.setTempLocalPath(path)),
       setAvatarPath: path => dispatch(actions.setAvatarLocalPath(path)),
+      addPrimaryAccount: account => dispatch(actions.addPrimaryAccount(account)),
     }),
 )(ProfileEdit);
