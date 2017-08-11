@@ -243,10 +243,10 @@ export class Password extends Component {
 
   authenticate = (password) => {
     // image_id, password, imei
-    if (this.props.password === password) {
+    if ((this.props.password === password) || (this.props.password === '')) {
       this.props.login({
         facial_image_id: this.props.user.validate.payload.payload.facial_image_id,
-        device_imei: this.state.imei,
+        device_imei: IMEI.getImei(),
         password,
       });
     } else {
