@@ -1,4 +1,5 @@
 import RNFetchBlob from 'react-native-fetch-blob';
+import store from '../utils/store';
 
 const API_ROOT = 'https://api.humaniq.com/tapatybe/api/v1/';
 
@@ -6,11 +7,16 @@ function callApi(endpoint, body) {
   const fullUrl = (endpoint.indexOf(API_ROOT) === -1) ? API_ROOT + endpoint : endpoint;
   console.log('api request body', fullUrl, body);
   // console.log('full url', fullUrl);
+  const token
+      = store.getState().user.account && store.getState().user.account.payload && store.getState().user.account.payload.payload
+      ? store.getState().user.account.payload.payload.token : '';
+  console.log('token::::»»', token);
   return RNFetchBlob.fetch(
     'POST',
     fullUrl,
     {
       'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
     },
     JSON.stringify(body),
   )
@@ -18,13 +24,12 @@ function callApi(endpoint, body) {
       console.log('API response', response);
       return response.json();
     })
-    .then((response) => {
+    .then(response =>
       // let code = response.code.toString();
       // if (code.slice(0, 1) == 4) {
       //   return Promise.reject(response);
       // }
-      return { response };
-    })
+       ({ response }))
     .catch(error => ({ response: { error: error.toString() } }));
 }
 
