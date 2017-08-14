@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
 import {
-  StyleSheet,
   Image,
   Modal,
   View,
   TouchableNativeFeedback,
   TouchableWithoutFeedback,
+  Text,
 } from 'react-native';
 import PropTypes from 'prop-types';
 import QRCode from 'react-native-qrcode';
@@ -38,6 +38,7 @@ class QrModal extends Component {
         >
           <TouchableWithoutFeedback onPress={onCancelClick}>
             <View style={styles.rootContainer}>
+
               <TouchableWithoutFeedback onPress={() => {}}>
                 <View style={styles.content}>
                   <View style={styles.qrContainer}>
@@ -45,7 +46,11 @@ class QrModal extends Component {
                       value={wallet.address}
                       size={270}
                     />
+                    <Text style={styles.qrAddress}>
+                      {wallet.address}
+                    </Text>
                   </View>
+
                   <View style={{ backgroundColor: '#e0e0e0', height: 1 }} />
                   <TouchableNativeFeedback
                     delayPressIn={0}
@@ -58,10 +63,11 @@ class QrModal extends Component {
                         source={ic_clipboard}
                       />
                     </View>
+
                   </TouchableNativeFeedback>
                 </View>
-              </TouchableWithoutFeedback>
 
+              </TouchableWithoutFeedback>
             </View>
           </TouchableWithoutFeedback>
         </Modal>
@@ -94,6 +100,14 @@ const styles = CustomStyleSheet({
   clipboard: {
     width: 28,
     height: 28,
+  },
+  qrAddress: {
+    width: 270,
+    fontSize: 16,
+    alignSelf: 'center',
+    marginTop: 5,
+    marginBottom: 5,
+    fontWeight: 'bold',
   },
 });
 

@@ -349,7 +349,7 @@ export class Cam extends Component {
         }}
         style={styles.camera}
         aspect={Camera.constants.Aspect.fill}
-        captureQuality={Camera.constants.CaptureQuality.low}
+        captureQuality={Camera.constants.CaptureQuality.medium}
         type={camtype}
         captureTarget={Camera.constants.CaptureTarget.disk}
         onBarCodeRead={onBarCode}
