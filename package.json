@@ -22,7 +22,7 @@
     "react-native-android-sms-listener": "0.4.1",
     "react-native-asset-library-to-base64": "1.0.1",
     "react-native-audio": "3.2.2",
-    "react-native-camera": "git+https://github.com/lwansbrough/react-native-camera.git",
+    "react-native-camera": "git+https://github.com/humaniq/react-native-camera.git",
     "react-native-camera-roll-picker": "1.1.7",
     "react-native-communications": "2.2.1",
     "react-native-device-info": "0.10.2",
