@@ -17,11 +17,12 @@ import {
   CodeInput,
   Accounts,
   Loading,
-  CountryCode
+  CountryCode,
 } from './components/Login';
 import Dashboard from './components/Dashboard';
 import Tutorial from './components/Shared/Components/Tutorial';
 import Chat from './components/Chat';
+import MainChat from './components/Chat/MainChatView';
 import Chats from './components/Chats';
 import { Instructions } from './components/Instructions/Instructions';
 import Choose from './components/Transactions/Choose';
@@ -49,8 +50,9 @@ const Dashboard = TabNavigator(
 
 const stack = {
 
-  // Chats: { screen: Chats },
-  // Chat: { screen: Chat },
+  MainChat: { screen: MainChat },
+  Chats: { screen: Chats },
+  Chat: { screen: Chat },
   // Temp: { screen: Temp },
   Loading: { screen: Loading },
   Accounts: { screen: Accounts },

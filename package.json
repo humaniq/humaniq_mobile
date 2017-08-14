@@ -39,6 +39,7 @@
     "react-native-parsed-text": "0.0.16",
     "react-native-progress": "3.3.0",
     "react-native-sound": "0.10.3",
+    "react-native-tab-view": "0.0.69",
     "react-native-video": "1.0.0",
     "react-navigation": "1.0.0-beta.11",
     "react-redux": "5.0.5",

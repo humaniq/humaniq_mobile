@@ -1,8 +1,16 @@
 import React, { Component } from 'react';
-import { View, TouchableOpacity, Image, Text, ScrollView, TextInput } from 'react-native';
+import {
+  View,
+  TouchableOpacity,
+  Image,
+  Text,
+  ScrollView,
+  TextInput,
+  StatusBar,
+} from 'react-native';
 
 import { connect } from 'react-redux';
-import { NavigationActions } from 'react-navigation'
+import { NavigationActions } from 'react-navigation';
 
 import { colors } from '../../utils/constants';
 import CustomStyleSheet from '../../utils/customStylesheet';
@@ -39,23 +47,26 @@ export class Chat extends Component {
   renderScrollViewContent() {
     const { chats, messages, contacts, navigation } = this.props;
     const { state: { params: { id } } } = navigation;
-    const curChat = chats.find(ch => ch.id === id) || {}
-    const allMessages = messages.filter(msg => msg.chatId === id)
-    const isGroup = curChat.contactIds.length > 2
+    const curChat = chats.find(ch => ch.id === id) || {};
+    const allMessages = messages.filter(msg => msg.chatId === id);
+    const isGroup = curChat.contactIds.length > 2;
 
     return (
       <View style={styles.scrollViewContent}>
+        <StatusBar
+          backgroundColor="#598FBA"
+        />
         {allMessages.map((child, childIndex) => {
           const isLeft = child.senderId !== myId;
-          const curContact = contacts.find(cnt => cnt.id === child.senderId)
-          const conatctName = curContact.name || curContact.phone;
+          const curContact = contacts.find(cnt => cnt.id === child.senderId);
+          const contactName = curContact ? (curContact.name || curContact.phone) : 'Name';
           return (
             <View key={child.id}>
               <View style={isLeft ? styles.leftMessage : styles.rightMessage}>
                 {isLeft ? <View style={styles.leftTriangle} /> : null}
                 <View style={[styles.bubble, { backgroundColor: isLeft ? colors.white : colors.very_light_green }]}>
-                  <View style={{flexDirection:'column'}}>
-                    {isGroup ? <Text style={styles.nameText}> {conatctName} </Text> : null}
+                  <View style={{ flexDirection: 'column' }}>
+                    {isGroup ? <Text style={styles.nameText}> {contactName} </Text> : null}
                     <Text style={styles.messageText}>
                       {child.text}
                     </Text>
@@ -65,14 +76,14 @@ export class Chat extends Component {
                   </Text>
                   {
                     isLeft ? null :
-                      <Image source={complete} style={{ width:15, height:15, alignSelf: 'flex-end', marginRight: 5, marginBottom: 5 }} />
+                    <Image source={complete} style={{ width: 15, height: 15, alignSelf: 'flex-end', marginRight: 5, marginBottom: 5 }} />
                   }
                 </View>
                 {isLeft ? null : <View style={styles.rightTriangle} />}
               </View>
             </View>
-          )
-        }
+          );
+        },
         )}
       </View>
     );
@@ -82,11 +93,11 @@ export class Chat extends Component {
     const { navigation } = this.props;
     const { chats, messages, contacts } = this.props;
     const { dispatch, state: { params: { id } } } = navigation;
-    const curChat = chats.find(ch => ch.id === id) || {}
+    const curChat = chats.find(ch => ch.id === id) || {};
     const allContacts = contacts.filter(cnt => curChat.contactIds.includes(cnt.id));
     const curContacts = allContacts.filter(cnt => cnt.id !== myId);
     const chatName = curChat.groupName || curContacts.map(cnt => cnt.name || cnt.phone).join(', ');
-    const isGroup = curChat.contactIds.length > 2
+    const isGroup = curChat.contactIds.length > 2;
 
     return (
       <View style={styles.header}>
@@ -132,7 +143,7 @@ export class Chat extends Component {
               placeholder="Type a message"
               underlineColorAndroid="transparent"
               style={styles.textInput}
-              onChangeText={(text) => this.setState({text})}
+              onChangeText={text => this.setState({ text })}
               value={this.state.text}
             />
             <Image style={styles.moneyImage} source={money} />
@@ -180,7 +191,7 @@ const styles = CustomStyleSheet({
   },
   header: {
     position: 'absolute',
-    height: 66,
+    height: 56,
     left: 0,
     right: 0,
     top: 0,
@@ -283,7 +294,6 @@ const styles = CustomStyleSheet({
   textInput: {
     flex: 1,
     height: 40,
-    marginTop: 9,
     fontFamily: 'Roboto',
     fontSize: 16,
     letterSpacing: 0,
