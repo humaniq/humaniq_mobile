@@ -1,7 +1,7 @@
 import RNFetchBlob from 'react-native-fetch-blob';
 import store from '../utils/store';
 
-const API_ROOT = 'https://api.humaniq.com/tapatybe/api/v1/';
+const API_ROOT = 'https://pilot.humaniq.com/tapatybe/api/v1/';
 
 function callApi(endpoint, body) {
   const fullUrl = (endpoint.indexOf(API_ROOT) === -1) ? API_ROOT + endpoint : endpoint;

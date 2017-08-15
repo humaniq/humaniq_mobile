@@ -18,7 +18,7 @@
     "prop-types": "15.5.10",
     "react": "16.0.0-alpha.6",
     "react-native": "0.44.0",
-    "react-native-android-library-humaniq-api": "git+https://github.com/humaniq/react-native-android-library-humaniq-api.git",
+    "react-native-android-library-humaniq-api": "git+https://github.com/humaniq/react-native-android-library-humaniq-api.git#pilot",
     "react-native-android-sms-listener": "0.4.1",
     "react-native-asset-library-to-base64": "1.0.1",
     "react-native-audio": "3.2.2",
