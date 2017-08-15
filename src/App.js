@@ -32,6 +32,7 @@ import SelectAmount from './components/Transactions/SelectAmount';
 import { Profile, ProfileSettings, ProfileEdit, ProfileEditPassword } from './components/Profile/index';
 import CameraEdit from './components/Profile/CameraEdit';
 import PasswordEdit from './components/Profile/PasswordEdit';
+import ChatContacts from './components/Chats/ChatContacts';
 
 /*
 const Dashboard = TabNavigator(
@@ -50,8 +51,9 @@ const Dashboard = TabNavigator(
 
 const stack = {
 
-  MainChat: { screen: MainChat },
+
   Chats: { screen: Chats },
+  ChatContacts: { screen: ChatContacts },
   Chat: { screen: Chat },
   // Temp: { screen: Temp },
   Loading: { screen: Loading },
