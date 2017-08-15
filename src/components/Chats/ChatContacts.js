@@ -36,13 +36,24 @@ const sort = (a, b) => nameSort(getName(a), getName(b));
 export class ChatContacts extends Component {
   constructor(props) {
     super(props);
+    const { contacts } = this.props;
     this.state = {
       search: false,
       text: '',
       groupArray: [],
       checkedItems: [],
       tempArray: [],
+      contacts,
     };
+  }
+
+  componentWillReceiveProps(newProps) {
+    // compare two arrays
+    if (this.compareTwoArrays(newProps)) {
+      this.setState({
+        contacts: newProps.contacts,
+      });
+    }
   }
 
   componentDidMount() {
@@ -52,7 +63,6 @@ export class ChatContacts extends Component {
       .then((response) => {
         // console.log('contacts.ok--->', JSON.stringify(response));
         const accs = response.map(acc => acc.accountId);
-        // console.log(JSON.stringify(accs));
         try {
           HumaniqProfileApiLib.getAccountProfiles(accs)
               .then((profiles) => {
@@ -72,6 +82,8 @@ export class ChatContacts extends Component {
                     avatar: avatar.url,
                   };
                 });
+                forAdd.sort((prevItem, nextItem) => this.compareArrays(prevItem, nextItem));
+                console.log(forAdd);
                 newContacts(forAdd);
               })
               .catch((/* err */) => {
@@ -84,6 +96,12 @@ export class ChatContacts extends Component {
       .catch((err) => {
         console.warn(JSON.stringify(err));
       });
+  }
+
+  compareArrays(prevItem, nextItem) {
+    if (prevItem.name < nextItem.name) { return -1; }
+    if (prevItem.name > nextItem.name) { return 1; }
+    return 0;
   }
 
   render() {
@@ -111,8 +129,7 @@ export class ChatContacts extends Component {
   }
 
   renderContent(mode) {
-    const { contacts } = this.props;
-    const { search, text } = this.state;
+    const { search, text, contacts } = this.state;
 
     const filter = cnt => (search && text ? getName(cnt).toUpperCase().indexOf(text.toUpperCase()) >= 0 : true);
     let groupLetter = '';
@@ -134,7 +151,7 @@ export class ChatContacts extends Component {
         </View>
         <View style={styles.contactsHeader} />
         {contacts.filter(filter).sort(sort).map((cnt) => {
-          const selected = false
+          const selected = false;
           const firstLetter = getName(cnt)[0];
           let showLetter = '';
           if (groupLetter !== firstLetter) {
@@ -276,8 +293,16 @@ export class ChatContacts extends Component {
   }
 
   onItemChecked(cnt) {
-    let { checkedItems } = this.state
-    console.warn(JSON.stringify(cnt))
+    const { checkedItems } = this.state;
+    console.warn(JSON.stringify(cnt));
+  }
+
+  compareTwoArrays(newProps) {
+    if (this.props.contacts.length === 0) { return true; }
+    for (let i = 0; i < newProps.contacts.length; i++) {
+      if (!newProps.contacts[i].equals(this.props.contacts[i])) { return true; }
+    }
+    return false;
   }
 }
 
@@ -336,7 +361,7 @@ const styles = CustomStyleSheet({
 const mapStateToProps = state => ({
   chats: state.chats,
   messages: state.messages,
-  contacts: state.contacts,
+  contacts: state.contacts || [],
 });
 
 export default connect(mapStateToProps, {
