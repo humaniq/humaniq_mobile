@@ -6,6 +6,7 @@ import {
     ScrollView,
     TouchableNativeFeedback,
   StatusBar,
+  TextInput,
 } from 'react-native';
 
 import { connect } from 'react-redux';
@@ -15,11 +16,16 @@ const ic_contacts = require('../../assets/icons/two_person_dark.png');
 const ic_chat_white = require('./../../assets/icons/ic_chat_white.png');
 const ic_group = require('../../assets/icons/ic_one_person.png');
 const ic_search = require('../../assets/icons/search_white.png');
+const ic_close_white = require('../../assets/icons/ic_close_white.png');
+const ic_back_white = require('../../assets/icons/back_white.png');
 
 export class Chats extends Component {
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = {
+      search: false,
+      text: '',
+    };
   }
 
   renderContent() {
@@ -52,56 +58,83 @@ export class Chats extends Component {
   }
 
   renderHeader() {
+    const { search } = this.state;
     return (
       <View style={styles.toolbar}>
-        <View style={{ flexDirection: 'row', flex: 1 }}>
-          <TouchableNativeFeedback
-            onPress={() => this.onContactsPress()}
-            delayPressIn={0}
-            background={TouchableNativeFeedback.SelectableBackground()}
-          >
-            <View style={styles.item}>
-              <Image
-                resizeMode="contain"
-                style={{ height: 27, tintColor: '#A8BED1' }}
-                source={ic_contacts}
-              />
-            </View>
-          </TouchableNativeFeedback>
-
-          <TouchableNativeFeedback
-            delayPressIn={0}
-            background={TouchableNativeFeedback.SelectableBackground()}
-          >
-            <View style={[styles.item, { borderBottomWidth: 3, borderBottomColor: 'white' }]}>
-              <Image
-                resizeMode="contain"
-                style={{ height: 27 }}
-                source={ic_chat_white}
+        {!search
+            ? <View style={{ flexDirection: 'row', flex: 1 }}>
+              <TouchableNativeFeedback
+                onPress={() => this.onContactsPress()}
+                delayPressIn={0}
+                background={TouchableNativeFeedback.SelectableBackground()}
               >
-                <View style={styles.onlineStatus} />
-              </Image>
-            </View>
-          </TouchableNativeFeedback>
+                <View style={styles.item}>
+                  <Image
+                    resizeMode="contain"
+                    style={{ height: 27, tintColor: '#A8BED1' }}
+                    source={ic_contacts}
+                  />
+                </View>
+              </TouchableNativeFeedback>
 
-          <TouchableNativeFeedback
-            onPress={() => this.onGroupMakePress()}
-            delayPressIn={0}
-            background={TouchableNativeFeedback.SelectableBackground()}
-          >
-            <View style={styles.item}>
-              <Image
-                resizeMode="contain"
-                style={{ height: 27, tintColor: '#A8BED1' }}
-                source={ic_group}
+              <TouchableNativeFeedback
+                delayPressIn={0}
+                background={TouchableNativeFeedback.SelectableBackground()}
+              >
+                <View style={[styles.item, { borderBottomWidth: 3, borderBottomColor: 'white' }]}>
+                  <Image
+                    resizeMode="contain"
+                    style={{ height: 27 }}
+                    source={ic_chat_white}
+                  >
+                    <View style={styles.onlineStatus} />
+                  </Image>
+                </View>
+              </TouchableNativeFeedback>
+
+              <TouchableNativeFeedback
+                onPress={() => this.onGroupMakePress()}
+                delayPressIn={0}
+                background={TouchableNativeFeedback.SelectableBackground()}
+              >
+                <View style={styles.item}>
+                  <Image
+                    resizeMode="contain"
+                    style={{ height: 27, tintColor: '#A8BED1' }}
+                    source={ic_group}
+                  />
+                </View>
+
+              </TouchableNativeFeedback>
+            </View>
+            : <View style={{ flexDirection: 'row', flex: 1 }}>
+              <TouchableNativeFeedback
+                onPress={() => this.onBackPress()}
+                delayPressIn={0}
+                background={TouchableNativeFeedback.SelectableBackground()}
+              >
+                <View style={styles.item}>
+                  <Image
+                    source={ic_back_white}
+                  />
+                </View>
+              </TouchableNativeFeedback>
+              <TextInput
+                autoFocus
+                ref="searchText"
+                style={styles.search}
+                placeholder="Search"
+                placeholderTextColor="#A8BED1"
+                underlineColorAndroid={'transparent'}
+                onChangeText={text => this.setState({ text })}
+                value={this.state.text}
+                onSubmitEditing={() => this.startSearch()}
               />
             </View>
-
-          </TouchableNativeFeedback>
-        </View>
+        }
 
         <TouchableNativeFeedback
-          onPress={() => this.onGroupMakePress()}
+          onPress={() => this.onSearchPress(search)}
           delayPressIn={0}
           background={TouchableNativeFeedback.SelectableBackground()}
         >
@@ -109,7 +142,7 @@ export class Chats extends Component {
             <Image
               resizeMode="contain"
               style={{ height: 28 }}
-              source={ic_search}
+              source={!search ? ic_search : ic_close_white}
             />
           </View>
 
@@ -131,6 +164,13 @@ export class Chats extends Component {
     );
   }
 
+  onBackPress() {
+    this.setState({
+      search: false,
+      text: '',
+    });
+  }
+
   onContactsPress() {
     const navState = this.props.navigation.state;
     this.props.navigation.navigate('ChatContacts', { ...navState.params, mode: 'contacts' });
@@ -139,6 +179,18 @@ export class Chats extends Component {
   onGroupMakePress() {
     const navState = this.props.navigation.state;
     this.props.navigation.navigate('ChatContacts', { ...navState.params, mode: 'group' });
+  }
+
+  onSearchPress(search) {
+    if (!search) {
+      this.setState({
+        search: true,
+      });
+    } else {
+      this.setState({
+        text: '',
+      });
+    }
   }
 }
 
@@ -180,6 +232,11 @@ const styles = StyleSheet.create({
     height: 56,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  search: {
+    flex: 1,
+    fontSize: 18,
+    color: 'white',
   },
 });
 
