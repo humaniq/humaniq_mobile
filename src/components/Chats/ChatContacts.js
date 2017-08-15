@@ -41,6 +41,7 @@ export class ChatContacts extends Component {
       text: '',
       groupArray: [],
       checkedItems: [],
+      tempArray: [],
     };
   }
 
@@ -69,7 +70,6 @@ export class ChatContacts extends Component {
                     name: `${person.first_name} ${person.last_name}`,
                     status: 1,
                     avatar: avatar.url,
-                    selected: false,
                   };
                 });
                 newContacts(forAdd);
@@ -134,6 +134,7 @@ export class ChatContacts extends Component {
         </View>
         <View style={styles.contactsHeader} />
         {contacts.filter(filter).sort(sort).map((cnt) => {
+          const selected = false
           const firstLetter = getName(cnt)[0];
           let showLetter = '';
           if (groupLetter !== firstLetter) {
@@ -275,6 +276,7 @@ export class ChatContacts extends Component {
   }
 
   onItemChecked(cnt) {
+    let { checkedItems } = this.state
     console.warn(JSON.stringify(cnt))
   }
 }
