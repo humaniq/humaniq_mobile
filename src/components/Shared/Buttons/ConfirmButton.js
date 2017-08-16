@@ -37,7 +37,6 @@ const styles = CustomStyleSheet({
     justifyContent: 'center',
     backgroundColor: '$cPaper',
     borderRadius: 3,
-    marginLeft: 9,
   },
   disabled: {
     opacity: 0.6,
