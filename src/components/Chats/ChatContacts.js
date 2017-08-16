@@ -53,9 +53,9 @@ export class ChatContacts extends Component {
     // compare two arrays
     if (this.compareTwoArrays(newProps)) {
       console.log('true');
-      //this.setState({
+      // this.setState({
       //  contacts: newProps.contacts,
-      //});
+      // });
       this.contacts = newProps.contacts;
     }
   }
@@ -156,7 +156,6 @@ export class ChatContacts extends Component {
         </View>
         <View style={styles.contactsHeader} />
         {this.contacts.filter(filter).sort(sort).map((cnt) => {
-          const selected = false;
           const firstLetter = getName(cnt)[0];
           let showLetter = '';
           if (groupLetter !== firstLetter) {
@@ -172,7 +171,6 @@ export class ChatContacts extends Component {
             contactID={cnt.id}
             mode={mode}
             onChecked={() => this.onItemChecked(cnt)}
-            isChecked={cnt.selected}
           />);
         })}
       </ScrollView>
@@ -298,7 +296,14 @@ export class ChatContacts extends Component {
   }
 
   onItemChecked(cnt) {
-    const { contacts } = this.props;
+    const { checkedItems } = this.state;
+    if (checkedItems.includes(cnt)) {
+      const index = checkedItems.indexOf(cnt);
+      checkedItems.splice(index, 1);
+    } else {
+      checkedItems.push(cnt);
+    }
+    this.setState({ checkedItems });
   }
 
   compareTwoArrays(newProps) {
@@ -308,6 +313,8 @@ export class ChatContacts extends Component {
     }
     return false;
   }
+
+
 }
 
 const styles = CustomStyleSheet({

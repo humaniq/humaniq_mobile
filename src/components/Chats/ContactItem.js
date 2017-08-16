@@ -28,17 +28,19 @@ class ContactItem extends Component {
     onPress: PropTypes.func,
     mode: PropTypes.string,
     onChecked: PropTypes.func,
-    isChecked: PropTypes.bool,
   };
 
   constructor(props) {
     super(props);
+    this.state = {
+      selected: false,
+    };
   }
 
   componentDidMount() {}
 
   render() {
-    const { contactID, letter, contacts, onPress, mode, onChecked, isChecked } = this.props;
+    const { contactID, letter, contacts, onPress, mode, onChecked } = this.props;
 
     const curContact = contacts.find(cnt => cnt.id === contactID);
     const contactAvatar = { uri: curContact.avatar };
@@ -51,7 +53,12 @@ class ContactItem extends Component {
           <View style={styles.startPart}>
             <Text style={styles.groupName}> {letter} </Text>
           </View>
-          <TouchableOpacity onPress={() => { onPress(contactID); }} style={styles.itemRightContainer}>
+          <TouchableOpacity
+            onPress={mode !== 'group'
+              ? () => { onPress(contactID); }
+              : () => { onChecked(); this.onChecked(); }}
+            style={styles.itemRightContainer}
+          >
             <View style={styles.imageContainer}>
               <Image resizeMode="cover" style={styles.image} source={contactAvatar} />
             </View>
@@ -81,16 +88,15 @@ class ContactItem extends Component {
             </View>
 
             {mode === 'group'
-                ? <TouchableOpacity
+                ? <View
                   style={{ alignSelf: 'center' }}
-                  onPress={onChecked}
                 >
                   <Image
                     style={{ height: 25, width: 25 }}
                     resizeMode="contain"
-                    source={isChecked ? ic_checked : ic_unchecked}
+                    source={this.state.selected ? ic_checked : ic_unchecked}
                   />
-                </TouchableOpacity>
+                </View>
                 : null
             }
 
@@ -99,6 +105,11 @@ class ContactItem extends Component {
       </View>
     );
   }
+
+  onChecked() {
+    this.setState({ selected: !this.state.selected });
+  }
+
 }
 
 const styles = CustomStyleSheet({

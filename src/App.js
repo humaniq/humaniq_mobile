@@ -51,10 +51,6 @@ const Dashboard = TabNavigator(
 
 const stack = {
 
-
-  Chats: { screen: Chats },
-  ChatContacts: { screen: ChatContacts },
-  Chat: { screen: Chat },
   // Temp: { screen: Temp },
   Loading: { screen: Loading },
   Accounts: { screen: Accounts },
@@ -75,6 +71,9 @@ const stack = {
   ProfileEditPassword: { screen: ProfileEditPassword },
   CameraEdit: { screen: CameraEdit },
   PasswordEdit: { screen: PasswordEdit },
+  Chats: { screen: Chats },
+  ChatContacts: { screen: ChatContacts },
+  Chat: { screen: Chat },
 };
 
 const LoginStack = StackNavigator(
