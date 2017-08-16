@@ -47,6 +47,7 @@ function phoneNumber(state = {}, action) {
   }
 }
 
+// TODO huge payload
 function account(state = {
   isFetching: false,
   payload: null,

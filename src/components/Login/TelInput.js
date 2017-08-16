@@ -67,8 +67,8 @@ export class TelInput extends Component {
           break;
 
         case 4005:
-            // registered user
-            // Account Phone Number Created Successfully. Validation Code Sent
+          // registered user
+          // Account Phone Number Created Successfully. Validation Code Sent
           this.props.savePhone({
             country_code: VMasker.toNumber(this.state.code),
             phone_number: VMasker.toNumber(this.state.phone),
@@ -111,9 +111,10 @@ export class TelInput extends Component {
   handlePhoneConfirm = () => {
     const phone_number = this.state.phone;
 
+    // this.props.user.account.payload.payload.account_information.account_id
     if (this.phonenumber(this.state.phone, this.state.countryCode)) {
       this.props.phoneNumberCreate({
-        account_id: this.props.user.account.payload.payload.account_information.account_id,
+        account_id: this.props.user.account.payload.payload.account_id,
         phone_number: VMasker.toNumber(`${this.state.code}${phone_number}`),
       });
     } else {
@@ -158,7 +159,7 @@ export class TelInput extends Component {
         style={styles.countryCodeContainer}
         onPress={() => {
           this.props.navigation.navigate('CountryCode',
-              { refresh: (dialCode, code, flag) => { dialCode != null ? this.setState({ code: dialCode, countryCode: code, flag }) : null; } });
+            { refresh: (dialCode, code, flag) => { dialCode != null ? this.setState({ code: dialCode, countryCode: code, flag }) : null; } });
         }}
       >
         <Image style={styles.flag} source={{ uri: this.state.flag }} />
@@ -167,14 +168,14 @@ export class TelInput extends Component {
       </TouchableOpacity>
       <Text style={[styles.number, this.state.error ? styles.error : null]}>{this.state.maskedPhone}</Text>
     </View>
-    );
+  );
 
   render() {
     return (
       <View style={styles.container}>
         <View style={styles.header}>
           <Animated.View style={[styles.passContainer, { marginLeft: this.state.phoneError }]}>
-            {this.renderInput() }
+            {this.renderInput()}
           </Animated.View>
         </View>
         <View style={styles.buttonsContainer}>

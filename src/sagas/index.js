@@ -99,6 +99,7 @@ function* faceEmotionValidate({ facial_image_validation_id, facial_image }) {
 function* login({ facial_image, password, device_imei }) {
   const response = yield call(validate, { facial_image });
   
+  // Additional request.
   if (response && response.payload.facial_image_id) {
     const errorCodes = [2002, 3003, 6000];
     const body = {
