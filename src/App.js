@@ -17,11 +17,12 @@ import {
   CodeInput,
   Accounts,
   Loading,
-  CountryCode
+  CountryCode,
 } from './components/Login';
 import Dashboard from './components/Dashboard';
 import Tutorial from './components/Shared/Components/Tutorial';
 import Chat from './components/Chat';
+import MainChat from './components/Chat/MainChatView';
 import Chats from './components/Chats';
 import { Instructions } from './components/Instructions/Instructions';
 import Choose from './components/Transactions/Choose';
@@ -31,6 +32,7 @@ import SelectAmount from './components/Transactions/SelectAmount';
 import { Profile, ProfileSettings, ProfileEdit, ProfileEditPassword } from './components/Profile/index';
 import CameraEdit from './components/Profile/CameraEdit';
 import PasswordEdit from './components/Profile/PasswordEdit';
+import ChatContacts from './components/Chats/ChatContacts';
 
 /*
 const Dashboard = TabNavigator(
@@ -48,9 +50,6 @@ const Dashboard = TabNavigator(
 */
 
 const stack = {
-
-  // Chats: { screen: Chats },
-  // Chat: { screen: Chat },
   // Temp: { screen: Temp },
   Loading: { screen: Loading },
   Accounts: { screen: Accounts },
@@ -71,6 +70,9 @@ const stack = {
   ProfileEditPassword: { screen: ProfileEditPassword },
   CameraEdit: { screen: CameraEdit },
   PasswordEdit: { screen: PasswordEdit },
+  Chats: { screen: Chats },
+  ChatContacts: { screen: ChatContacts },
+  Chat: { screen: Chat },
 };
 
 const LoginStack = StackNavigator(
