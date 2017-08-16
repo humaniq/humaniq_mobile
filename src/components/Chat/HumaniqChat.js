@@ -7,6 +7,8 @@ import {
   ScrollView,
   TextInput,
   StatusBar,
+  TouchableWithoutFeedback,
+  Animated,
 } from 'react-native';
 
 import { connect } from 'react-redux';
@@ -30,7 +32,9 @@ const myId = 1;
 export class Chat extends Component {
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = {
+      recordAnimation: new Animated.Value(0),
+    };
   }
 
   renderContent() {
@@ -149,12 +153,34 @@ export class Chat extends Component {
             <Image style={styles.moneyImage} source={money} />
           </View>
           <Swiper onSwipeLeft={() => alert('Left')}>
-            <Image source={fabBlue} style={styles.fabBlue} />
+            <TouchableWithoutFeedback
+              delayPressIn={0}
+              delayPressOut={0}
+              onPressOut={() => this.onPressEnd()}
+              onPressIn={() => this.onPressStart()}
+            >
+              <Animated.View>
+                <Image
+                  source={fabBlue}
+                  style={styles.fabBlue}
+                />
+              </Animated.View>
+
+            </TouchableWithoutFeedback>
           </Swiper>
         </View>
       </View>
     );
   }
+
+  onPressEnd = () => {
+    // end animation
+  };
+
+  onPressStart = () => {
+    // start animation
+
+  };
 
   render() {
     return (
