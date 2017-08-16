@@ -132,7 +132,7 @@ export class Password extends Component {
           HumaniqTokenApiLib.saveCredentials(map)
             .then((res) => { console.log(res); })
             .catch(err => console.log(err));
-          this.navigateTo('Profile');
+          this.navigateTo('TelInput');
           break;
 
         case 2002:
