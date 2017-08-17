@@ -44,6 +44,7 @@ export class ChatContacts extends Component {
       checkedItems: [],
       tempArray: [],
       contacts,
+      showEmptyView: false,
     };
   }
 
@@ -111,6 +112,7 @@ export class ChatContacts extends Component {
 
   render() {
     const { mode } = this.props.navigation.state.params;
+    const { search, text, showEmptyView } = this.state;
     return (
       <View style={styles.container}>
         <StatusBar
@@ -134,29 +136,15 @@ export class ChatContacts extends Component {
   }
 
   renderContent(mode) {
-    const { search, text, contacts } = this.state;
+    const { search, text, contacts, showEmptyView } = this.state;
 
     const filter = cnt => (search && text ? getName(cnt).toUpperCase().indexOf(text.toUpperCase()) >= 0 : true);
     const groupLetter = '';
 
     return (
-      <ScrollView style={{ backgroundColor: colors.white }} showsVerticalScrollIndicator={false}>
-        <View style={{ backgroundColor: '#F2F2F2', justifyContent: 'center', height: 42 }}>
-          {!search
-              ? <Image
-                style={styles.checkBlue}
-                resizeMode="contain"
-                source={ic_big_check_blue}
-              />
-              : <Text style={styles.checkText}>
-                CONTACTS
-              </Text>
-          }
-
-        </View>
-        <View style={styles.contactsHeader} />
+      <View style={{ backgroundColor: colors.white, flex: 1 }}>
         {this.getContacts(filter, groupLetter, mode)}
-      </ScrollView>
+      </View>
     );
   }
 
@@ -299,27 +287,54 @@ export class ChatContacts extends Component {
 
 
   getContacts(filter, groupLetter, mode) {
+    const { search, text } = this.state;
+    if (search && text && this.contacts.filter(filter).sort(sort).length === 0) {
+      return (
+        <View style={styles.emptyViewContainer}>
+          <Text style={styles.emptyText}>No results</Text>
+        </View>
+      );
+    }
     return (
-      <View style={{ flex: 1 }}>
-        {this.contacts.filter(filter).sort(sort).map((cnt) => {
-          const firstLetter = getName(cnt)[0];
-          let showLetter = '';
-          if (groupLetter !== firstLetter) {
-            groupLetter = firstLetter;
-            showLetter = groupLetter;
-          } else {
-            showLetter = '';
-          }
-          return (<ContactItem
-            onPress={this.selectItem}
-            letter={showLetter}
-            key={cnt.id}
-            contactID={cnt.id}
-            mode={mode}
-            onChecked={() => this.onItemChecked(cnt)}
-          />);
-        })}
-      </View>
+      <ScrollView
+        style={{ backgroundColor: colors.white, flex: 1 }}
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={{ flex: 1 }}>
+          <View style={{ backgroundColor: '#F2F2F2', justifyContent: 'center', height: 42 }}>
+            {!search
+                  ? <Image
+                    style={styles.checkBlue}
+                    resizeMode="contain"
+                    source={ic_big_check_blue}
+                  />
+                  : <Text style={styles.checkText}>
+                    CONTACTS
+                  </Text>
+              }
+          </View>
+          <View style={styles.contactsHeader} />
+          {this.contacts.filter(filter).sort(sort).map((cnt) => {
+            const firstLetter = getName(cnt)[0];
+            let showLetter = '';
+            if (groupLetter !== firstLetter) {
+              groupLetter = firstLetter;
+              showLetter = groupLetter;
+            } else {
+              showLetter = '';
+            }
+            return (<ContactItem
+              onPress={this.selectItem}
+              letter={showLetter}
+              key={cnt.id}
+              contactID={cnt.id}
+              mode={mode}
+              onChecked={() => this.onItemChecked(cnt)}
+            />);
+          })}
+        </View>
+      </ScrollView>
+
     );
   }
 }
@@ -373,6 +388,17 @@ const styles = CustomStyleSheet({
     marginTop: 8,
     marginBottom: 8,
     marginLeft: 16,
+  },
+  emptyViewContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    alignSelf: 'center',
+  },
+  emptyText: {
+    fontSize: 25,
+    color: '#9c9c9c',
+    alignSelf: 'center',
   },
 });
 

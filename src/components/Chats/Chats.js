@@ -18,6 +18,7 @@ const ic_group = require('../../assets/icons/ic_one_person.png');
 const ic_search = require('../../assets/icons/search_white.png');
 const ic_close_white = require('../../assets/icons/ic_close_white.png');
 const ic_back_white = require('../../assets/icons/back_white.png');
+const ic_chats_empty = require('../../assets/icons/ic_chats_empty.png');
 
 export class Chats extends Component {
   constructor(props) {
@@ -153,13 +154,24 @@ export class Chats extends Component {
   }
 
   render() {
+    const { chats } = this.props;
     return (
       <View style={styles.mainContainer}>
         <StatusBar
           backgroundColor="#598fba"
         />
         {this.renderHeader()}
-        {this.renderContent()}
+        {chats.length > 0 ? this.renderContent() : this.renderEmptyView()}
+      </View>
+    );
+  }
+
+  renderEmptyView() {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <Image
+          source={ic_chats_empty}
+        />
       </View>
     );
   }
