@@ -25,14 +25,11 @@ const user1 = require('../../assets/icons/face.png');
 const chats_complete = require('../../assets/icons/chats_complete.png');
 const chats_accepted = require('../../assets/icons/chats_accepted.png');
 const chats_wait = require('../../assets/icons/chats_wait.png');
-
 const persons = require('../../assets/icons/two_person_dark.png');
-
 const incoming = require('../../assets/icons/incoming.png');
 const outcoming = require('../../assets/icons/outcoming.png');
-
 const approved = require('../../assets/icons/approved.png');
-
+const ic_avatar_holder = require('../../assets/icons/ic_mock.png');
 
 class Item extends Component {
 
@@ -58,7 +55,7 @@ class Item extends Component {
       lastMessageTime.getFullYear(),
     ].map(e => e.toString().replace(/^([0-9])$/, '0$1')).join('.') : '';
     const isGroup = item.contactIds.length > 2;
-    const chatAvatar = isGroup ? user1 : { uri: curContacts[0].avatar };
+    const chatAvatar = isGroup ? user1 : curContacts[0] ? { uri: curContacts[0].avatar } : ic_avatar_holder;
     const chatName = item.groupName || curContacts.map(cnt => cnt.name || cnt.phone).join(', ');
     const isApproved = !isGroup && (curContacts.slice(-1)[0] || {}).approved;
 

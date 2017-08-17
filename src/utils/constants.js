@@ -1,8 +1,8 @@
 const colors = {
-  purpley_grey: '#9b9b9b',
+  purpley_grey: '#cbcbcb',
   light_grey: '#ede6de',
   faded_blue: '#598fba',
-  very_light_green: '#e1ffc7',
+  very_light_green: '#E1FFC7',
   light_blue_grey: '#d4eaf4',
   dark_lime_green: '#69c900',
   fire_engine_red: '#e5000a',

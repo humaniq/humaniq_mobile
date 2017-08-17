@@ -230,7 +230,7 @@ const styles = {
     backgroundColor: 'white',
   },
   header: {
-    height: 66,
+    height: 56,
     left: 0,
     right: 0,
     top: 0,
@@ -243,7 +243,7 @@ const styles = {
   headerInner: {
     marginLeft: 12,
     marginRight: 12,
-    height: 66,
+    height: 56,
     backgroundColor: colors.orangeish,
     flexDirection: 'row',
     justifyContent: 'space-between',

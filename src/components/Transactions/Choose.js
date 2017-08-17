@@ -2,7 +2,7 @@
 /* eslint-disable react/forbid-prop-types */
 
 import React from 'react';
-import { View, TouchableOpacity, Image, Text, ScrollView, TextInput } from 'react-native';
+import { View, TouchableOpacity, Image, Text, ScrollView, TextInput, StatusBar } from 'react-native';
 
 import { HumaniqContactsApiLib, HumaniqProfileApiLib } from 'react-native-android-library-humaniq-api';
 
@@ -167,10 +167,10 @@ class Choose extends React.Component {
       <View style={styles.header}>
         {search
           ? <View style={styles.headerInner}>
-            <TouchableOpacity onPress={() => dispatch(NavigationActions.back())}>
+            <TouchableOpacity onPress={() => this.handleBackButton(dispatch, search)}>
               <Image source={backWhite} style={styles.headerImage} />
             </TouchableOpacity>
-            <View style={{ flex: 1, alignItems: 'stretch' }}>
+            <View style={{ flex: 1 }}>
               <TextInput
                 style={styles.inputText}
                 underlineColorAndroid="transparent"
@@ -178,6 +178,7 @@ class Choose extends React.Component {
                 placeholderTextColor="white"
                 onChangeText={text => this.setState({ text })}
                 value={this.state.text}
+                autoFocus
               />
             </View>
             <TouchableOpacity onPress={this.setSearch}>
@@ -239,10 +240,21 @@ class Choose extends React.Component {
     */
     return (
       <View style={styles.container}>
+        <StatusBar
+          backgroundColor={colors.orangeish}
+        />
         {this.renderHeader()}
         {this.renderContent()}
       </View>
     );
+  }
+
+  handleBackButton(dispatch, search) {
+    if (search) {
+      this.setState({ search: false, text: '' });
+    } else {
+      dispatch(NavigationActions.back());
+    }
   }
 }
 
@@ -253,7 +265,7 @@ const styles = {
   },
   header: {
     position: 'absolute',
-    height: 66 + 48,
+    height: 56 + 48,
     left: 0,
     right: 0,
     top: 0,
@@ -266,7 +278,7 @@ const styles = {
   headerInner: {
     marginLeft: 12,
     marginRight: 12,
-    height: 66,
+    height: 56,
     backgroundColor: colors.orangeish,
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -318,12 +330,8 @@ const styles = {
   },
   inputText: {
     fontFamily: 'Roboto',
-    fontSize: 16,
-    lineHeight: 24,
-    textAlign: 'left',
+    fontSize: 18,
     color: colors.white,
-    height: 40,
-    bottom: -5,
   },
 };
 
