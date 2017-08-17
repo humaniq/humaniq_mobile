@@ -179,6 +179,7 @@ export class Profile extends Component {
   getUserInfo() {
     HumaniqProfileApiLib.getAccountProfile(this.props.id)
         .then((response) => {
+          console.log('getUserInfo=>', response)
           if (this.activity) {
             if (response.code === 401) {
               this.navigateTo('Tutorial');
@@ -204,6 +205,7 @@ export class Profile extends Component {
     // get Balance
     HumaniqProfileApiLib.getBalance(this.props.id)
         .then((addressState) => {
+          console.log('getBalance=>', addressState)
           if (this.activity) {
             if (addressState.code === 401) {
               this.navigateTo('Tutorial');
@@ -227,7 +229,7 @@ export class Profile extends Component {
         })
         .catch((err) => {
           // handle error
-          console.log(err);
+          console.log('getBalance', err);
         });
   }
 
@@ -246,12 +248,13 @@ export class Profile extends Component {
         this.limit,
     )
         .then((array) => {
+      console.log('transactions success', array)
           let { transactions } = this.state;
           if (this.activity) {
             if (shouldRefresh) {
               transactions = array;
             } else {
-              transactions = transactions.concat(array);
+              transactions.concat(array);
             }
             const map = this.convertToMap(transactions);
             this.setState({
@@ -264,7 +267,7 @@ export class Profile extends Component {
         })
         .catch((err) => {
           // handle error
-          console.log(err);
+          console.log('transactions err', err)
           this.setState({ refreshing: false, isFetching: false });
         });
   }
@@ -434,7 +437,7 @@ export class Profile extends Component {
   onEndReached() {
     if (!this.state.isFetching) {
       this.setState({ isFetching: true });
-      this.getTransactions(false);
+      this.getTransactions(false, false);
     }
   }
 
@@ -675,13 +678,16 @@ export class Profile extends Component {
 
   getExchangeValue() {
     HumaniqProfileApiLib.getExchangeUsd('1').then((data) => {
+      console.log('exchange success', data)
       if (this.activity) {
         const { USD = 0 } = data;
         this.setState({
           rate: USD,
         });
       }
-    });
+    }).catch((err) => {
+      console.log('exchange error', err)
+    })
   }
 
   isTransactionIdExist(error) {
