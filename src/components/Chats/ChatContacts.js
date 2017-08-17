@@ -137,7 +137,7 @@ export class ChatContacts extends Component {
     const { search, text, contacts } = this.state;
 
     const filter = cnt => (search && text ? getName(cnt).toUpperCase().indexOf(text.toUpperCase()) >= 0 : true);
-    let groupLetter = '';
+    const groupLetter = '';
 
     return (
       <ScrollView style={{ backgroundColor: colors.white }} showsVerticalScrollIndicator={false}>
@@ -155,24 +155,7 @@ export class ChatContacts extends Component {
 
         </View>
         <View style={styles.contactsHeader} />
-        {this.contacts.filter(filter).sort(sort).map((cnt) => {
-          const firstLetter = getName(cnt)[0];
-          let showLetter = '';
-          if (groupLetter !== firstLetter) {
-            groupLetter = firstLetter;
-            showLetter = groupLetter;
-          } else {
-            showLetter = '';
-          }
-          return (<ContactItem
-            onPress={this.selectItem}
-            letter={showLetter}
-            key={cnt.id}
-            contactID={cnt.id}
-            mode={mode}
-            onChecked={() => this.onItemChecked(cnt)}
-          />);
-        })}
+        {this.getContacts(filter, groupLetter, mode)}
       </ScrollView>
     );
   }
@@ -315,6 +298,30 @@ export class ChatContacts extends Component {
   }
 
 
+  getContacts(filter, groupLetter, mode) {
+    return (
+      <View style={{ flex: 1 }}>
+        {this.contacts.filter(filter).sort(sort).map((cnt) => {
+          const firstLetter = getName(cnt)[0];
+          let showLetter = '';
+          if (groupLetter !== firstLetter) {
+            groupLetter = firstLetter;
+            showLetter = groupLetter;
+          } else {
+            showLetter = '';
+          }
+          return (<ContactItem
+            onPress={this.selectItem}
+            letter={showLetter}
+            key={cnt.id}
+            contactID={cnt.id}
+            mode={mode}
+            onChecked={() => this.onItemChecked(cnt)}
+          />);
+        })}
+      </View>
+    );
+  }
 }
 
 const styles = CustomStyleSheet({
