@@ -302,7 +302,7 @@ class Choose extends React.Component {
 const styles = {
   container: {
     flex: 1,
-    backgroundColor: 'white',
+    backgroundColor: '#F2F2F2',
   },
   header: {
     height: 56 + 48,
