@@ -14,16 +14,14 @@ import {
   ToastAndroid,
 } from 'react-native';
 
-import CustomStyleSheet from '../../utils/customStylesheet';
-import { HumaniqBlockchainApiLib } from 'react-native-android-library-humaniq-api';
-import * as actions from '../../actions/index';
+import PropTypes from 'prop-types';
+import { HumaniqBlockchainApiLib, HumaniqProfileApiLib } from 'react-native-android-library-humaniq-api';
 import { NavigationActions } from 'react-navigation';
 import { connect } from 'react-redux';
+import * as actions from '../../actions/index';
 import * as constants from './utils/constants';
 import QrModal from './modals/QrModal';
-import { HumaniqProfileApiLib } from 'react-native-android-library-humaniq-api';
 import { secureText } from '../../utils/units';
-import PropTypes from 'prop-types';
 import Fab from './shared/Fab';
 
 const HEADER_MAX_HEIGHT = 160;
@@ -49,7 +47,7 @@ export class ProfileSettings extends Component {
       dispatch: PropTypes.func.isRequired,
     }),
     user: PropTypes.object.isRequired,
-  }
+  };
   constructor(props) {
     super(props);
     // TODO get user from props (redux)

@@ -10,6 +10,7 @@ import { connect } from 'react-redux';
 import VMasker from 'vanilla-masker';
 import SmsListener from 'react-native-android-sms-listener';
 import IMEI from 'react-native-imei';
+import { NavigationActions } from 'react-navigation';
 
 import CustomStyleSheet from '../../utils/customStylesheet';
 import PhoneKeyboard from '../Shared/Components/PhoneKeyboard';
@@ -124,7 +125,7 @@ export class CodeInput extends Component {
           break;
 
         case 4002:
-          this.setState({ code }, () => this.props.navigation.navigate('Profile'));
+          this.setState({ code }, () => this.navigateTo('Profile'));
           break;
 
         case 4004:
@@ -172,6 +173,14 @@ export class CodeInput extends Component {
       }
     }
   }
+
+  navigateTo = (screen, params) => {
+    const resetAction = NavigationActions.reset({
+      index: 0,
+      actions: [NavigationActions.navigate({ routeName: screen, params })],
+    });
+    this.props.navigation.dispatch(resetAction);
+  };
 
   handleNumberPress = (number) => {
     const c = this.state.code + number;
