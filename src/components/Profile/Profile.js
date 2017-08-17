@@ -434,7 +434,7 @@ export class Profile extends Component {
   onEndReached() {
     if (!this.state.isFetching) {
       this.setState({ isFetching: true });
-      this.getTransactions(false);
+      this.getTransactions(false, false);
     }
   }
 
