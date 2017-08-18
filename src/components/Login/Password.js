@@ -124,7 +124,11 @@ export class Password extends Component {
           // login, password ok (save password & token?)
           let profile = nextProps.user.profile;
           if (profile.phone_number && profile.phone_number.country_code && profile.phone_number.phone_number) {
-            this.navigateTo('Profile');
+            if (!profile.phone_number.validated) {
+              this.navigateTo('CodeInput');
+            } else {
+              this.navigateTo('Profile');
+            }
           } else {
             this.navigateTo('TelInput');
           }
