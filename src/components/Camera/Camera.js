@@ -129,7 +129,7 @@ export class Cam extends Component {
           this.setState({ animation: doneAnimation });
           this.animate(1000, 0, 1, () => {
             this.setState({ animation: pressAnimation });
-            this.props.navigation.navigate('Password');
+            this.navigateTo('Password');
           });
           break;
 
@@ -147,7 +147,7 @@ export class Cam extends Component {
             this.setState({ animation: doneAnimation });
             this.animate(1000, 0, 1, () => {
               this.setState({ animation: pressAnimation });
-              this.props.navigation.navigate('Tutorial', { nextScene: 'Password' });
+              this.navigateTo('Tutorial', { nextScene: 'Password' });
             });
           }
 
@@ -217,7 +217,7 @@ export class Cam extends Component {
         // reduce emotions there
         this.setState({ animation: doneAnimation });
         this.animate(1000, 0, 1, () => {
-          this.props.navigation.navigate('Tutorial', { nextScene: 'Password' });
+          this.navigateTo('Tutorial', { nextScene: 'Password' });
         });
       } else {
         this.setState({

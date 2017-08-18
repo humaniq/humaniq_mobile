@@ -252,12 +252,12 @@ export class CodeInput extends Component {
     VMasker.toPattern(this.state.code, { pattern: '999999', placeholder: '0' }).split('').map((o, i) => {
       if (i === 2) {
         return [
-          <View style={[styles.numberContainer, this.state.error ? styles.errorContainer : null]}>
+          <View key={i} style={[styles.numberContainer, this.state.error ? styles.errorContainer : null]}>
             <Text style={[styles.codeInput, this.state.error ? styles.errorText : null]}>
               {o}
             </Text>
           </View>,
-          <View style={[styles.numberContainer, this.state.error ? styles.errorContainer : null]}>
+          <View key={i + 'dash'} style={[styles.numberContainer, this.state.error ? styles.errorContainer : null]}>
             <Text style={[styles.codeInput, this.state.error ? styles.errorText : null]}>
               {'-'}
             </Text>
@@ -265,7 +265,7 @@ export class CodeInput extends Component {
         ];
       }
       return (
-        <View style={[styles.numberContainer, this.state.error ? styles.errorContainer : null]}>
+        <View key={i} style={[styles.numberContainer, this.state.error ? styles.errorContainer : null]}>
           <Text style={[styles.codeInput, this.state.error ? styles.errorText : null]}>
             {o}
           </Text>

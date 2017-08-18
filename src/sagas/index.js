@@ -3,11 +3,12 @@ import { take, put, call, fork, select, all, takeLatest } from 'redux-saga/effec
 import { api } from '../utils/index';
 import * as actions from '../actions';
 import { HumaniqProfileApiLib, HumaniqTokenApiLib } from 'react-native-android-library-humaniq-api';
+import IMEI from 'react-native-imei';
 
 function* fetchEntity(entity, apiFn, body, errorCodes) {
   const { response } = yield call(apiFn, body);
   let result = null;
-
+  console.log(response);
   if (response && response.code) {
     const responseCode = parseInt(response.code, 10);
     const errorCode = errorCodes.find(errCode => errCode === responseCode);
@@ -24,7 +25,7 @@ function* fetchEntity(entity, apiFn, body, errorCodes) {
   } else {
     result = { ...response };
     console.log('unknown response fail', result);
-    yield put(entity.failure(error));
+    yield put(entity.failure(result));
   }
   return result;
 }
@@ -119,18 +120,26 @@ function* login({ facial_image, password, device_imei }) {
       },
     };
     response = yield call(fetchLogin, body, errorCodes);
-    console.log(response);
     if (response && response.code == 2001 && response.payload && response.payload.account_id) {
+      const credentials = yield select(state => {
+        return {
+          token: state.user.account.payload.payload.token,
+          account_id: state.user.account.payload.payload.account_id,
+          facial_image_id: state.user.validate.payload.payload.facial_image_id,
+          password: password,
+          device_imei: IMEI.getImei(),
+        }
+      });
+      // Save credentials to preferences
+      yield HumaniqTokenApiLib.saveCredentials(credentials);
       response = yield HumaniqProfileApiLib.getAccountProfile(response.payload.account_id);
-      console.log(response);
-      if (response.code === 401) {
-        yield put(actions.getProfile.failure(response));
-      } else {
-        yield put(actions.getProfile.success(response));
-      }
+      yield put(actions.getProfile.success(response));
       yield put(actions.login.success());
-    } 
-    
+    } else {
+      actions.login.failure();
+    }
+  } else {
+    actions.login.failure();
   }
 }
 
@@ -145,7 +154,6 @@ function* signup({ facial_image_id, password, device_imei }) {
       },
     },
   };
-  console.log('body', body);
   yield call(fetchSignup, body, errorCodes);
 }
 
@@ -159,9 +167,7 @@ function* phoneNumberCreate({ phone_number, account_id }) {
     account_id,
     phone_number: {
       country_code: code,
-      // country_code: '1',
       phone_number: number,
-      // phone_number: '5035863325',
     },
   };
   yield call(fetchPhoneNumberCreate, body, errorCodes);

@@ -23,7 +23,7 @@ function tempPhoto(state = '', action) {
 function profile(state = {}, action) {
   switch (action.type) {
     case ActionTypes.GET_PROFILE.SUCCESS:
-      return action.payload;
+      return action.response;
     case ActionTypes.GET_PROFILE.FAILURE:
       return action.error;
     default:

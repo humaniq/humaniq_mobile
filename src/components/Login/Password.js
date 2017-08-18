@@ -122,18 +122,8 @@ export class Password extends Component {
 
         case 2001:
           // login, password ok (save password & token?)
-          const map = {
-            token: nextProps.user.account.payload.payload.token,
-            account_id: nextProps.user.account.payload.payload.account_id,
-            facial_image_id: this.props.user.validate.payload.payload.facial_image_id,
-            password: this.state.password,
-            device_imei: IMEI.getImei(),
-          };
-          // need to add here 
-          HumaniqTokenApiLib.saveCredentials(map)
-            .then((res) => { console.log(res); })
-            .catch(err => console.log(err));
-          if (nextProps.user.profile.code != 401) {
+          let profile = nextProps.user.profile;
+          if (profile.phone_number && profile.phone_number.country_code && profile.phone_number.phone_number) {
             this.navigateTo('Profile');
           } else {
             this.navigateTo('TelInput');

@@ -8,6 +8,7 @@ import {
 } from 'react-native';
 
 import PropTypes from 'prop-types';
+import Animation from 'lottie-react-native';
 import { connect } from 'react-redux';
 import VMasker from 'vanilla-masker';
 import phoneFormat from 'phoneformat-react-native';
@@ -17,11 +18,13 @@ import CustomStyleSheet from '../../utils/customStylesheet';
 import PhoneKeyboard from '../Shared/Components/PhoneKeyboard';
 import ConfirmButton from '../Shared/Buttons/ConfirmButton';
 import HelpButton from '../Shared/Buttons/HelpButton';
+import { NavigationActions } from 'react-navigation';
 import { phoneNumberCreate, savePhone } from '../../actions';
 import { vw } from '../../utils/units';
 
 // const ic_user = require('../../assets/icons/ic_user.png');
 const arrowDownWhite = require('../../assets/icons/arrow_down_white.png');
+const spinner = require('../../assets/animations/s-spiner.json');
 
 export class TelInput extends Component {
   static propTypes = {
@@ -54,11 +57,20 @@ export class TelInput extends Component {
     countryCode: 'US',
     flag: 'united_states',
     phoneError: new Animated.Value(0),
+    progress: new Animated.Value(0),
   };
 
   componentWillReceiveProps(nextProps) {
-    if (this.props.user.phoneCreate.isFetching && !nextProps.user.phoneCreate.isFetching &&
-      nextProps.user.phoneCreate.payload) {
+    if (!this.props.user.phoneCreate.isFetching && nextProps.user.phoneCreate.isFetching) {
+      this.animateCycle(2000, 0, 1);
+    } else if (
+      this.props.user.phoneCreate.isFetching && 
+      !nextProps.user.phoneCreate.isFetching && 
+      nextProps.user.phoneCreate.payload
+    ) 
+    {
+      this.state.progress.stopAnimation();
+      this.state.progress.setValue(0);
       const code = nextProps.user.phoneCreate.payload.code;
 
       switch (code) {
@@ -73,7 +85,7 @@ export class TelInput extends Component {
             country_code: VMasker.toNumber(this.state.code),
             phone_number: VMasker.toNumber(this.state.phone),
           });
-          this.props.navigation.navigate('CodeInput');
+          this.navigateTo('CodeInput');
           break;
 
         case 4011:
@@ -111,7 +123,6 @@ export class TelInput extends Component {
   handlePhoneConfirm = () => {
     const phone_number = this.state.phone;
 
-    // this.props.user.account.payload.payload.account_information.account_id
     if (this.phonenumber(this.state.phone, this.state.countryCode)) {
       this.props.phoneNumberCreate({
         account_id: this.props.user.account.payload.payload.account_id,
@@ -121,6 +132,14 @@ export class TelInput extends Component {
       this.setState({ error: true });
       this.animatePasswordError();
     }
+  };
+
+  navigateTo = (screen, params) => {
+    const resetAction = NavigationActions.reset({
+      index: 0,
+      actions: [NavigationActions.navigate({ routeName: screen, params })],
+    });
+    this.props.navigation.dispatch(resetAction);
   };
 
   phonenumber = (inputtxt, code) => (
@@ -153,6 +172,21 @@ export class TelInput extends Component {
     ]).start(() => { this.setState({ error: null }); });
   };
 
+  animateCycle = (/* time, fr = 0, to = 1, callback */) => {
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(this.state.progress, {
+          toValue: 1,
+          duration: 2000,
+        }),
+        Animated.timing(this.state.progress, {
+          toValue: 0,
+          duration: 0,
+        }),
+      ]),
+    ).start();
+  };
+
   renderInput = () => (
     <View style={styles.telInput}>
       <TouchableOpacity
@@ -173,6 +207,10 @@ export class TelInput extends Component {
   render() {
     return (
       <View style={styles.container}>
+        <Animation
+              style={styles.animation}
+              source={spinner}
+              progress={this.state.progress}/>
         <View style={styles.header}>
           <Animated.View style={[styles.passContainer, { marginLeft: this.state.phoneError }]}>
             {this.renderInput()}
@@ -210,6 +248,13 @@ const styles = CustomStyleSheet({
     flex: 1,
     paddingTop: 120,
     paddingLeft: 16,
+  },
+  animation: {
+    position: 'absolute',
+    top: 16,
+    right: 16,
+    width: 24,
+    height: 24,
   },
   countryCodeContainer: {
     flexDirection: 'row',
