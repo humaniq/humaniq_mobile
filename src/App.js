@@ -76,10 +76,10 @@ const stack = {
 };
 
 const LoginStack = StackNavigator(
-    stack,
-    {
-      headerMode: 'none',
-    },
+  stack,
+  {
+    headerMode: 'none',
+  },
 );
 
 const defaultGetStateForAction = LoginStack.router.getStateForAction;
@@ -127,18 +127,18 @@ LoginStack.router.getStateForAction = (action, state) => {
 };
 
 const App = () => (
-    <Provider store={store}>
-      <LoginStack onNavigationStateChange={(prevState, { routes, index }) => {
-        if (routes && index >= 0) {
-          const { routeName, params } = routes[index];
-          if (routeName === 'Camera' && params && params.mode === 'qr') {
-            oncetrig.blockCall(false);
-            newTransaction.setTrAdress('');
-          }
+  <Provider store={store}>
+    <LoginStack onNavigationStateChange={(prevState, { routes, index }) => {
+      if (routes && index >= 0) {
+        const { routeName, params } = routes[index];
+        if (routeName === 'Camera' && params && params.mode === 'qr') {
+          oncetrig.blockCall(false);
+          newTransaction.setTrAdress('');
         }
-      }}
-      />
-    </Provider>
+      }
+    }}
+    />
+  </Provider>
 );
 
 AppRegistry.registerComponent('humaniq_mobile', () => App);
