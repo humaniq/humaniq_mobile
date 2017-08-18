@@ -254,7 +254,7 @@ export class Profile extends Component {
             if (shouldRefresh) {
               transactions = array;
             } else {
-              transactions.concat(array);
+              transactions = transactions.concat(array);
             }
             const map = this.convertToMap(transactions);
             this.setState({
