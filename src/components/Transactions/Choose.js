@@ -22,6 +22,7 @@ const doneWhite = require('./../../assets/icons/done_white.png');
 const qr = require('./../../assets/icons/qr.png');
 const phoneNumber = require('./../../assets/icons/phone_number.png');
 const send = require('./../../assets/icons/send.png');
+const ic_big_check_blue = require('../../assets/icons/ic_big_check_blue.png');
 
 const getName = cnt => cnt.name || cnt.phone || ' ';
 const nameSort = (a, b) => {
@@ -45,14 +46,15 @@ class Choose extends React.Component {
     setTrContact: PropTypes.func,
   };
 
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
     this.state = {
       selectedID: '',
       search: false,
       text: '',
     };
   }
+  contacts = this.props.contacts
 
   componentDidMount() {
     const { navigation: { state }, setRootScreen, newContacts } = this.props;
@@ -83,6 +85,7 @@ class Choose extends React.Component {
                   avatar: avatar.url,
                 };
               });
+              forAdd.sort((prevItem, nextItem) => this.compareArrays(prevItem, nextItem));
               newContacts(forAdd);
             })
             .catch((/* err */) => {
@@ -95,6 +98,31 @@ class Choose extends React.Component {
       .catch((/* err */) => {
         // console.log('contacts.err--->', JSON.stringify(err));
       });
+  }
+
+  componentWillReceiveProps(newProps) {
+    // compare two arrays
+    if (this.compareTwoArrays(newProps)) {
+      console.log('true');
+      // this.setState({
+      //  contacts: newProps.contacts,
+      // });
+      this.contacts = newProps.contacts;
+    }
+  }
+
+  compareTwoArrays(newProps) {
+    if (this.props.contacts.length === 0) { return true; }
+    for (let i = 0; i < newProps.contacts.length; i++) {
+      if (!newProps.contacts[i].equals(this.props.contacts[i])) { return true; }
+    }
+    return false;
+  }
+
+  compareArrays(prevItem, nextItem) {
+    if (prevItem.name < nextItem.name) { return -1; }
+    if (prevItem.name > nextItem.name) { return 1; }
+    return 0;
   }
 
   /*
@@ -139,6 +167,19 @@ class Choose extends React.Component {
 
     return (
       <ScrollView style={{ backgroundColor: colors.white }} showsVerticalScrollIndicator={false}>
+        <View style={{ backgroundColor: '#F2F2F2', justifyContent: 'center', height: 42 }}>
+          {!search
+              ? <Image
+                style={styles.checkBlue}
+                resizeMode="contain"
+                source={ic_big_check_blue}
+              />
+              : <Text style={styles.checkText}>
+                CONTACTS
+              </Text>
+          }
+
+        </View>
         <View style={styles.contactsHeader} />
         {contacts.filter(filter).sort(sort).map((cnt) => {
           const firstLetter = getName(cnt)[0];
@@ -261,14 +302,10 @@ class Choose extends React.Component {
 const styles = {
   container: {
     flex: 1,
-    backgroundColor: 'white',
+    backgroundColor: '#F2F2F2',
   },
   header: {
-    position: 'absolute',
     height: 56 + 48,
-    left: 0,
-    right: 0,
-    top: 0,
     backgroundColor: colors.orangeish,
     flexDirection: 'column',
     justifyContent: 'center',
@@ -319,7 +356,6 @@ const styles = {
   contactsHeader: {
     flex: 1,
     backgroundColor: 'transparent',
-    marginTop: 66 + 48,
   },
   selectedNum: {
     fontFamily: 'Roboto',
@@ -333,12 +369,26 @@ const styles = {
     fontSize: 18,
     color: colors.white,
   },
+  checkBlue: {
+    width: 32,
+    height: 32,
+    marginTop: 8,
+    marginBottom: 8,
+    marginLeft: 16,
+  },
+  checkText: {
+    color: '#4a4a4a',
+    fontSize: 17,
+    marginTop: 8,
+    marginBottom: 8,
+    marginLeft: 16,
+  },
 };
 
 const mapStateToProps = state => ({
   chats: state.chats,
   messages: state.messages,
-  contacts: state.contacts,
+  contacts: state.contacts || [],
 });
 
 export default connect(mapStateToProps, {

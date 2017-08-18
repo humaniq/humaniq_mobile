@@ -148,10 +148,10 @@ const styles = CustomStyleSheet({
   },
   contactName: {
     fontFamily: 'Roboto',
-    fontSize: 17,
+    fontSize: 18,
     letterSpacing: -0.1,
     textAlign: 'left',
-    color: colors.black_two,
+    color: 'black',
   },
   statusText: {
     fontFamily: 'Roboto',

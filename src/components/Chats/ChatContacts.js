@@ -36,14 +36,12 @@ const sort = (a, b) => nameSort(getName(a), getName(b));
 export class ChatContacts extends Component {
   constructor(props) {
     super(props);
-    const { contacts } = this.props;
     this.state = {
       search: false,
       text: '',
       groupArray: [],
       checkedItems: [],
       tempArray: [],
-      contacts,
       showEmptyView: false,
     };
   }
