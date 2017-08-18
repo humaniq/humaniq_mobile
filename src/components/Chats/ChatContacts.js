@@ -261,7 +261,6 @@ export class ChatContacts extends Component {
   }
 
   startSearch() {
-
   }
 
   onItemChecked(cnt) {
