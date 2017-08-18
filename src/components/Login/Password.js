@@ -129,10 +129,15 @@ export class Password extends Component {
             password: this.state.password,
             device_imei: IMEI.getImei(),
           };
+          // need to add here 
           HumaniqTokenApiLib.saveCredentials(map)
             .then((res) => { console.log(res); })
             .catch(err => console.log(err));
-          this.navigateTo('TelInput');
+          if (nextProps.user.profile.code != 401) {
+            this.navigateTo('Profile');
+          } else {
+            this.navigateTo('TelInput');
+          }
           break;
 
         case 2002:

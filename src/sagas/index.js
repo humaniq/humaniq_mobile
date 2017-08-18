@@ -2,6 +2,7 @@
 import { take, put, call, fork, select, all, takeLatest } from 'redux-saga/effects';
 import { api } from '../utils/index';
 import * as actions from '../actions';
+import { HumaniqProfileApiLib, HumaniqTokenApiLib } from 'react-native-android-library-humaniq-api';
 
 function* fetchEntity(entity, apiFn, body, errorCodes) {
   const { response } = yield call(apiFn, body);
@@ -35,7 +36,7 @@ export const fetchValidate = fetchEntity.bind(
 );
 export const fetchLogin = fetchEntity.bind(
   null,
-  actions.login,
+  actions.validatePassword,
   api.login
 );
 export const fetchSignup = fetchEntity.bind(
@@ -69,6 +70,12 @@ export const fetchSmsCodeRepeat = fetchEntity.bind(
   api.smsCodeRepeat,
 );
 
+/*export const fetchAccountProfile = fetchEntity.bind(
+  null,
+  actions.smsCodeRepeat,
+  HumaniqProfileApiLib.getAccountProfile,
+);*/
+
 
 // Сallers 
 
@@ -97,7 +104,7 @@ function* faceEmotionValidate({ facial_image_validation_id, facial_image }) {
 /* Login into App [Resolve all things here] */
 
 function* login({ facial_image, password, device_imei }) {
-  const response = yield call(validate, { facial_image });
+  let response = yield call(validate, { facial_image });
   
   // Additional request.
   if (response && response.payload.facial_image_id) {
@@ -111,7 +118,19 @@ function* login({ facial_image, password, device_imei }) {
         },
       },
     };
-    yield call(fetchLogin, body, errorCodes);
+    response = yield call(fetchLogin, body, errorCodes);
+    console.log(response);
+    if (response && response.code == 2001 && response.payload && response.payload.account_id) {
+      response = yield HumaniqProfileApiLib.getAccountProfile(response.payload.account_id);
+      console.log(response);
+      if (response.code === 401) {
+        yield put(actions.getProfile.failure(response));
+      } else {
+        yield put(actions.getProfile.success(response));
+      }
+      yield put(actions.login.success());
+    } 
+    
   }
 }
 

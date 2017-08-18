@@ -10,7 +10,9 @@ function createRequestTypes(base) {
 }
 
 export const VALIDATE = createRequestTypes('VALIDATE');
+export const VALIDATE_PASSWORD = createRequestTypes('VALIDATE_PASSWORD');
 export const LOGIN = createRequestTypes('LOGIN');
+export const GET_PROFILE = createRequestTypes('GET_PROFILE');
 export const SIGNUP = createRequestTypes('SIGNUP');
 export const PHONE_NUMBER_CREATE = createRequestTypes('PHONE_NUMBER_CREATE');
 export const PHONE_NUMBER_VALIDATE = createRequestTypes('PHONE_NUMBER_VALIDATE');
@@ -31,7 +33,6 @@ export const SET_TR_AMOUNT = 'SET_TR_AMOUNT';
 export const ADD_CONTACT = 'ADD_CONTACT';
 export const ADD_CONTACTS = 'ADD_CONTACTS';
 export const SET_TR_ROOT_SCREEN = 'SET_TR_ROOT_SCREEN';
-export const SET_PROFILE = 'SET_PROFILE';
 
 function action(type, payload = {}) {
   return { type, ...payload };
@@ -44,10 +45,21 @@ export const validate = {
   failure: error => action(VALIDATE[FAILURE], { error }),
 };
 
+export const validatePassword = {
+  success: response => action(VALIDATE_PASSWORD[SUCCESS], { response }),
+  failure: error => action(VALIDATE_PASSWORD[FAILURE], { error }),
+};
+
 export const login = {
   request: request => action(LOGIN[REQUEST], request),
   success: response => action(LOGIN[SUCCESS], { response }),
   failure: error => action(LOGIN[FAILURE], { error }),
+};
+
+export const getProfile = {
+  request: request => action(GET_PROFILE[REQUEST], request),
+  success: response => action(GET_PROFILE[SUCCESS], { response }),
+  failure: error => action(GET_PROFILE[FAILURE], { error }),
 };
 
 export const signup = {

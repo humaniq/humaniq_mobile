@@ -19,7 +19,7 @@ export default function HelpButton(props) {
   return (
     // using TouchH instead TouchO to disable pressing when prop active == false
     <TouchableHighlight
-      style={[styles.container, disabled && styles.disabled]}
+      style={[styles.container, disabled && styles.disabled, props.containerStyle]}
       onPress={disabled ? null : props.onPress}
     >
       <Image source={ic_confirm} />
@@ -32,7 +32,7 @@ HelpButton.propTypes = propTypes;
 const styles = CustomStyleSheet({
   container: {
     height: 45,
-    flex: 1,
+    width: 155,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: '$cPaper',
