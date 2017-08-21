@@ -5,6 +5,7 @@ import {
   TouchableWithoutFeedback,
   Image,
   Animated,
+  Dimensions,
 } from 'react-native';
 import PropTypes from 'prop-types';
 import Camera from 'react-native-camera';
@@ -348,17 +349,22 @@ export class Cam extends Component {
           this.camera = cam;
         }}
         style={styles.camera}
-        aspect={Camera.constants.Aspect.fill}
-        captureQuality={Camera.constants.CaptureQuality.low}
+        captureQuality={Camera.constants.CaptureQuality.preview}
         type={camtype}
         captureTarget={Camera.constants.CaptureTarget.disk}
         onBarCodeRead={onBarCode}
+        mirrorImage
       />
     );
   }
 
 
-  renderImage = () => (<Image source={{ uri: this.state.path }} style={styles.previewImage} />);
+  renderImage = () => (
+    <Image
+      resizeMode='contain'
+      source={{ uri: this.state.path }}
+      style={styles.previewImage}
+    />);
 
   render() {
     const isFetching =
@@ -380,7 +386,10 @@ export class Cam extends Component {
           {this.state.path ? this.renderImage() : this.renderCamera() }
         </View>
         <View style={styles.maskLayer}>
-          <Image source={whiteMask} style={styles.maskImageStyle} />
+          <Image
+            source={whiteMask}
+            style={styles.maskImageStyle}
+          />
         </View>
         <View style={styles.buttonsLayer}>
           <View style={styles.navbar}>
@@ -448,7 +457,6 @@ export default connect(mapStateToProps, {
 const styles = CustomStyleSheet({
   container: {
     flex: 1,
-    backgroundColor: 'white',
   },
   maskLayer: {
     position: 'absolute',
@@ -480,16 +488,14 @@ const styles = CustomStyleSheet({
     backgroundColor: 'white',
   },
   camera: {
-    height: 640,
-    width: 360,
+    height: Dimensions.get('window').height,
+    width: Dimensions.get('window').width,
   },
   cameraImageContainer: {
-    alignItems: 'center',
-    backgroundColor: 'white',
   },
   previewImage: {
-    height: 640,
-    width: 360,
+    height: Dimensions.get('window').height,
+    width: Dimensions.get('window').width,
   },
   emojiImage: {
     alignSelf: 'center',
