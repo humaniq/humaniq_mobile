@@ -64,35 +64,33 @@ export class TelInput extends Component {
     if (!this.props.user.phoneCreate.isFetching && nextProps.user.phoneCreate.isFetching) {
       this.animateCycle(2000, 0, 1);
     } else if (
-      this.props.user.phoneCreate.isFetching && 
-      !nextProps.user.phoneCreate.isFetching && 
+      this.props.user.phoneCreate.isFetching &&
+      !nextProps.user.phoneCreate.isFetching &&
       nextProps.user.phoneCreate.payload
-    ) 
-    {
+    ) {
       this.state.progress.stopAnimation();
       this.state.progress.setValue(0);
       const code = nextProps.user.phoneCreate.payload.code;
 
       switch (code) {
-        case 6000:
-          alert(nextProps.user.phoneCreate.payload.message);
-          break;
-
         case 4005:
-          // registered user
           // Account Phone Number Created Successfully. Validation Code Sent
-          this.props.savePhone({
-            country_code: VMasker.toNumber(this.state.code),
-            phone_number: VMasker.toNumber(this.state.phone),
+          this.navigateTo('CodeInput', {
+            prevScene: 'TelInput',
+            phoneNumber: {
+              country_code: VMasker.toNumber(this.state.code),
+              phone_number: VMasker.toNumber(this.state.phone),
+            }
           });
-          this.navigateTo('CodeInput');
           break;
 
         case 4011:
           // The Account Already Has A Phone Number
           alert('The Account Already Has A Phone Number');
-          // this.props.setAvatarLocalPath(this.state.path);
-          // this.props.navigation.navigate('Tutorial', { nextScene: 'Password' });
+          break;
+
+        case 6000:
+          alert(nextProps.user.phoneCreate.payload.message);
           break;
 
         default:
@@ -100,6 +98,14 @@ export class TelInput extends Component {
       }
     }
   }
+
+  navigateTo = (screen, params) => {
+    const resetAction = NavigationActions.reset({
+      index: 0,
+      actions: [NavigationActions.navigate({ routeName: screen, params })],
+    });
+    this.props.navigation.dispatch(resetAction);
+  };
 
   handleNumberPress = (number) => {
     if (this.state.phone.length < this.state.maxPhoneLength) {
@@ -126,7 +132,10 @@ export class TelInput extends Component {
     if (this.phonenumber(this.state.phone, this.state.countryCode)) {
       this.props.phoneNumberCreate({
         account_id: this.props.user.account.payload.payload.account_id,
-        phone_number: VMasker.toNumber(`${this.state.code}${phone_number}`),
+        phone_number: {
+          country_code: this.state.code,
+          phone_number: this.state.phone_number,
+        }
       });
     } else {
       this.setState({ error: true });
@@ -134,18 +143,29 @@ export class TelInput extends Component {
     }
   };
 
-  navigateTo = (screen, params) => {
-    const resetAction = NavigationActions.reset({
-      index: 0,
-      actions: [NavigationActions.navigate({ routeName: screen, params })],
-    });
-    this.props.navigation.dispatch(resetAction);
-  };
-
   phonenumber = (inputtxt, code) => (
-    // let phoneno = /^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/;
     phoneFormat.isValidNumber(inputtxt, code)
   );
+
+  /* Render functions */
+
+  renderInput = () => (
+    <View style={styles.telInput}>
+      <TouchableOpacity
+        style={styles.countryCodeContainer}
+        onPress={() => {
+          this.props.navigation.navigate('CountryCode',
+            { refresh: (dialCode, code, flag) => { dialCode != null ? this.setState({ code: dialCode, countryCode: code, flag }) : null; } });
+        }}>
+        <Image style={styles.flag} source={{ uri: this.state.flag }} />
+        <Text style={[styles.code, this.state.error ? styles.error : null]}>{this.state.code}</Text>
+        <Image style={[styles.arrow, this.state.error ? { tintColor: 'red' } : null]} source={arrowDownWhite} />
+      </TouchableOpacity>
+      <Text style={[styles.number, this.state.error ? styles.error : null]}>{this.state.maskedPhone}</Text>
+    </View>
+  );
+
+  /* Animations */
 
   animatePasswordError = () => {
     Animated.sequence([
@@ -187,30 +207,13 @@ export class TelInput extends Component {
     ).start();
   };
 
-  renderInput = () => (
-    <View style={styles.telInput}>
-      <TouchableOpacity
-        style={styles.countryCodeContainer}
-        onPress={() => {
-          this.props.navigation.navigate('CountryCode',
-            { refresh: (dialCode, code, flag) => { dialCode != null ? this.setState({ code: dialCode, countryCode: code, flag }) : null; } });
-        }}
-      >
-        <Image style={styles.flag} source={{ uri: this.state.flag }} />
-        <Text style={[styles.code, this.state.error ? styles.error : null]}>{this.state.code}</Text>
-        <Image style={[styles.arrow, this.state.error ? { tintColor: 'red' } : null]} source={arrowDownWhite} />
-      </TouchableOpacity>
-      <Text style={[styles.number, this.state.error ? styles.error : null]}>{this.state.maskedPhone}</Text>
-    </View>
-  );
-
   render() {
     return (
       <View style={styles.container}>
         <Animation
-              style={styles.animation}
-              source={spinner}
-              progress={this.state.progress}/>
+          style={styles.animation}
+          source={spinner}
+          progress={this.state.progress} />
         <View style={styles.header}>
           <Animated.View style={[styles.passContainer, { marginLeft: this.state.phoneError }]}>
             {this.renderInput()}

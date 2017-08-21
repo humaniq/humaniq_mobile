@@ -13,12 +13,6 @@ const logo_text = require('../../assets/icons/logo_text.png');
 
 class Loading extends Component {
   static propTypes = {
-    accounts: PropTypes.shape({
-      primaryAccount: PropTypes.object.isRequired,
-      secondaryAccounts: PropTypes.array,
-      saved: PropTypes.bool,
-    }).isRequired,
-
     navigation: PropTypes.shape({
       navigate: PropTypes.func.isRequired,
       dispatch: PropTypes.func.isRequired,
@@ -37,8 +31,7 @@ class Loading extends Component {
   }
 
   onTimeoutFinish = () => {
-    const savedDataExists = this.props.accounts.saved === true;
-    // go to accs or tuts
+    const savedDataExists = this.props.accounts.primaryAccount != null;
     this.props.navigation.navigate(savedDataExists ? 'Accounts' : 'Tutorial');
   };
 
@@ -53,7 +46,7 @@ class Loading extends Component {
 }
 
 const mapStateToProps = state => ({
-  accounts: state.accounts,
+  accounts: state.accounts
 });
 
 export default connect(mapStateToProps)(Loading);

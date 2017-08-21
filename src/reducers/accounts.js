@@ -13,15 +13,6 @@ function primaryAccount(state, action) {
   }
 }
 
-function saved(state, action) {
-  switch (action.type) {
-    case ActionTypes.ADD_PRIMARY_ACCOUNT:
-      return true;
-    default:
-      return state;
-  }
-}
-
 function secondaryAccounts(state, action) {
   switch (action.type) {
     case ActionTypes.ADD_SECONDARY_ACCOUNT:
@@ -49,9 +40,8 @@ function savePrimaryPhoneNumber(state, action) {
   }
 }
 
-
 const defaultState = {
-  primaryAccount: {},
+  primaryAccount: null,
   secondaryAccounts: [],
   saved: null,
 };
@@ -62,7 +52,6 @@ export function accounts(state = defaultState, action) {
       return {
         ...state,
         primaryAccount: primaryAccount(state.primaryAccount, action),
-        saved: saved(state.saved, action),
       };
     case ActionTypes.ADD_SECONDARY_ACCOUNT:
       return {

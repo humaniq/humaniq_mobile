@@ -14,12 +14,14 @@ export const VALIDATE_PASSWORD = createRequestTypes('VALIDATE_PASSWORD');
 export const LOGIN = createRequestTypes('LOGIN');
 export const GET_PROFILE = createRequestTypes('GET_PROFILE');
 export const SIGNUP = createRequestTypes('SIGNUP');
+export const PASSWORD_CREATE = createRequestTypes('PASSWORD_CREATE');
 export const PHONE_NUMBER_CREATE = createRequestTypes('PHONE_NUMBER_CREATE');
 export const PHONE_NUMBER_VALIDATE = createRequestTypes('PHONE_NUMBER_VALIDATE');
 export const SMS_CODE_REPEAT = createRequestTypes('SMS_CODE_REPEAT');
 export const FACE_EMOTION_CREATE = createRequestTypes('FACE_EMOTION_CREATE');
 export const FACE_EMOTION_VALIDATE = createRequestTypes('FACE_EMOTION_VALIDATE');
 
+export const SAVE_CREDENTIALS = 'SAVE_CREDENTIALS';
 export const SET_AVATAR_LOCAL_PATH = 'SET_AVATAR_LOCAL_PATH';
 export const SET_TEMP_LOCAL_PATH = 'SET_TEMP_LOCAL_PATH';
 export const SET_PASSWORD = 'SET_PASSWORD';
@@ -39,7 +41,6 @@ function action(type, payload = {}) {
 }
 
 export const validate = {
-  // TODO: remove obj as
   request: facial_image => action(VALIDATE[REQUEST], { facial_image }),
   success: response => action(VALIDATE[SUCCESS], { response }),
   failure: error => action(VALIDATE[FAILURE], { error }),
@@ -60,6 +61,11 @@ export const getProfile = {
   request: request => action(GET_PROFILE[REQUEST], request),
   success: response => action(GET_PROFILE[SUCCESS], { response }),
   failure: error => action(GET_PROFILE[FAILURE], { error }),
+};
+
+export const passwordCreate = {
+  success: response => action(PASSWORD_CREATE[SUCCESS], { response }),
+  failure: error => action(PASSWORD_CREATE[FAILURE], { error }),
 };
 
 export const signup = {
@@ -97,6 +103,8 @@ export const faceEmotionValidate = {
   success: response => action(FACE_EMOTION_VALIDATE[SUCCESS], { response }),
   failure: error => action(FACE_EMOTION_VALIDATE[FAILURE], { error }),
 };
+
+//export const saveCredentials = path => action(SAVE_CREDENTIALS, credentials);
 
 export const setAvatarLocalPath = path => action(SET_AVATAR_LOCAL_PATH, { path });
 export const setTempLocalPath = path => action(SET_TEMP_LOCAL_PATH, { path });

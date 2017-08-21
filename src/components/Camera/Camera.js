@@ -97,13 +97,6 @@ export class Cam extends Component {
     this[`${this.state.photoGoal}ReceiveProps`](nextProps);
   }
 
-  animateEmoji = (callback) => {
-    Animated.timing(this.state.emojiAnimation, {
-      toValue: 1,
-      duration: 2000,
-    }).start(callback);
-  };
-
   replayEmoji = () => {
     this.setState({ isButtonVisible: false });
     this.state.emojiAnimation.setValue(0);
@@ -153,14 +146,12 @@ export class Cam extends Component {
 
           break;
         default:
-          this.state.progress.stopAnimation();
-          this.state.progress.setValue(0);
           this.setState({
             error: true,
             errorCode: code,
             path: '',
-            animation: pressAnimation,
           });
+          this.rollBackAnimation();
       }
     }
   };
@@ -193,8 +184,8 @@ export class Cam extends Component {
           error: true,
           errorCode: code,
           path: '',
-          animation: doneAnimation,
         });
+        this.rollBackAnimation();
       }
     }
   };
@@ -221,11 +212,11 @@ export class Cam extends Component {
         });
       } else {
         this.setState({
-          animation: pressAnimation,
           error: true,
           errorCode: code,
           path: '',
         });
+        this.rollBackAnimation();
       }
     }
   };
@@ -275,9 +266,6 @@ export class Cam extends Component {
         }
       })
       .catch((err) => { console.log(err.message); });
-
-    // this.props.checkUserRegStatus(this.state.base64);
-    // console.log('this.props.validate', this.props);
   };
 
   convertToBase64 = (path) => {
@@ -290,19 +278,6 @@ export class Cam extends Component {
       .catch((err) => { console.log(err.message); });
   };
 
-  handleImageDelete = () => {
-    this.state.progress.setValue(0);
-    this.setState({ path: '', animation: pressAnimation });
-  };
-
-  handleCameraClose = () => {
-    this.handleImageDelete();
-    const backAction = NavigationActions.back({
-      key: null,
-    });
-    this.props.navigation.dispatch(backAction);
-  };
-
   navigateTo = (screen, params) => {
     const resetAction = NavigationActions.reset({
       index: 0,
@@ -311,7 +286,22 @@ export class Cam extends Component {
     this.props.navigation.dispatch(resetAction);
   };
 
+  handleCameraClose = () => {
+    this.state.progress.setValue(0);
+    this.setState({ path: '', animation: pressAnimation });
+    const backAction = NavigationActions.back({
+      key: null,
+    });
+    this.props.navigation.dispatch(backAction);
+  };
+
+  handleDismissModal = () => {
+    this.state.progress.stopAnimation();
+    this.setState({ error: false, errorCode: null, animation: pressAnimation });
+  };
+
   // Animation
+
   animate = (time, fr = 0, to = 1, callback) => {
     this.state.progress.setValue(fr);
     const animationref = Animated.timing(this.state.progress, {
@@ -321,9 +311,19 @@ export class Cam extends Component {
     this.setState({ animationref });
   };
 
-  handleDismissModal = () => {
+  rollBackAnimation = () => {
     this.state.progress.stopAnimation();
-    this.setState({ error: false, errorCode: null, animation: pressAnimation });
+    this.state.progress.setValue(0);
+    this.setState({
+      animation: pressAnimation,
+    });
+  };
+
+  animateEmoji = (callback) => {
+    Animated.timing(this.state.emojiAnimation, {
+      toValue: 1,
+      duration: 2000,
+    }).start(callback);
   };
 
   renderCamera() {
@@ -377,7 +377,7 @@ export class Cam extends Component {
           visible={this.state.error}
         />
         <View style={styles.cameraImageContainer}>
-          {this.state.path ? this.renderImage() : this.renderCamera() }
+          {this.state.path ? this.renderImage() : this.renderCamera()}
         </View>
         <View style={styles.maskLayer}>
           <Image source={whiteMask} style={styles.maskImageStyle} />
@@ -393,13 +393,13 @@ export class Cam extends Component {
           </View>
           {
             this.state.isButtonVisible ? <View /> :
-            <Animated.Image
-              source={emojiHappy}
-              style={[styles.emojiImage, {
-                transform: [{ scale: this.state.emojiAnimation }],
-                opacity: this.state.emojiAnimation,
-              }]}
-            />
+              <Animated.Image
+                source={emojiHappy}
+                style={[styles.emojiImage, {
+                  transform: [{ scale: this.state.emojiAnimation }],
+                  opacity: this.state.emojiAnimation,
+                }]}
+              />
           }
           <View style={styles.captureContainer}>
             {

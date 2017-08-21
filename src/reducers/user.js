@@ -68,6 +68,15 @@ function account(state = {
         payload: action.response
       }
     case ActionTypes.LOGIN.SUCCESS:
+      return {
+        ...state,
+        isFetching: false,
+      };
+    case ActionTypes.PASSWORD_CREATE.SUCCESS:
+      return {
+        ...state,
+        payload: action.response
+      }
     case ActionTypes.SIGNUP.SUCCESS:
       return {
         ...state,
@@ -76,6 +85,7 @@ function account(state = {
     case ActionTypes.LOGIN.FAILURE:
     case ActionTypes.SIGNUP.FAILURE:
     case ActionTypes.VALIDATE_PASSWORD.FAILURE:
+    case ActionTypes.PASSWORD_CREATE.FAILURE:
       return {
         ...state,
         isFetching: false,

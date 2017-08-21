@@ -71,53 +71,12 @@ export class Password extends Component {
       this.state.progress.stopAnimation();
       this.state.progress.setValue(0);
 
-      console.log(nextProps.user.account);
-      if (!nextProps.user.account.payload) {
-        return;
-      }
-
       const code = nextProps.user.account.payload.code;
-      // const password = nextProps.user.password;
 
       switch (code) {
-        case 6000:
-          this.setState({
-            error: true,
-            errorCode: nextProps.user.account.payload.code,
-          });
-          break;
-
         case 1001:
-          const registeredAcc = nextProps.user.account.payload.payload.account_information;
           console.log('registeredAccount ::', registeredAcc);
-          // this.props.navigation.navigate('TelInput');
-          const map2 = {
-            token: nextProps.user.account.payload.payload.token,
-            account_id: registeredAcc.account_id,
-            facial_image_id: this.props.user.validate.payload.payload.facial_image_id,
-            password: this.state.password,
-            device_imei: IMEI.getImei(),
-          };
-          HumaniqTokenApiLib.saveCredentials(map2)
-            .then(res => console.log(res))
-            .catch(err => console.log(err));
-          // TODO: replace with validated??
-          if (registeredAcc.phone_number.country_code) {
-            // secondary user, redirect to dash
-            this.props.addSecondaryAccount({
-              accountId: registeredAcc.account_id,
-              photo: this.props.user.photo,
-              number: `${registeredAcc.phone_number.country_code}${registeredAcc.phone_number.phone_number}`,
-            });
-            this.navigateTo('Profile');
-          } else {
-            // primary user
-            this.props.addPrimaryAccount({
-              accountId: registeredAcc.account_id,
-              photo: this.props.user.photo,
-            });
-            this.navigateTo('TelInput');
-          }
+          this.navigateTo('TelInput');
           break;
 
         case 2001:
@@ -125,60 +84,39 @@ export class Password extends Component {
           let profile = nextProps.user.profile;
           if (profile.phone_number && profile.phone_number.country_code && profile.phone_number.phone_number) {
             if (!profile.phone_number.validated) {
-              this.navigateTo('CodeInput');
+              this.navigateTo('CodeInput', {
+                prevScene: 'Password',
+                phoneNumber: {
+                  country_code: profile.phone_number.country_code,
+                  phone_number: profile.phone_number.phone_number,
+                }
+              });
             } else {
               this.navigateTo('Profile');
             }
           } else {
-            this.navigateTo('TelInput');
+            this.navigateTo('Tutorial', { nextScene: 'TelInput' });
           }
           break;
 
-        case 2002:
-          // Authentication Failed
-          /* this.setState({
-            error: true,
-            errorCode: nextProps.user.account.payload.code,
-          }); */
+        case 6000: // Unprocessible Entity
+        case 3003: // Facial Image Not Found
+        case 2002: // Authentication Failed
           this.setState({
             error: true,
           });
           this.animatePasswordError();
           break;
 
-        case 3003:
-          // Facial Image Not Found
-          this.setState({
-            error: true,
-            errorCode: nextProps.user.account.payload.code,
-          });
-          break;
-
         default:
           this.setState({
             error: true,
-            errorCode: nextProps.user.account.payload.code,
           });
           this.animatePasswordError();
           break;
       }
     }
   }
-
-  animateCycle = (/* time, fr = 0, to = 1, callback */) => {
-    Animated.loop(
-      Animated.sequence([
-        Animated.timing(this.state.progress, {
-          toValue: 1,
-          duration: 2000,
-        }),
-        Animated.timing(this.state.progress, {
-          toValue: 0,
-          duration: 0,
-        }),
-      ]),
-    ).start();
-  };
 
   navigateTo = (screen, params) => {
     const resetAction = NavigationActions.reset({
@@ -215,7 +153,6 @@ export class Password extends Component {
       }
     } else if (res.length === this.state.maxPasswordLength) {
       // Auth
-      console.log('authenticate');
       this.handlePasswordConfirm(false, res);
     }
   };
@@ -223,10 +160,6 @@ export class Password extends Component {
   handleBackspacePress = () => {
     const password = this.state.password.slice(0, -1);
     this.setState({ password });
-  };
-
-  handleHelpPress = () => {
-    // TODO: support button action
   };
 
   handlePasswordConfirm = (match, password) => {
@@ -252,11 +185,6 @@ export class Password extends Component {
         this.props.login({ facial_image: base64, device_imei: this.state.imei, password });
       })
       .catch((err) => { console.log(err.message); });
-    /* this.props.login({
-      facial_image_id: this.props.user.validate.payload.payload.facial_image_id,
-      device_imei: this.state.imei,
-      password,
-    }); */
   };
 
   createRegistration = (password) => {
@@ -275,30 +203,7 @@ export class Password extends Component {
     });
   };
 
-  animatePasswordError = () => {
-    Animated.sequence([
-      Animated.timing(this.state.passwordError, {
-        toValue: vw(-30),
-        duration: 50,
-      }),
-      Animated.timing(this.state.passwordError, {
-        toValue: vw(30),
-        duration: 100,
-      }),
-      Animated.timing(this.state.passwordError, {
-        toValue: vw(-30),
-        duration: 100,
-      }),
-      Animated.timing(this.state.passwordError, {
-        toValue: vw(30),
-        duration: 100,
-      }),
-      Animated.timing(this.state.passwordError, {
-        toValue: vw(0),
-        duration: 50,
-      }),
-    ]).start(() => { this.setState({ error: null, password: '' }); });
-  };
+  /* Render functions */
 
   renderPassMask = () => {
     const { password, maxPasswordLength } = this.state;
@@ -344,6 +249,48 @@ export class Password extends Component {
     }
 
     return null;
+  };
+
+  /* Animations */
+
+  animateCycle = (/* time, fr = 0, to = 1, callback */) => {
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(this.state.progress, {
+          toValue: 1,
+          duration: 2000,
+        }),
+        Animated.timing(this.state.progress, {
+          toValue: 0,
+          duration: 0,
+        }),
+      ]),
+    ).start();
+  };
+
+  animatePasswordError = () => {
+    Animated.sequence([
+      Animated.timing(this.state.passwordError, {
+        toValue: vw(-30),
+        duration: 50,
+      }),
+      Animated.timing(this.state.passwordError, {
+        toValue: vw(30),
+        duration: 100,
+      }),
+      Animated.timing(this.state.passwordError, {
+        toValue: vw(-30),
+        duration: 100,
+      }),
+      Animated.timing(this.state.passwordError, {
+        toValue: vw(30),
+        duration: 100,
+      }),
+      Animated.timing(this.state.passwordError, {
+        toValue: vw(0),
+        duration: 50,
+      }),
+    ]).start(() => { this.setState({ error: null, password: '' }); });
   };
 
   render() {
