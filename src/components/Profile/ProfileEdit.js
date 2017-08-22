@@ -51,8 +51,6 @@ export class ProfileEdit extends Component {
       localPath: '',
       uploading: false,
       count: 0,
-      isAvatarUploading: false,
-      isCredsUploading: false,
     };
   }
 
@@ -212,28 +210,28 @@ export class ProfileEdit extends Component {
   };
 
   convertToBase64 = (path) => {
+    const { addPrimaryAccount, accounts } = this.props;
     RNFetchBlob.fs.readFile(path, 'base64')
         .then((data) => {
           HumaniqProfileApiLib.uploadProfileAvatar(this.props.profile.account_id, data)
               .then((resp) => {
                 if (resp.code === 401) {
-                  this.navigateTo('Tutorial');
-                } else {
-                  if (resp.code === 5004) {
-                    this.setState({ count: this.state.count += 1 });
-                    ToastAndroid.show('Success', ToastAndroid.LONG);
-                    const { profile } = this.props;
-                    profile.avatar.url = resp.avatar.url;
-                    this.props.setProfile({ ...profile });
-                    this.props.setAvatarPath(resp.avatar.url);
-                    if (this.state.count === 2) {
-                      this.handleClose();
-                    } else if (!this.state.fieldChanged) {
-                      this.handleClose();
-                    }
-                  } else if (resp.code === 3013) {
-                    // do some stuff
+                  this.navigateTo('Accounts');
+                } else if (resp.code === 5004) {
+                  this.setState({ count: this.state.count += 1 });
+                  ToastAndroid.show('Success', ToastAndroid.LONG);
+                  const { profile } = this.props;
+                  profile.avatar.url = resp.avatar.url;
+                  this.props.setProfile({...profile});
+                  this.props.setAvatarPath(resp.avatar.url);
+                  this.props.saveAvatar({ url: resp.avatar.url });
+                  if (this.state.count === 2) {
+                    this.handleClose();
+                  } else if (!this.state.fieldChanged) {
+                    this.handleClose();
                   }
+                } else if (resp.code === 3013) {
+                    // do some stuff
                 }
               })
               .catch((err) => {
@@ -264,20 +262,17 @@ export class ProfileEdit extends Component {
     )
         .then((resp) => {
           if (resp.code === 401) {
-            this.navigateTo('Tutorial');
+            this.navigateTo('Accounts');
           } else {
             this.setState({ count: this.state.count += 1 });
             const { profile } = this.props;
             profile.person.first_name = resp.payload.person.first_name;
             profile.person.last_name = resp.payload.person.last_name;
-            this.props.setProfile({ ...profile });
-
-            addPrimaryAccount({
-              ...accounts.primaryAccount,
-              person: profile.person,
-              phone_number: profile.phone_number,
+            this.props.setProfile({...profile});
+            this.props.saveNames({
+              first_name: resp.payload.person.first_name,
+              last_name: resp.payload.person.last_name,
             });
-
             this.setState({ fieldChanged: false });
             ToastAndroid.show('Success', ToastAndroid.LONG);
             if (this.state.count === 2) {
@@ -397,9 +392,11 @@ export default connect(
       accounts: state.accounts,
     }),
     dispatch => ({
-      setProfile: profile => dispatch(actions.setProfile(profile)),
+      setProfile: profile => dispatch(actions.getProfile.success(profile)),
       setLocalPath: path => dispatch(actions.setTempLocalPath(path)),
       setAvatarPath: path => dispatch(actions.setAvatarLocalPath(path)),
+      saveAvatar: avatar => dispatch(actions.saveAvatar(avatar)),
+      saveNames: names => dispatch(actions.saveNames(names)),
       addPrimaryAccount: account => dispatch(actions.addPrimaryAccount(account)),
     }),
 )(ProfileEdit);

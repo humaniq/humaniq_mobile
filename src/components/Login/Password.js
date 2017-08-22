@@ -4,6 +4,7 @@ import {
   Image,
   Text,
   Animated,
+  StatusBar,
 } from 'react-native';
 
 import PropTypes from 'prop-types';
@@ -296,6 +297,9 @@ export class Password extends Component {
   render() {
     return (
       <View style={styles.container}>
+        <StatusBar
+          backgroundColor="#3aa3e3"
+        />
         <Modal
           onPress={this.handleDismissModal}
           code={this.state.errorCode}

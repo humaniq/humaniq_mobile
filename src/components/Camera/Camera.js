@@ -5,6 +5,7 @@ import {
   TouchableWithoutFeedback,
   Image,
   Animated,
+  StatusBar,
 } from 'react-native';
 import PropTypes from 'prop-types';
 import Camera from 'react-native-camera';
@@ -371,6 +372,7 @@ export class Cam extends Component {
     const fn = () => null;
     return (
       <View style={styles.container}>
+        <StatusBar hidden/>
         <Modal
           onPress={this.handleDismissModal}
           code={this.state.errorCode}

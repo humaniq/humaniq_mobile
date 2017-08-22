@@ -7,6 +7,7 @@ import {
   TouchableWithoutFeedback,
   Animated,
   ToastAndroid,
+  StatusBar,
 } from 'react-native';
 import PropTypes from 'prop-types';
 import Camera from 'react-native-camera';
@@ -22,7 +23,7 @@ import CustomStyleSheet from '../../utils/customStylesheet';
 import Modal from '../Shared/Components/Modal';
 
 const emojiHappy = require('../../assets/icons/emojiHappy.png');
-const close = require('../../assets/icons/ic_close.png');
+const close = require('../../assets/icons/close_dark.png');
 const repeat = require('../../assets/icons/repeat.png');
 const confirm = require('../../assets/icons/ic_confirm_dark.png');
 
@@ -169,6 +170,7 @@ export class CameraEdit extends Component {
   render() {
     return (
       <View style={styles.container}>
+        <StatusBar hidden/>
         <Modal
           onPress={this.handleDismissModal}
           code={this.state.errorCode}

@@ -117,7 +117,7 @@ export class Profile extends Component {
   };
 
   componentWillMount() {
-    console.log('profile_id', this.props.id);
+    console.warn(JSON.stringify(this.props.acc))
     DeviceEventEmitter.addListener('EVENT_TRANSACTION_ERROR', (event) => {
       console.log('ошибка');
       console.log(event);
@@ -177,11 +177,11 @@ export class Profile extends Component {
   }
 
   getUserInfo() {
-    /*HumaniqProfileApiLib.getAccountProfile(this.props.id)
+    HumaniqProfileApiLib.getAccountProfile(this.props.id)
         .then((response) => {
           if (this.activity) {
             if (response.code === 401) {
-              this.navigateTo('Tutorial');
+              this.navigateTo('Accounts');
             } else {
               this.props.setProfile(response);
             }
@@ -189,7 +189,7 @@ export class Profile extends Component {
         })
         .catch((err) => {
           console.log('get user info error: ', err);
-        });*/
+        });
   }
 
   navigateTo = (screen, params) => {
@@ -206,7 +206,7 @@ export class Profile extends Component {
         .then((addressState) => {
           if (this.activity) {
             if (addressState.code === 401) {
-              this.navigateTo('Tutorial');
+              this.navigateTo('Accounts');
             } else {
               const { balance } = this.state;
               if (addressState) {
@@ -650,7 +650,7 @@ export class Profile extends Component {
     HumaniqProfileApiLib.createTransaction(this.props.id, toUserId, toUserAddress, (newTransaction.amount * 100000000))
         .then((resp) => {
           if (resp.code === 401) {
-            this.navigateTo('Tutorial');
+            this.navigateTo('Accounts');
           } else {
             // save transaction id in array
             console.log('create transaction::', resp);
@@ -846,13 +846,13 @@ export default connect(
     state => ({
       user: state.user,
       profile: state.user.profile || {},
-      id: state.user.account.payload.payload.account_id || state.accounts.primaryAccount.accountId,
+      id: state.accounts.primaryAccount.account_id,
       acc: state.accounts.primaryAccount,
       newTransaction: state.newtransaction,
       contacts: state.contacts,
     }),
     dispatch => ({
-      setProfile: profile => dispatch(actions.setProfile(profile)),
+      setProfile: profile => dispatch(actions.getProfile.success(profile)),
       setAmount: amount => dispatch(actions.newTransaction.setTrAmount(amount)),
       setAddress: address => dispatch(actions.newTransaction.setTrAdress(address)),
       setPhone: phone => dispatch(actions.newTransaction.setTrAdress(phone)),

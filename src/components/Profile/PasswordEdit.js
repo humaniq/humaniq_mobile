@@ -5,6 +5,7 @@ import {
   Text,
   Animated,
   ToastAndroid,
+  StatusBar,
 } from 'react-native';
 
 import Animation from 'lottie-react-native';
@@ -159,6 +160,9 @@ export class PasswordEdit extends Component {
   render() {
     return (
       <View style={styles.container}>
+        <StatusBar
+            backgroundColor="#3aa3e3"
+        />
         <View style={styles.header}>
           <View style={styles.animationContainer}>
             <Animation

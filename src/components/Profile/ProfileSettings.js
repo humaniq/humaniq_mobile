@@ -380,7 +380,7 @@ export class ProfileSettings extends Component {
           // log out
           console.log(response);
           if (response.code === 200) {
-            this.navigateTo('Tutorial');
+            this.navigateTo('Accounts');
           }
         })
         .catch((err) => {
