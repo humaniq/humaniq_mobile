@@ -35,16 +35,15 @@ export class ProfileEdit extends Component {
   constructor(props) {
     super(props);
     const { user } = this.props.navigation.state.params;
-    const { profile } = this.props;
+    const { primaryAccount } = this.props;
     let name,
       lastName;
-    if (profile.person) {
-      name = profile.person.first_name;
-      lastName = profile.person.last_name;
+    if (primaryAccount.person) {
+      name = primaryAccount.person.first_name;
+      lastName = primaryAccount.person.last_name;
     }
     this.state = {
       user,
-      profile,
       name: name || '',
       surname: lastName || '',
       fieldChanged: false,
@@ -55,14 +54,15 @@ export class ProfileEdit extends Component {
   }
 
   render() {
-    const { user, profile } = this.state;
-    const name = profile.person
-        ? `${profile.person.first_name} ${profile.person.last_name}`
+    const { user } = this.state;
+    const { primaryAccount } = this.props
+    const name = primaryAccount.person
+        ? `${primaryAccount.person.first_name} ${primaryAccount.person.last_name}`
         : '';
-    const phone = profile.phone_number
-        ? `+(${profile.phone_number.country_code}) ${profile.phone_number.phone_number}`
+    const phone = primaryAccount.phone_number
+        ? `+(${primaryAccount.phone_number.country_code}) ${primaryAccount.phone_number.phone_number}`
         : '';
-    const userCreds = profile.person
+    const userCreds = primaryAccount.person
         ? name
         : phone;
 
@@ -105,7 +105,7 @@ export class ProfileEdit extends Component {
                     style={styles.avatar}
                     source={this.props.photo
                             ? { uri: this.props.photo }
-                            : profile.avatar ? { uri: profile.avatar.url } : ic_photo_holder}
+                            : primaryAccount.avatar ? { uri: primaryAccount.avatar.url } : ic_photo_holder}
                   />
                   <View style={[{
                     position: 'absolute',
@@ -210,20 +210,16 @@ export class ProfileEdit extends Component {
   };
 
   convertToBase64 = (path) => {
-    const { addPrimaryAccount, accounts } = this.props;
+    const { primaryAccount } = this.props;
     RNFetchBlob.fs.readFile(path, 'base64')
         .then((data) => {
-          HumaniqProfileApiLib.uploadProfileAvatar(this.props.profile.account_id, data)
+          HumaniqProfileApiLib.uploadProfileAvatar(primaryAccount.account_id, data)
               .then((resp) => {
                 if (resp.code === 401) {
                   this.navigateTo('Accounts');
                 } else if (resp.code === 5004) {
                   this.setState({ count: this.state.count += 1 });
                   ToastAndroid.show('Success', ToastAndroid.LONG);
-                  const { profile } = this.props;
-                  profile.avatar.url = resp.avatar.url;
-                  this.props.setProfile({...profile});
-                  this.props.setAvatarPath(resp.avatar.url);
                   this.props.saveAvatar({ url: resp.avatar.url });
                   if (this.state.count === 2) {
                     this.handleClose();
@@ -255,20 +251,15 @@ export class ProfileEdit extends Component {
   };
 
   uploadPerson() {
-    const { addPrimaryAccount, accounts } = this.props;
-
+    const { primaryAccount } = this.props;
     HumaniqProfileApiLib.updateUserPerson(
-        this.state.profile.account_id, this.state.name, this.state.surname,
+        primaryAccount.account_id, this.state.name, this.state.surname,
     )
         .then((resp) => {
           if (resp.code === 401) {
             this.navigateTo('Accounts');
           } else {
             this.setState({ count: this.state.count += 1 });
-            const { profile } = this.props;
-            profile.person.first_name = resp.payload.person.first_name;
-            profile.person.last_name = resp.payload.person.last_name;
-            this.props.setProfile({...profile});
             this.props.saveNames({
               first_name: resp.payload.person.first_name,
               last_name: resp.payload.person.last_name,
@@ -387,14 +378,12 @@ const styles = StyleSheet.create({
 export default connect(
     state => ({
       user: state.user,
-      profile: state.user.profile || {},
+      primaryAccount: state.accounts.primaryAccount,
       photo: state.user.tempPhoto,
       accounts: state.accounts,
     }),
     dispatch => ({
-      setProfile: profile => dispatch(actions.getProfile.success(profile)),
       setLocalPath: path => dispatch(actions.setTempLocalPath(path)),
-      setAvatarPath: path => dispatch(actions.setAvatarLocalPath(path)),
       saveAvatar: avatar => dispatch(actions.saveAvatar(avatar)),
       saveNames: names => dispatch(actions.saveNames(names)),
       addPrimaryAccount: account => dispatch(actions.addPrimaryAccount(account)),

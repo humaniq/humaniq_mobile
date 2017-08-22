@@ -106,7 +106,7 @@ export class CameraEdit extends Component {
           })
           .catch((err) => {
             this.setState({ capturing: false });
-            console.error('error during image capture', err);
+            console.log('error during image capture', err);
           });
     }
   };
@@ -307,7 +307,6 @@ export class CameraEdit extends Component {
 export default connect(
     state => ({
       user: state.user,
-      profile: state.user.profile || {},
       photo: state.user.tempPhoto || '',
     }),
     dispatch => ({

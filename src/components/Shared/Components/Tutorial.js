@@ -2,6 +2,7 @@ import React, { Component, PropTypes } from 'react';
 import {
   View,
   Image,
+  StatusBar,
 } from 'react-native';
 import CustomStyleSheet from '../../../utils/customStylesheet';
 import ConfirmButton from '../Buttons/ConfirmButton';
@@ -60,6 +61,10 @@ render() {
 
   return (
     <View style={styles.container}>
+      <StatusBar
+          translucent
+          backgroundColor='transparent'
+      />
       <Image style={styles.illustration} source={source} />
       <View style={styles.buttonsContainer}>
         {/*<HelpButton onPress={this.handleHelpPress} />*/}
