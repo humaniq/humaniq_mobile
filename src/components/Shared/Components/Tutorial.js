@@ -63,7 +63,7 @@ render() {
       <Image style={styles.illustration} source={source} />
       <View style={styles.buttonsContainer}>
         {/*<HelpButton onPress={this.handleHelpPress} />*/}
-        <ConfirmButton onPress={this.handleConfirmPress} />
+        <ConfirmButton onPress={this.handleConfirmPress} containerStyle={{ flex: 1 }}/>
       </View>
     </View>
   );

@@ -2,11 +2,13 @@
 import { take, put, call, fork, select, all, takeLatest } from 'redux-saga/effects';
 import { api } from '../utils/index';
 import * as actions from '../actions';
+import { HumaniqProfileApiLib, HumaniqTokenApiLib } from 'react-native-android-library-humaniq-api';
+import IMEI from 'react-native-imei';
 
 function* fetchEntity(entity, apiFn, body, errorCodes) {
   const { response } = yield call(apiFn, body);
   let result = null;
-
+  console.log(response);
   if (response && response.code) {
     const responseCode = parseInt(response.code, 10);
     const errorCode = errorCodes.find(errCode => errCode === responseCode);
@@ -23,7 +25,7 @@ function* fetchEntity(entity, apiFn, body, errorCodes) {
   } else {
     result = { ...response };
     console.log('unknown response fail', result);
-    yield put(entity.failure(error));
+    yield put(entity.failure(result));
   }
   return result;
 }
@@ -35,12 +37,12 @@ export const fetchValidate = fetchEntity.bind(
 );
 export const fetchLogin = fetchEntity.bind(
   null,
-  actions.login,
+  actions.validatePassword,
   api.login
 );
 export const fetchSignup = fetchEntity.bind(
   null,
-  actions.signup,
+  actions.passwordCreate,
   api.signup
 );
 export const fetchPhoneNumberCreate = fetchEntity.bind(
@@ -69,6 +71,12 @@ export const fetchSmsCodeRepeat = fetchEntity.bind(
   api.smsCodeRepeat,
 );
 
+/*export const fetchAccountProfile = fetchEntity.bind(
+  null,
+  actions.smsCodeRepeat,
+  HumaniqProfileApiLib.getAccountProfile,
+);*/
+
 
 // Сallers 
 
@@ -88,19 +96,22 @@ function* faceEmotionCreate({ facial_image_id }) {
 }
 
 /* Finish emotial recognition process */
-// 
+
 function* faceEmotionValidate({ facial_image_validation_id, facial_image }) {
   const errorCodes = [3000, 3011, 3009, 3007, 6000];
   yield call(fetchFaceEmotionValidate, { facial_image_validation_id, facial_image }, errorCodes);
 }
 
-/* Login into App [Resolve all things here] */
+/* Login into App with password */
 
 function* login({ facial_image, password, device_imei }) {
-  const response = yield call(validate, { facial_image });
-  
+  // Call to get new facial_image_id (every time password was typed incorrectly we need new fid)
+  let response = yield call(validate, { facial_image });
+
+  // If new fid recieved go on
   if (response && response.payload.facial_image_id) {
-    const errorCodes = [2002, 3003, 6000];
+    const errorCodesLogin = [2002, 3003, 6000];
+    //Prepare body
     const body = {
       facial_image_id: response.payload.facial_image_id,
       password,
@@ -110,9 +121,37 @@ function* login({ facial_image, password, device_imei }) {
         },
       },
     };
-    yield call(fetchLogin, body, errorCodes);
+    // Call to check if password is correct.
+    response = yield call(fetchLogin, body, errorCodesLogin);
+    // Check if response correct (possibly need to remove)
+    if (response && response.code == 2001 && response.payload && response.payload.account_id) {
+      const credentials = yield select(state => {
+        return {
+          token: state.user.account.payload.payload.token,
+          account_id: state.user.account.payload.payload.account_id,
+          facial_image_id: state.user.validate.payload.payload.facial_image_id,
+          password: password,
+          device_imei: IMEI.getImei(),
+        }
+      });
+      const photo = yield select(state => { return state.user.photo });
+
+      /* Save creds to the store */
+      yield HumaniqTokenApiLib.saveCredentials(credentials);
+      // Native Call to get user profile data 
+      response = yield HumaniqProfileApiLib.getAccountProfile(response.payload.account_id);
+      yield put(actions.addPrimaryAccount(response));
+      yield put(actions.getProfile.success(response));
+      yield put(actions.login.success());
+    } else {
+      actions.login.failure();
+    }
+  } else {
+    actions.login.failure();
   }
 }
+
+/* Sign up and finish first part of user registration by setting the password */
 
 function* signup({ facial_image_id, password, device_imei }) {
   const errorCodes = [1003, 2002, 3003, 6000];
@@ -125,8 +164,44 @@ function* signup({ facial_image_id, password, device_imei }) {
       },
     },
   };
-  console.log('body', body);
-  yield call(fetchSignup, body, errorCodes);
+  let response = yield call(fetchSignup, body, errorCodes);
+  if (response && response.code == 1001) {
+    const account_information = response.account.payload.payload.account_information;
+    /* Save creds to the store */
+    yield saveCredentials(
+      account_information.token,
+      account_information.account_id,
+      facial_image_id,
+      password,
+      IMEI.getImei()
+    );
+    let photo = yield select(state => { return state.user.photo });
+    yield put(actions.addPrimaryAccount(
+      {
+        avatar: {
+          url: photo
+        }
+      }
+    ));
+    yield put(actions.signup.success());
+  } else {
+    actions.login.failure();
+  }
+}
+
+/* Save credentials to preferences (to disk) */
+
+function* saveCredentials({ token, account_id, facial_image_id, password, device_imei }) {
+  const credentials = {
+    token: token,
+    account_id: account_id,
+    facial_image_id: facial_image_id,
+    password: password,
+    device_imei: device_imei,
+  };
+  HumaniqTokenApiLib.saveCredentials(credentials)
+    .then(res => console.log(res))
+    .catch(err => console.log(err));
 }
 
 /* Initiate phone number validation process */
@@ -137,14 +212,10 @@ function* phoneNumberCreate({ phone_number, account_id }) {
   const number = phone_number.toString().slice(1);
   const body = {
     account_id,
-    phone_number: {
-      country_code: code,
-      // country_code: '1',
-      phone_number: number,
-      // phone_number: '5035863325',
-    },
+    phone_number: phone_number,
   };
   yield call(fetchPhoneNumberCreate, body, errorCodes);
+  yield put(actions.savePhone(phone_number));
 }
 
 /* Finish phone number validation process*/
@@ -166,7 +237,7 @@ function* phoneNumberValidate({ phone_number, validation_code, account_id }) {
   yield call(fetchPhoneNumberValidate, body, errorCodes);
 }
 
-/* Resend sms code to user*/
+/* Resend sms code to user */
 
 function* smsCodeRepeat({ account_id, phone_number, imei }) {
   const errorCodes = [6000, 4010, 4004, 4003, 4001, 4009];
@@ -187,6 +258,14 @@ function* watchValidate() {
   yield takeLatest(actions.VALIDATE.REQUEST, validate);
 }
 
+function* watchFaceEmotionCreate() {
+  yield takeLatest(actions.FACE_EMOTION_CREATE.REQUEST, faceEmotionCreate);
+}
+
+function* watchFaceEmotionValidate() {
+  yield takeLatest(actions.FACE_EMOTION_VALIDATE.REQUEST, faceEmotionValidate);
+}
+
 function* watchLogin() {
   yield takeLatest(actions.LOGIN.REQUEST, login);
 }
@@ -194,6 +273,10 @@ function* watchLogin() {
 function* watchSignup() {
   yield takeLatest(actions.SIGNUP.REQUEST, signup);
 }
+
+/*function* watchSaveCredentials() {
+  yield takeLatest(actions.SAVE_CREDENTIALS, saveCredentials);
+}*/
 
 function* watchPhoneNumberCreate() {
   yield takeLatest(actions.PHONE_NUMBER_CREATE.REQUEST, phoneNumberCreate);
@@ -205,14 +288,6 @@ function* watchPhoneNumberValidate() {
 
 function* watchSmsCodeRepeat() {
   yield takeLatest(actions.SMS_CODE_REPEAT.REQUEST, smsCodeRepeat);
-}
-
-function* watchFaceEmotionCreate() {
-  yield takeLatest(actions.FACE_EMOTION_CREATE.REQUEST, faceEmotionCreate);
-}
-
-function* watchFaceEmotionValidate() {
-  yield takeLatest(actions.FACE_EMOTION_VALIDATE.REQUEST, faceEmotionValidate);
 }
 
 export default function* root() {

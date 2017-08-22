@@ -22,8 +22,10 @@ function tempPhoto(state = '', action) {
 
 function profile(state = {}, action) {
   switch (action.type) {
-    case ActionTypes.SET_PROFILE:
-      return action.profile;
+    case ActionTypes.GET_PROFILE.SUCCESS:
+      return action.response;
+    case ActionTypes.GET_PROFILE.FAILURE:
+      return action.error;
     default:
       return state;
   }
@@ -47,6 +49,7 @@ function phoneNumber(state = {}, action) {
   }
 }
 
+// TODO huge payload
 function account(state = {
   isFetching: false,
   payload: null,
@@ -59,15 +62,30 @@ function account(state = {
         isFetching: true,
         payload: null,
       };
+    case ActionTypes.VALIDATE_PASSWORD.SUCCESS:
+      return {
+        ...state,
+        payload: action.response
+      }
     case ActionTypes.LOGIN.SUCCESS:
+      return {
+        ...state,
+        isFetching: false,
+      };
+    case ActionTypes.PASSWORD_CREATE.SUCCESS:
+      return {
+        ...state,
+        payload: action.response
+      }
     case ActionTypes.SIGNUP.SUCCESS:
       return {
         ...state,
         isFetching: false,
-        payload: action.response,
       };
     case ActionTypes.LOGIN.FAILURE:
     case ActionTypes.SIGNUP.FAILURE:
+    case ActionTypes.VALIDATE_PASSWORD.FAILURE:
+    case ActionTypes.PASSWORD_CREATE.FAILURE:
       return {
         ...state,
         isFetching: false,

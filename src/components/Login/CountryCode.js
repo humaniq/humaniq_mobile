@@ -118,7 +118,6 @@ export class CountryCode extends Component {
 
     // Render List of countries
     renderList = (array) => {
-        console.log(this.state.isSearchActive);
         return (
             <View style={styles.row}>
                 {this.state.isSearchActive ? () => { return null} : this.renderLetters() }
@@ -186,7 +185,6 @@ export class CountryCode extends Component {
                 res.push(o);
             }
         });
-        console.log(res);
         return this.renderSection(res);
     }
 

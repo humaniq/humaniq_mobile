@@ -51,16 +51,17 @@ export class CodeInput extends Component {
     phone: '',
     code: '',
     codeError: new Animated.Value(0),
-    // for modal
     modalVisible: false,
     errorCode: null,
     cooldownTime: 120,
-    // cooldownTime: 0,
     noAttempts: false,
   };
 
   componentDidMount() {
-    // this.setState({ cooldownTime: 120 });
+    const params = this.props.navigation.state.params;
+    if (params.prevScene != 'TelInput') {
+      this.handleRequestSms();
+    }
     let interval;
     const cooldown = () => {
       if (this.state.cooldownTime > 0) {
@@ -78,7 +79,6 @@ export class CodeInput extends Component {
       if (body.match(hmqRegEx)) {
         // request server;
         const smsCode = body.replace(/\D/g, '');
-
         this.props.phoneNumberValidate({
           account_id: this.props.user.account.payload.payload.account_information.account_id,
           phone_number: this.props.user.phoneNumber,
@@ -90,9 +90,7 @@ export class CodeInput extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    // console.log('📞 nextProps', nextProps.user.validate);
     if (nextProps.user.smsCodeRepeat.payload) {
-      console.log('✷✷✷✷✷ code', nextProps.user.smsCodeRepeat);
       const code = parseInt(nextProps.user.smsCodeRepeat.payload.code, 10);
       if (code === 4008 || code === 4010) {
         this.setState({
@@ -116,48 +114,23 @@ export class CodeInput extends Component {
     if (nextProps.user.phoneValidate.payload) {
       const code = nextProps.user.phoneValidate.payload.code;
       switch (code) {
-        case 6000:
-          // alert(nextProps.user.validate.payload.message);
-          this.setState({
-            modalVisible: true,
-            errorCode: code,
-          });
-          break;
 
         case 4002:
           this.setState({ code }, () => this.navigateTo('Profile'));
           break;
 
+        case 6000:
         case 4004:
-          this.setState({
-            modalVisible: true,
-            errorCode: code,
-          });
-          break;
-
         case 4003:
-          this.setState({
-            modalVisible: true,
-            errorCode: code,
-          });
-          break;
-
         case 4010:
-          this.setState({
-            // noAttempts: true,
-            modalVisible: true,
-            errorCode: code,
-          });
-          break;
-
         case 4001:
           this.setState({
             modalVisible: true,
             errorCode: code,
           });
           break;
-
         case 4009:
+        case 4008:
           this.setState({
             noAttempts: true,
             // modalVisible: true,
@@ -184,7 +157,6 @@ export class CodeInput extends Component {
 
   handleNumberPress = (number) => {
     const c = this.state.code + number;
-    console.log(c.length);
     if (c.length < 7) {
       this.setState({ code: c });
     } else {
@@ -203,12 +175,39 @@ export class CodeInput extends Component {
   };
 
   handleCodeConfirm = () => {
+    const params = this.props.navigation.state.params;
+    if (this.props.user.account.payload.payload.account_information) {
+      account = this.props.user.account.payload.payload.account_information;
+    } else {
+      account = this.props.user.account.payload.payload;
+    }
     this.props.phoneNumberValidate({
-      account_id: this.props.user.account.payload.payload.account_information.account_id,
-      phone_number: this.props.user.phoneNumber,
+      account_id: account.account_id,
+      phone_number: params.phoneNumber,
       validation_code: this.state.code.toString(),
     });
   };
+
+  handleDismissModal = () => {
+    this.setState({ modalVisible: false, errorCode: null });
+  };
+
+  handleRequestSms = () => {
+    let account = null;
+    const params = this.props.navigation.state.params;
+    if (this.props.user.account.payload.payload.account_information) {
+      account = this.props.user.account.payload.payload.account_information;
+    } else {
+      account = this.props.user.account.payload.payload;
+    }
+    this.props.smsCodeRepeat({
+      account_id: account.account_id,
+      phone_number: params.phoneNumber,
+      imei: IMEI.getImei().toString(),
+    });
+  };
+
+  // Animation
 
   animatePasswordError = () => {
     Animated.sequence([
@@ -235,29 +234,16 @@ export class CodeInput extends Component {
     ]).start(() => { this.setState({ error: null }); });
   };
 
-  handleDismissModal = () => {
-    this.setState({ modalVisible: false, errorCode: null });
-  };
-
-  handleRequestSms = () => {
-    this.props.smsCodeRepeat({
-      account_id: this.props.user.account.payload.payload.account_information.account_id,
-      phone_number: this.props.user.phoneNumber,
-      imei: IMEI.getImei().toString(),
-    });
-    // set cooldown
-  };
-
   renderInput = () => (
     VMasker.toPattern(this.state.code, { pattern: '999999', placeholder: '0' }).split('').map((o, i) => {
       if (i === 2) {
         return [
-          <View style={[styles.numberContainer, this.state.error ? styles.errorContainer : null]}>
+          <View key={i} style={[styles.numberContainer, this.state.error ? styles.errorContainer : null]}>
             <Text style={[styles.codeInput, this.state.error ? styles.errorText : null]}>
               {o}
             </Text>
           </View>,
-          <View style={[styles.numberContainer, this.state.error ? styles.errorContainer : null]}>
+          <View key={i + 'dash'} style={[styles.numberContainer, this.state.error ? styles.errorContainer : null]}>
             <Text style={[styles.codeInput, this.state.error ? styles.errorText : null]}>
               {'-'}
             </Text>
@@ -265,7 +251,7 @@ export class CodeInput extends Component {
         ];
       }
       return (
-        <View style={[styles.numberContainer, this.state.error ? styles.errorContainer : null]}>
+        <View key={i} style={[styles.numberContainer, this.state.error ? styles.errorContainer : null]}>
           <Text style={[styles.codeInput, this.state.error ? styles.errorText : null]}>
             {o}
           </Text>
@@ -290,7 +276,7 @@ export class CodeInput extends Component {
         <View style={styles.buttonsContainer}>
           <RequestSmsButton
             onPress={this.handleRequestSms}
-            disabled={this.state.cooldownTime > 0 || this.state.noAttempts}
+            disabled={this.state.noAttempts}
             cooldownTime={this.state.cooldownTime}
           />
           <ConfirmButton

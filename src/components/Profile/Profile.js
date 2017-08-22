@@ -177,7 +177,7 @@ export class Profile extends Component {
   }
 
   getUserInfo() {
-    HumaniqProfileApiLib.getAccountProfile(this.props.id)
+    /*HumaniqProfileApiLib.getAccountProfile(this.props.id)
         .then((response) => {
           if (this.activity) {
             if (response.code === 401) {
@@ -189,7 +189,7 @@ export class Profile extends Component {
         })
         .catch((err) => {
           console.log('get user info error: ', err);
-        });
+        });*/
   }
 
   navigateTo = (screen, params) => {
