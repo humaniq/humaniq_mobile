@@ -94,7 +94,7 @@ export class Profile extends Component {
   offset = 0
   limit = 10
   activity = true
-  divideBy = 100000000
+  divideBy = 100000000; // divide and multiply each transaction
 
   convertToMap = (array) => {
     const categoryMap = {};
@@ -181,7 +181,7 @@ export class Profile extends Component {
         .then((response) => {
           if (this.activity) {
             if (response.code === 401) {
-              this.navigateTo('Tutorial');
+              this.navigateTo('Accounts');
             } else {
               this.props.setProfile(response);
             }
@@ -206,7 +206,7 @@ export class Profile extends Component {
         .then((addressState) => {
           if (this.activity) {
             if (addressState.code === 401) {
-              this.navigateTo('Tutorial');
+              this.navigateTo('Accounts');
             } else {
               const { balance } = this.state;
               if (addressState) {
@@ -650,7 +650,7 @@ export class Profile extends Component {
     HumaniqProfileApiLib.createTransaction(this.props.id, toUserId, toUserAddress, (newTransaction.amount * 100000000))
         .then((resp) => {
           if (resp.code === 401) {
-            this.navigateTo('Tutorial');
+            this.navigateTo('Accounts');
           } else {
             // save transaction id in array
             console.log('create transaction::', resp);
@@ -846,7 +846,7 @@ export default connect(
     state => ({
       user: state.user,
       profile: state.user.profile || {},
-      id: state.user.account.payload.payload.account_id || state.accounts.primaryAccount.accountId,
+      id: state.accounts.primaryAccount.accountId,
       acc: state.accounts.primaryAccount,
       newTransaction: state.newtransaction,
       contacts: state.contacts,

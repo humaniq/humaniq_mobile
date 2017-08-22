@@ -217,7 +217,7 @@ export class ProfileEdit extends Component {
           HumaniqProfileApiLib.uploadProfileAvatar(this.props.profile.account_id, data)
               .then((resp) => {
                 if (resp.code === 401) {
-                  this.navigateTo('Tutorial');
+                  this.navigateTo('Accounts');
                 } else {
                   if (resp.code === 5004) {
                     this.setState({ count: this.state.count += 1 });
@@ -264,7 +264,7 @@ export class ProfileEdit extends Component {
     )
         .then((resp) => {
           if (resp.code === 401) {
-            this.navigateTo('Tutorial');
+            this.navigateTo('Accounts');
           } else {
             this.setState({ count: this.state.count += 1 });
             const { profile } = this.props;
@@ -272,11 +272,11 @@ export class ProfileEdit extends Component {
             profile.person.last_name = resp.payload.person.last_name;
             this.props.setProfile({ ...profile });
 
-            addPrimaryAccount({
-              ...accounts.primaryAccount,
-              person: profile.person,
-              phone_number: profile.phone_number,
-            });
+            //addPrimaryAccount({
+            //  ...accounts.primaryAccount,
+            //  person: profile.person,
+            //  phone_number: profile.phone_number,
+            //});
 
             this.setState({ fieldChanged: false });
             ToastAndroid.show('Success', ToastAndroid.LONG);
