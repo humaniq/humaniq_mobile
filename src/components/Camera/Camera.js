@@ -6,6 +6,7 @@ import {
   Image,
   Animated,
   StatusBar,
+  Dimensions,
 } from 'react-native';
 import PropTypes from 'prop-types';
 import Camera from 'react-native-camera';
@@ -235,7 +236,7 @@ export class Cam extends Component {
     if (!this.state.path && !this.state.capturing) {
       this.setState({ capturing: true });
       console.log('Camera::handleImageCapture BEGIN!!!');
-      this.camera.capture()
+      this.camera.capture({ jpegQuality: 50 })
         .then((data) => {
           console.log('Camera::handleImageCapture DONE');
           this.setState({ capturing: false, path: data.path });
@@ -358,16 +359,15 @@ export class Cam extends Component {
         }}
         style={styles.camera}
         aspect={Camera.constants.Aspect.fill}
-        captureQuality={Camera.constants.CaptureQuality.low}
+        captureQuality={Camera.constants.CaptureQuality.preview}
         type={camtype}
-        captureTarget={Camera.constants.CaptureTarget.disk}
         onBarCodeRead={onBarCode}
       />
     );
   }
 
 
-  renderImage = () => (<Image source={{ uri: this.state.path }} style={styles.previewImage} />);
+  renderImage = () => (<Image source={{ uri: this.state.path }} style={styles.camera} />);
 
   getEmoji(emoji) {
     switch (emoji) {
@@ -518,8 +518,10 @@ const styles = CustomStyleSheet({
     backgroundColor: 'white',
   },
   camera: {
-    height: 640,
-    width: 360,
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+    height: Dimensions.get('window').height,
+    width: Dimensions.get('window').width,
   },
   cameraImageContainer: {
     alignItems: 'center',
