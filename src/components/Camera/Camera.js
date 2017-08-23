@@ -360,6 +360,7 @@ export class Cam extends Component {
         style={styles.camera}
         aspect={Camera.constants.Aspect.fill}
         captureQuality={Camera.constants.CaptureQuality.preview}
+        captureTarget={Camera.constants.CaptureTarget.temp}
         type={camtype}
         onBarCodeRead={onBarCode}
       />

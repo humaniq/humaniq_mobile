@@ -152,8 +152,8 @@ export class CameraEdit extends Component {
         style={styles.camera}
         aspect={Camera.constants.Aspect.fill}
         captureQuality={Camera.constants.CaptureQuality.preview}
+        captureTarget={Camera.constants.CaptureTarget.temp}
         type={Camera.constants.Type.front}
-        // captureTarget={Camera.constants.CaptureTarget.memory}
       />
     );
   }

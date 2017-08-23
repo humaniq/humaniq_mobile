@@ -62,8 +62,7 @@ render() {
   return (
     <View style={styles.container}>
       <StatusBar
-          translucent
-          backgroundColor='transparent'
+          backgroundColor="#3aa3e3"
       />
       <Image style={styles.illustration} source={source} />
       <View style={styles.buttonsContainer}>
