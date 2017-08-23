@@ -152,7 +152,7 @@ describe('<Login />', () => {
     expect(wrapper.length).toBe(1);
   });
     //
-  it('Password component children count should be equal to 3', () => {
+  it('Password component children count should be equal to 4', () => {
     const wrapper = shallow(
       <Password
         signup={() => {
@@ -166,7 +166,7 @@ describe('<Login />', () => {
         navigation={navigation}
       />,
         );
-    expect(wrapper.find('View').at(0).children().length).toEqual(3);
+    expect(wrapper.find('View').at(0).children().length).toEqual(4);
   });
     //
   it('should render correctly Keyboard', () => {
@@ -358,7 +358,7 @@ describe('<Login />', () => {
         navigation={navigation}
       />,
         );
-    expect(wrapper.find('View').first().children().length).toBe(3);
+    expect(wrapper.find('View').first().children().length).toBe(4);
   });
 
     /** *
