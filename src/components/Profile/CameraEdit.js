@@ -94,6 +94,7 @@ export class CameraEdit extends Component {
   };
 
   handleImageCapture = () => {
+    console.log('handleImageCapture::');
     if (!this.state.path && !this.state.capturing) {
       this.setState({ capturing: true });
       this.camera.capture({ jpegQuality: 60 })
@@ -136,6 +137,7 @@ export class CameraEdit extends Component {
   }
 
   handleImageUpload = (path) => {
+    console.log('handleImageUpload::');
     RNFetchBlob.fs.readFile(path, 'base64')
       .then((base64) => {
         this.checkIsRegistered(base64);
@@ -176,7 +178,7 @@ export class CameraEdit extends Component {
   render() {
     return (
       <View style={styles.container}>
-        <StatusBar hidden/>
+        <StatusBar hidden />
         <Modal
           onPress={this.handleDismissModal}
           code={this.state.errorCode}
@@ -237,12 +239,13 @@ export class CameraEdit extends Component {
   }
 
   createValidation(resp) {
+    console.log('create Validation::');
     const { path } = this.state;
     console.warn(path);
     // returns emotions
     HumaniqPhotoValidation.createValidation(resp.facial_image_id)
       .then((resp2) => {
-        console.warn(JSON.stringify(resp2));
+        console.log('create Validation Success::', resp2);
         this.state.progress.stopAnimation();
         this.state.progress.setValue(0);
         this.setState({ animation: doneAnimation });
@@ -256,14 +259,14 @@ export class CameraEdit extends Component {
           });
           this.handleImageDelete();
           // After state is updated, need to animate emoji there
-          setTimeout(() => { this.replayEmoji() }, 1000)
+          setTimeout(() => { this.replayEmoji(); }, 1000);
         });
       })
       .catch((err) => {
+        console.log('create Validation Error::', err);
         this.setState({ animation: doneAnimation });
         this.state.progress.stopAnimation();
         this.state.progress.setValue(0);
-        console.warn(JSON.stringify(err));
       });
   }
 
@@ -280,8 +283,8 @@ export class CameraEdit extends Component {
             this.handleCameraClose();
           });
         } else {
-          console.warn(JSON.stringify(response))
-          this.setState({error: true, errorCode: response.code})
+          console.warn(JSON.stringify(response));
+          this.setState({ error: true, errorCode: response.code });
           this.handleImageDelete();
           ToastAndroid.show('Try again', ToastAndroid.LONG);
         }
@@ -292,20 +295,27 @@ export class CameraEdit extends Component {
   }
 
   checkIsRegistered(base64) {
+    console.log('checkIsRegistered::');
     if (this.state.count === 1) {
       HumaniqPhotoValidation.isRegistered(base64)
         .then((resp) => {
-          console.warn(JSON.stringify(resp));
-          this.setState({ facialImageId: resp.facial_image_id });
-          this.createValidation(resp);
+          console.log('isRegistered Success::', resp);
+          if (resp && resp.code === 400) {
+            // error
+            this.setState({ error: true, errorCode: 3001 });
+            this.handleImageDelete();
+          } else {
+            this.setState({ facialImageId: resp.facial_image_id });
+            this.createValidation(resp);
+          }
         })
         .catch((err) => {
-          console.warn(JSON.stringify(err));
+          console.log('isRegistered Error::', err);
           this.state.progress.stopAnimation();
           this.state.progress.setValue(0);
           this.handleImageDelete();
           ToastAndroid.show('Try again', ToastAndroid.LONG);
-          this.setState({error: true, errorCode: 3001})
+          this.setState({ error: true, errorCode: 3001 });
         });
     } else if (this.state.count === 2) {
       this.validate(base64);
