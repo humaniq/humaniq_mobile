@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import {
-    View,
-    Text,
-    Animated,
+  View,
+  Text,
+  Animated,
 } from 'react-native';
 
 import PropTypes from 'prop-types';
@@ -79,9 +79,17 @@ export class CodeInput extends Component {
       if (body.match(hmqRegEx)) {
         // request server;
         const smsCode = body.replace(/\D/g, '');
+
+        let account = null;
+        const params = this.props.navigation.state.params;
+        if (this.props.user.account.payload.payload.account_information) {
+          account = this.props.user.account.payload.payload.account_information;
+        } else {
+          account = this.props.user.account.payload.payload;
+        }
         this.props.phoneNumberValidate({
-          account_id: this.props.user.account.payload.payload.account_information.account_id,
-          phone_number: this.props.user.phoneNumber,
+          account_id: account.account_id,
+          phone_number: params.phoneNumber,
           validation_code: smsCode.toString(),
         });
         this.setState({ password: smsCode });
@@ -175,6 +183,7 @@ export class CodeInput extends Component {
   };
 
   handleCodeConfirm = () => {
+    let account = null;
     const params = this.props.navigation.state.params;
     if (this.props.user.account.payload.payload.account_information) {
       account = this.props.user.account.payload.payload.account_information;
@@ -270,7 +279,7 @@ export class CodeInput extends Component {
         />
         <View style={styles.header}>
           <Animated.View style={[styles.codeInputContainer, { marginLeft: this.state.codeError }]}>
-            {this.renderInput() }
+            {this.renderInput()}
           </Animated.View>
         </View>
         <View style={styles.buttonsContainer}>

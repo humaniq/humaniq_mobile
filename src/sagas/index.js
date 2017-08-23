@@ -166,15 +166,17 @@ function* signup({ facial_image_id, password, device_imei }) {
   };
   let response = yield call(fetchSignup, body, errorCodes);
   if (response && response.code == 1001) {
-    const account_information = response.account.payload.payload.account_information;
+    const account_information = response.payload.account_information;
     /* Save creds to the store */
-    yield saveCredentials(
-      account_information.token,
-      account_information.account_id,
-      facial_image_id,
-      password,
-      IMEI.getImei()
-    );
+    console.log(response.payload.token);
+    const credentials = {
+      token: response.payload.token,
+      account_id: account_information.account_id,
+      facial_image_id: facial_image_id,
+      password: password,
+      device_imei: IMEI.getImei(),
+    }
+    yield HumaniqTokenApiLib.saveCredentials(credentials);
     let photo = yield select(state => { return state.user.photo });
     yield put(actions.addPrimaryAccount(
       {
@@ -206,16 +208,27 @@ function* saveCredentials({ token, account_id, facial_image_id, password, device
 
 /* Initiate phone number validation process */
 
-function* phoneNumberCreate({ phone_number, account_id }) {
+function* phoneNumberCreate({ account_id, phone_number }) {
   const errorCodes = [4011, 6000];
   const code = phone_number.toString().slice(0, 1);
   const number = phone_number.toString().slice(1);
   const body = {
     account_id,
-    phone_number: phone_number,
+    phone_number: {
+      country_code: code,
+      phone_number: number,
+    },
   };
-  yield call(fetchPhoneNumberCreate, body, errorCodes);
-  yield put(actions.savePhone(phone_number));
+  console.log(body);
+  let response = yield call(fetchPhoneNumberCreate, body, errorCodes);
+  if (response.code == 4005) {
+    yield put(actions.savePhone({
+      phone_number: {
+        country_code: code,
+        phone_number: number,
+      },
+    }));
+  }
 }
 
 /* Finish phone number validation process*/

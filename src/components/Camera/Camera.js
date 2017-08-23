@@ -30,6 +30,12 @@ const repeat = require('../../assets/icons/repeat.png');
 
 // Emoji assetss
 const emojiHappy = require('../../assets/icons/emojiHappy.png');
+const disgustEmoji = require('../../assets/icons/disgustEmoji.png');
+const neutralEmoji = require('../../assets/icons/neutralEmoji.png');
+const sadEmoji = require('../../assets/icons/sadEmoji.png');
+const angryEmoji = require('../../assets/icons/angryEmoji.png');
+const fearEmoji = require('../../assets/icons/fearEmoji.png');
+const surpriseEmoji = require('../../assets/icons/surpriseEmoji.png');
 
 // Button animations
 const emergeAnimation = require('../../assets/animations/emerge.json');
@@ -84,6 +90,7 @@ export class Cam extends Component {
       errorCode: null,
       progress: new Animated.Value(0),
       animation: pressAnimation,
+      emoji: emojiHappy,
       emojiAnimation: new Animated.Value(0),
       photoGoal: 'isRegistered',
       requiredEmotions: [],
@@ -175,9 +182,10 @@ export class Cam extends Component {
             photoGoal: 'validateFacialRecognitionValidation',
             requiredEmotions: nextProps.user.faceEmotionCreate.payload.payload.required_emotions,
             isButtonVisible: false,
+            emoji: this.getEmoji(nextProps.user.faceEmotionCreate.payload.payload.required_emotions[0])
           });
           // After state is updated, need to animate emoji there
-          this.replayEmoji();
+          setTimeout(() => { this.replayEmoji() }, 1000)
         });
       } else {
         this.setState({
@@ -360,6 +368,35 @@ export class Cam extends Component {
 
   renderImage = () => (<Image source={{ uri: this.state.path }} style={styles.previewImage} />);
 
+  getEmoji(emoji) {
+    switch (emoji) {
+      case 'happy':
+        return emojiHappy;
+        break;
+      case 'neutral':
+        return neutralEmoji;
+        break;
+      case 'surprise':
+        return surpriseEmoji;
+        break;
+      case 'fear':
+        return fearEmoji;
+        break;
+      case 'disgust':
+        return disgustEmoji;
+        break;
+      case 'angry':
+        return angryEmoji;
+        break;
+      case 'sad':
+        return sadEmoji;
+        break;
+      default:
+        return emojiHappy;
+        break;
+    }
+  }
+
   render() {
     const isFetching =
       this.props.user.validate.isFetching ||
@@ -386,15 +423,14 @@ export class Cam extends Component {
           <View style={styles.navbar}>
             <TouchableOpacity
               style={styles.closeBtn}
-              onPress={this.handleCameraClose}
-            >
+              onPress={this.handleCameraClose}>
               <Image source={close} />
             </TouchableOpacity>
           </View>
           {
             this.state.isButtonVisible ? <View /> :
               <Animated.Image
-                source={emojiHappy}
+                source={this.state.emoji}
                 style={[styles.emojiImage, {
                   transform: [{ scale: this.state.emojiAnimation }],
                   opacity: this.state.emojiAnimation,
