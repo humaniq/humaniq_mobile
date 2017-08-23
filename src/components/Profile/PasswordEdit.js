@@ -204,6 +204,9 @@ export class PasswordEdit extends Component {
       .then((resp) => {
         this.setState({ isFetching: false });
         this.props.setPassword(newPassword);
+        HumaniqTokenApiLib.savePassword(newPassword)
+          .then((res) => {})
+          .catch((err) => {})
         this.state.progress.stopAnimation();
         this.state.progress.setValue(0);
         ToastAndroid.show('Success', ToastAndroid.LONG);

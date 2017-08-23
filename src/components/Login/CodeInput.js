@@ -3,6 +3,7 @@ import {
   View,
   Text,
   Animated,
+  StatusBar,
 } from 'react-native';
 
 import PropTypes from 'prop-types';
@@ -272,6 +273,7 @@ export class CodeInput extends Component {
   render() {
     return (
       <View style={styles.container}>
+        <StatusBar backgroundColor="#439fe0" />
         <Modal
           onPress={this.handleDismissModal}
           visible={this.state.modalVisible}
