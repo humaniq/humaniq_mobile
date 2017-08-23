@@ -49,14 +49,17 @@ class Input extends React.Component {
   setAdress = () => {
     const { adress } = this.state;
     const { setTrAdress, navigation: { navigate } } = this.props;
-    setTrAdress(adress);
-    navigate('SelectAmount');
+    if (adress) {
+      setTrAdress(adress);
+      navigate('SelectAmount');
+    }
   }
 
   setPhoneNumber = () => {
     const { code, maskedPhone } = this.state;
     const { setTrPhone, navigation: { navigate } } = this.props;
     const filtered = maskedPhone.split('').filter(s => '0123456789'.indexOf(s) >= 0).join('');
+    console.warn(filtered)
     setTrPhone(code + filtered);
     navigate('SelectAmount');
   }
@@ -148,7 +151,7 @@ class Input extends React.Component {
     return (
       <View style={styles.container}>
         <StatusBar
-            backgroundColor={colors.orangeish}
+          backgroundColor={colors.orangeish}
         />
         {this.renderHeader()}
         {this.renderContent()}

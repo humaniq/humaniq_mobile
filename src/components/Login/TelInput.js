@@ -5,6 +5,7 @@ import {
   Text,
   TouchableOpacity,
   Animated,
+  StatusBar,
 } from 'react-native';
 
 import PropTypes from 'prop-types';
@@ -212,6 +213,7 @@ export class TelInput extends Component {
   render() {
     return (
       <View style={styles.container}>
+        <StatusBar backgroundColor="#439fe0" />
         <Animation
           style={styles.animation}
           source={spinner}
