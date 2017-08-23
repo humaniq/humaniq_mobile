@@ -55,6 +55,7 @@ export class Accounts extends Component {
               const name = acc.person
                     ? `${acc.person.first_name} ${acc.person.last_name}`
                     : '';
+
               const p_code = (acc.phone_number && acc.phone_number.country_code)
                     ? `+(${acc.phone_number.country_code})` : '';
               const p_num = (acc.phone_number && acc.phone_number.phone_number)
@@ -74,7 +75,7 @@ export class Accounts extends Component {
                             <Image style={styles.profilePhoto} source={{ uri: acc.avatar.url }} />
                           }
                       {
-                            name ?
+                            name.trim() ?
                               <View style={{ flexDirection: 'column' }}>
                                 <Text style={styles.nameRow}>{name}</Text>
                                 <Text style={styles.phoneRow}>{phone}</Text>
