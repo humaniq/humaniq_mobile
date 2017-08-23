@@ -32,7 +32,7 @@ function savePrimaryPhoneNumber(state, action) {
         ...state,
         primaryAccount: {
           ...state.primaryAccount,
-          phone: action.number,
+          ...action.number,
         },
       };
     default:
