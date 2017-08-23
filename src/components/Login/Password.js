@@ -297,7 +297,7 @@ export class Password extends Component {
     return (
       <View style={styles.container}>
         <StatusBar
-            backgroundColor="#439fe0"
+            backgroundColor="#3aa3e3"
         />
         <Modal
           onPress={this.handleDismissModal}
