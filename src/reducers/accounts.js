@@ -40,6 +40,36 @@ function savePrimaryPhoneNumber(state, action) {
   }
 }
 
+function saveAvatar(state, action) {
+  switch (action.type) {
+    case ActionTypes.SAVE_AVATAR:
+      return {
+        ...state,
+        primaryAccount: {
+          ...state.primaryAccount,
+          avatar: action.avatar,
+        },
+      };
+    default:
+      return state;
+  }
+}
+
+function saveNames(state, action) {
+  switch (action.type) {
+    case ActionTypes.SAVE_NAMES:
+      return {
+        ...state,
+        primaryAccount: {
+          ...state.primaryAccount,
+          person: action.names,
+        },
+      };
+    default:
+      return state;
+  }
+}
+
 const defaultState = {
   primaryAccount: null,
   secondaryAccounts: [],
@@ -60,6 +90,10 @@ export function accounts(state = defaultState, action) {
       };
     case ActionTypes.SAVE_PHONE:
       return savePrimaryPhoneNumber(state, action);
+    case ActionTypes.SAVE_AVATAR:
+      return saveAvatar(state, action);
+    case ActionTypes.SAVE_NAMES:
+      return saveNames(state, action);
     default:
       return state;
   }

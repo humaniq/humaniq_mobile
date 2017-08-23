@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import {
   View,
   Image,
+  StatusBar,
 } from 'react-native';
 
 import PropTypes from 'prop-types';
@@ -38,6 +39,7 @@ class Loading extends Component {
   render() {
     return (
       <View style={styles.container}>
+        <StatusBar hidden/>
         <Image source={logo_face} />
         <Image style={styles.logo} source={logo_text} />
       </View>
