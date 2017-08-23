@@ -1,7 +1,7 @@
 /* eslint-disable import/no-unresolved */
 /* eslint-disable react/forbid-prop-types */
 import React from 'react';
-import { View, TouchableOpacity, Image, Text } from 'react-native';
+import { View, TouchableOpacity, Image, Text, Alert } from 'react-native';
 import VMasker from 'vanilla-masker';
 import PropTypes from 'prop-types';
 
@@ -207,6 +207,13 @@ class SelectAmount extends React.Component {
           }
         } else {
           // show modal or alert message
+          Alert.alert(null, "Not found", [
+            {
+              text: 'Ok',
+              onPress: () => {
+              },
+            },
+          ]);
         }
       })
       .catch(err => console.warn(JSON.stringify(err)));

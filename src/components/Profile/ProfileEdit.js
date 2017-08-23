@@ -233,7 +233,9 @@ export class ProfileEdit extends Component {
               .catch((err) => {
               });
         })
-        .catch((err) => { console.log(err.message); });
+        .catch((err) => {
+          console.log(err.message);
+    });
   };
 
   onPhotoClick = () => {
