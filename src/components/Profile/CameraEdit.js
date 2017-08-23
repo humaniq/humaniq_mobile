@@ -176,7 +176,7 @@ export class CameraEdit extends Component {
   render() {
     return (
       <View style={styles.container}>
-        <StatusBar hidden/>
+        <StatusBar hidden />
         <Modal
           onPress={this.handleDismissModal}
           code={this.state.errorCode}
@@ -256,7 +256,7 @@ export class CameraEdit extends Component {
           });
           this.handleImageDelete();
           // After state is updated, need to animate emoji there
-          setTimeout(() => { this.replayEmoji() }, 1000)
+          setTimeout(() => { this.replayEmoji(); }, 1000);
         });
       })
       .catch((err) => {
@@ -280,8 +280,8 @@ export class CameraEdit extends Component {
             this.handleCameraClose();
           });
         } else {
-          console.warn(JSON.stringify(response))
-          this.setState({error: true, errorCode: response.code})
+          console.warn(JSON.stringify(response));
+          this.setState({ error: true, errorCode: response.code });
           this.handleImageDelete();
           ToastAndroid.show('Try again', ToastAndroid.LONG);
         }
@@ -295,9 +295,14 @@ export class CameraEdit extends Component {
     if (this.state.count === 1) {
       HumaniqPhotoValidation.isRegistered(base64)
         .then((resp) => {
-          console.warn(JSON.stringify(resp));
-          this.setState({ facialImageId: resp.facial_image_id });
-          this.createValidation(resp);
+          if (resp && resp.code === 400) {
+            // error
+            this.setState({ error: true, errorCode: 3001 });
+            this.handleImageDelete();
+          } else {
+            this.setState({ facialImageId: resp.facial_image_id });
+            this.createValidation(resp);
+          }
         })
         .catch((err) => {
           console.warn(JSON.stringify(err));
@@ -305,7 +310,7 @@ export class CameraEdit extends Component {
           this.state.progress.setValue(0);
           this.handleImageDelete();
           ToastAndroid.show('Try again', ToastAndroid.LONG);
-          this.setState({error: true, errorCode: 3001})
+          this.setState({ error: true, errorCode: 3001 });
         });
     } else if (this.state.count === 2) {
       this.validate(base64);
