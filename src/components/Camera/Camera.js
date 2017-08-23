@@ -236,7 +236,7 @@ export class Cam extends Component {
     if (!this.state.path && !this.state.capturing) {
       this.setState({ capturing: true });
       console.log('Camera::handleImageCapture BEGIN!!!');
-      this.camera.capture({ jpegQuality: 50 })
+      this.camera.capture({ jpegQuality: 60 })
         .then((data) => {
           console.log('Camera::handleImageCapture DONE');
           this.setState({ capturing: false, path: data.path });

@@ -8,6 +8,7 @@ import {
   Animated,
   ToastAndroid,
   StatusBar,
+  Dimensions,
 } from 'react-native';
 import PropTypes from 'prop-types';
 import Camera from 'react-native-camera';
@@ -22,10 +23,17 @@ import * as actions from '../../actions/index';
 import CustomStyleSheet from '../../utils/customStylesheet';
 import Modal from '../Shared/Components/Modal';
 
-const emojiHappy = require('../../assets/icons/emojiHappy.png');
 const close = require('../../assets/icons/close_dark.png');
 const repeat = require('../../assets/icons/repeat.png');
 const confirm = require('../../assets/icons/ic_confirm_dark.png');
+
+const emojiHappy = require('../../assets/icons/emojiHappy.png');
+const disgustEmoji = require('../../assets/icons/disgustEmoji.png');
+const neutralEmoji = require('../../assets/icons/neutralEmoji.png');
+const sadEmoji = require('../../assets/icons/sadEmoji.png');
+const angryEmoji = require('../../assets/icons/angryEmoji.png');
+const fearEmoji = require('../../assets/icons/fearEmoji.png');
+const surpriseEmoji = require('../../assets/icons/surpriseEmoji.png');
 
 const whiteMask = require('../../assets/icons/white_mask.png');
 const emergeAnimation = require('../../assets/animations/emerge.json');
@@ -49,6 +57,7 @@ export class CameraEdit extends Component {
       animation: pressAnimation,
       requiredEmotions: [],
       isButtonVisible: true,
+      emoji: emojiHappy,
       emojiAnimation: new Animated.Value(0),
       capturing: false,
       lastPath: '',
@@ -87,7 +96,7 @@ export class CameraEdit extends Component {
   handleImageCapture = () => {
     if (!this.state.path && !this.state.capturing) {
       this.setState({ capturing: true });
-      this.camera.capture()
+      this.camera.capture({ jpegQuality: 60 })
           .then((data) => {
             this.setState({ capturing: false, path: data.path });
             this.handleImageUpload(data.path);
@@ -140,13 +149,10 @@ export class CameraEdit extends Component {
         ref={(cam) => {
           this.camera = cam;
         }}
-        mirrorImage={false}
-        playSoundOnCapture={false}
         style={styles.camera}
         aspect={Camera.constants.Aspect.fill}
-        captureQuality={Camera.constants.CaptureQuality.low}
+        captureQuality={Camera.constants.CaptureQuality.preview}
         type={Camera.constants.Type.front}
-        captureTarget={Camera.constants.CaptureTarget.disk}
         // captureTarget={Camera.constants.CaptureTarget.memory}
       />
     );
@@ -157,7 +163,7 @@ export class CameraEdit extends Component {
       <Image
         // resizeMode={'center'}
         source={{ uri: this.state.path }}
-        style={styles.previewImage}
+        style={styles.camera}
       />
     );
   }
@@ -194,7 +200,7 @@ export class CameraEdit extends Component {
           {
               this.state.isButtonVisible ? <View /> :
               <Animated.Image
-                source={emojiHappy}
+                source={this.state.emoji}
                 style={[styles.emojiImage, {
                   transform: [{ scale: this.state.emojiAnimation }],
                   opacity: this.state.emojiAnimation,
@@ -245,9 +251,12 @@ export class CameraEdit extends Component {
             lastPath: path,
             isButtonVisible: false,
             count: 2,
-            facialImageValidation: resp2.facial_image_validation_id });
+            facialImageValidation: resp2.facial_image_validation_id,
+            emoji: this.getEmoji(resp2.required_emotions[0].emotion),
+          });
           this.handleImageDelete();
-          this.replayEmoji();
+          // After state is updated, need to animate emoji there
+          setTimeout(() => { this.replayEmoji() }, 1000)
         });
       })
       .catch((err) => {
@@ -302,6 +311,35 @@ export class CameraEdit extends Component {
       this.validate(base64);
     }
   }
+
+  getEmoji(emoji) {
+    switch (emoji) {
+      case 'happy':
+        return emojiHappy;
+        break;
+      case 'neutral':
+        return neutralEmoji;
+        break;
+      case 'surprise':
+        return surpriseEmoji;
+        break;
+      case 'fear':
+        return fearEmoji;
+        break;
+      case 'disgust':
+        return disgustEmoji;
+        break;
+      case 'angry':
+        return angryEmoji;
+        break;
+      case 'sad':
+        return sadEmoji;
+        break;
+      default:
+        return emojiHappy;
+        break;
+    }
+  }
 }
 
 export default connect(
@@ -351,8 +389,10 @@ const styles = CustomStyleSheet({
     backgroundColor: 'transparent',
   },
   camera: {
-    height: 640,
-    width: 360,
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+    height: Dimensions.get('window').height,
+    width: Dimensions.get('window').width,
   },
   cameraImageContainer: {
     flex: 1,
