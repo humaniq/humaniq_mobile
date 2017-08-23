@@ -78,7 +78,7 @@ export const fetchSmsCodeRepeat = fetchEntity.bind(
 );*/
 
 
-// Сallers 
+// Сallers
 
 /* Validate facial image */
 
@@ -138,7 +138,7 @@ function* login({ facial_image, password, device_imei }) {
 
       /* Save creds to the store */
       yield HumaniqTokenApiLib.saveCredentials(credentials);
-      // Native Call to get user profile data 
+      // Native Call to get user profile data
       response = yield HumaniqProfileApiLib.getAccountProfile(response.payload.account_id);
       yield put(actions.addPrimaryAccount(response));
       yield put(actions.getProfile.success(response));
@@ -181,8 +181,9 @@ function* signup({ facial_image_id, password, device_imei }) {
     yield put(actions.addPrimaryAccount(
       {
         avatar: {
-          url: photo
-        }
+          url: photo,
+        },
+        account_id: account_information.account_id,
       }
     ));
     yield put(actions.signup.success());
