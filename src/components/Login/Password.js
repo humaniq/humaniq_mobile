@@ -76,8 +76,7 @@ export class Password extends Component {
 
       switch (code) {
         case 1001:
-          console.log('registeredAccount ::', registeredAcc);
-          this.navigateTo('TelInput');
+          this.navigateTo('Tutorial', { nextScene: 'TelInput' });
           break;
 
         case 2001:

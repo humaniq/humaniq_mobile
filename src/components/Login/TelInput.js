@@ -128,14 +128,16 @@ export class TelInput extends Component {
 
   handlePhoneConfirm = () => {
     const phone_number = this.state.phone;
-
+    let account = null;
+    if (this.props.user.account.payload.payload.account_information) {
+      account = this.props.user.account.payload.payload.account_information;
+    } else {
+      account = this.props.user.account.payload.payload;
+    }
     if (this.phonenumber(this.state.phone, this.state.countryCode)) {
       this.props.phoneNumberCreate({
-        account_id: this.props.user.account.payload.payload.account_id,
-        phone_number: {
-          country_code: this.state.code,
-          phone_number: this.state.phone_number,
-        }
+        account_id: account.account_id,
+        phone_number: VMasker.toNumber(`${this.state.code}${phone_number}`),
       });
     } else {
       this.setState({ error: true });

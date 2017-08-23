@@ -32,8 +32,8 @@ class Loading extends Component {
   }
 
   onTimeoutFinish = () => {
-    const savedDataExists = this.props.accounts.primaryAccount != null;
-    this.props.navigation.navigate(savedDataExists ? 'Accounts' : 'Tutorial');
+    console.log(this.props.accounts.primaryAccount);
+    this.props.navigation.navigate(this.props.accounts.primaryAccount != null ? 'Accounts' : 'Tutorial');
   };
 
   render() {
