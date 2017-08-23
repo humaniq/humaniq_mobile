@@ -74,7 +74,7 @@ export class Accounts extends Component {
                             <Image style={styles.profilePhoto} source={{ uri: acc.avatar.url }} />
                           }
                       {
-                            name ?
+                            name.trim() ?
                               <View style={{ flexDirection: 'column' }}>
                                 <Text style={styles.nameRow}>{name}</Text>
                                 <Text style={styles.phoneRow}>{phone}</Text>
