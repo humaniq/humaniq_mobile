@@ -294,7 +294,6 @@ const styles = CustomStyleSheet({
     backgroundColor: '$cBrand_dark',
     height: 56,
     width: '100%',
-    position: 'absolute',
     justifyContent: 'space-between',
   },
   headerLeftContainer: {
@@ -327,7 +326,6 @@ const styles = CustomStyleSheet({
     flexDirection: 'row',
   },
   row: {
-    marginTop: 56,
     flex: 1,
     flexDirection: 'row',
     backgroundColor: 'white',

@@ -117,7 +117,7 @@ export class Profile extends Component {
   };
 
   componentWillMount() {
-    console.warn(JSON.stringify(this.props.primaryAccount))
+    console.log('primaryAccount', this)
     DeviceEventEmitter.addListener('EVENT_TRANSACTION_ERROR', (event) => {
       console.log('ошибка');
       console.log(event);
@@ -177,8 +177,10 @@ export class Profile extends Component {
   }
 
   getUserInfo() {
+    console.log('getUserInfo')
     HumaniqProfileApiLib.getAccountProfile(this.props.primaryAccount.account_id)
         .then((response) => {
+          console.log('getUserInfo Success', response)
           if (this.activity) {
             if (response.code === 401) {
               this.navigateTo('Accounts');
@@ -205,9 +207,11 @@ export class Profile extends Component {
   };
 
   getBalance() {
+    console.log('get Balance');
     // get Balance
     HumaniqProfileApiLib.getBalance(this.props.primaryAccount.account_id)
         .then((addressState) => {
+          console.log('get Balance Success', addressState);
           if (this.activity) {
             if (addressState.code === 401) {
               this.navigateTo('Accounts');
@@ -231,7 +235,7 @@ export class Profile extends Component {
         })
         .catch((err) => {
           // handle error
-          console.log(err);
+          console.log('get Balance error', err);
         });
   }
 
@@ -243,6 +247,7 @@ export class Profile extends Component {
   }
 
   getTransactions(shouldRefresh, initial) {
+    console.log('get Transactions')
     // get Transactions
     HumaniqProfileApiLib.getTransactions(
         this.props.primaryAccount.account_id,
@@ -250,6 +255,7 @@ export class Profile extends Component {
         this.limit,
     )
         .then((array) => {
+          console.log('get Transactions success', array)
           let { transactions } = this.state;
           if (this.activity) {
             if (shouldRefresh) {
@@ -268,7 +274,7 @@ export class Profile extends Component {
         })
         .catch((err) => {
           // handle error
-          console.log(err);
+          console.log('get Transactions error', err);
           this.setState({ refreshing: false, isFetching: false });
         });
   }
@@ -678,7 +684,9 @@ export class Profile extends Component {
   }
 
   getExchangeValue() {
+    console.log('get Exchange value');
     HumaniqProfileApiLib.getExchangeUsd('1').then((data) => {
+      console.log('get Exchange success', data);
       if (this.activity) {
         const { USD = 0 } = data;
         this.setState({
