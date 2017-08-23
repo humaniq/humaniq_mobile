@@ -33,17 +33,17 @@ function* fetchEntity(entity, apiFn, body, errorCodes) {
 export const fetchValidate = fetchEntity.bind(
   null,
   actions.validate,
-  api.validate
+  api.validate,
 );
 export const fetchLogin = fetchEntity.bind(
   null,
   actions.validatePassword,
-  api.login
+  api.login,
 );
 export const fetchSignup = fetchEntity.bind(
   null,
   actions.passwordCreate,
-  api.signup
+  api.signup,
 );
 export const fetchPhoneNumberCreate = fetchEntity.bind(
   null,
@@ -71,14 +71,14 @@ export const fetchSmsCodeRepeat = fetchEntity.bind(
   api.smsCodeRepeat,
 );
 
-/*export const fetchAccountProfile = fetchEntity.bind(
+/* export const fetchAccountProfile = fetchEntity.bind(
   null,
   actions.smsCodeRepeat,
   HumaniqProfileApiLib.getAccountProfile,
-);*/
+); */
 
 
-// Сallers 
+// Сallers
 
 /* Validate facial image */
 
@@ -111,7 +111,7 @@ function* login({ facial_image, password, device_imei }) {
   // If new fid recieved go on
   if (response && response.payload.facial_image_id) {
     const errorCodesLogin = [2002, 3003, 6000];
-    //Prepare body
+    // Prepare body
     const body = {
       facial_image_id: response.payload.facial_image_id,
       password,
@@ -125,20 +125,18 @@ function* login({ facial_image, password, device_imei }) {
     response = yield call(fetchLogin, body, errorCodesLogin);
     // Check if response correct (possibly need to remove)
     if (response && response.code == 2001 && response.payload && response.payload.account_id) {
-      const credentials = yield select(state => {
-        return {
-          token: state.user.account.payload.payload.token,
-          account_id: state.user.account.payload.payload.account_id,
-          facial_image_id: state.user.validate.payload.payload.facial_image_id,
-          password: password,
-          device_imei: IMEI.getImei(),
-        }
-      });
-      const photo = yield select(state => { return state.user.photo });
+      const credentials = yield select(state => ({
+        token: state.user.account.payload.payload.token,
+        account_id: state.user.account.payload.payload.account_id,
+        facial_image_id: state.user.validate.payload.payload.facial_image_id,
+        password,
+        device_imei: IMEI.getImei(),
+      }));
+      const photo = yield select(state => state.user.photo);
 
       /* Save creds to the store */
       yield HumaniqTokenApiLib.saveCredentials(credentials);
-      // Native Call to get user profile data 
+      // Native Call to get user profile data
       response = yield HumaniqProfileApiLib.getAccountProfile(response.payload.account_id);
       yield put(actions.addPrimaryAccount(response));
       yield put(actions.getProfile.success(response));
@@ -164,7 +162,7 @@ function* signup({ facial_image_id, password, device_imei }) {
       },
     },
   };
-  let response = yield call(fetchSignup, body, errorCodes);
+  const response = yield call(fetchSignup, body, errorCodes);
   if (response && response.code == 1001) {
     const account_information = response.payload.account_information;
     /* Save creds to the store */
@@ -172,18 +170,19 @@ function* signup({ facial_image_id, password, device_imei }) {
     const credentials = {
       token: response.payload.token,
       account_id: account_information.account_id,
-      facial_image_id: facial_image_id,
-      password: password,
+      facial_image_id,
+      password,
       device_imei: IMEI.getImei(),
-    }
+    };
     yield HumaniqTokenApiLib.saveCredentials(credentials);
-    let photo = yield select(state => { return state.user.photo });
+    const photo = yield select(state => state.user.photo);
     yield put(actions.addPrimaryAccount(
       {
         avatar: {
-          url: photo
-        }
-      }
+          url: photo,
+        },
+        account_id: account_information.account_id,
+      },
     ));
     yield put(actions.signup.success());
   } else {
@@ -195,11 +194,11 @@ function* signup({ facial_image_id, password, device_imei }) {
 
 function* saveCredentials({ token, account_id, facial_image_id, password, device_imei }) {
   const credentials = {
-    token: token,
-    account_id: account_id,
-    facial_image_id: facial_image_id,
-    password: password,
-    device_imei: device_imei,
+    token,
+    account_id,
+    facial_image_id,
+    password,
+    device_imei,
   };
   HumaniqTokenApiLib.saveCredentials(credentials)
     .then(res => console.log(res))
@@ -220,7 +219,7 @@ function* phoneNumberCreate({ account_id, phone_number }) {
     },
   };
   console.log(body);
-  let response = yield call(fetchPhoneNumberCreate, body, errorCodes);
+  const response = yield call(fetchPhoneNumberCreate, body, errorCodes);
   if (response.code == 4005) {
     yield put(actions.savePhone({
       phone_number: {
@@ -231,7 +230,7 @@ function* phoneNumberCreate({ account_id, phone_number }) {
   }
 }
 
-/* Finish phone number validation process*/
+/* Finish phone number validation process */
 
 function* phoneNumberValidate({ phone_number, validation_code, account_id }) {
   const errorCodes = [6000, 4010, 4004, 4003, 4001, 4009];
@@ -287,9 +286,9 @@ function* watchSignup() {
   yield takeLatest(actions.SIGNUP.REQUEST, signup);
 }
 
-/*function* watchSaveCredentials() {
+/* function* watchSaveCredentials() {
   yield takeLatest(actions.SAVE_CREDENTIALS, saveCredentials);
-}*/
+} */
 
 function* watchPhoneNumberCreate() {
   yield takeLatest(actions.PHONE_NUMBER_CREATE.REQUEST, phoneNumberCreate);
