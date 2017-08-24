@@ -51,7 +51,7 @@ export class Profile extends Component {
       navigate: PropTypes.func.isRequired,
       dispatch: PropTypes.func.isRequired,
     }),
-    profile: PropTypes.object.isRequired,
+    primaryAccount: PropTypes.object.isRequired,
     user: PropTypes.object.isRequired,
   };
   constructor(props) {
@@ -117,7 +117,7 @@ export class Profile extends Component {
   };
 
   componentWillMount() {
-    console.log('profile_id', this.props.id);
+    console.warn(JSON.stringify(this.props.primaryAccount))
     DeviceEventEmitter.addListener('EVENT_TRANSACTION_ERROR', (event) => {
       console.log('ошибка');
       console.log(event);
@@ -145,7 +145,7 @@ export class Profile extends Component {
     // add listener to listen transactions status changes
     DeviceEventEmitter.addListener('EVENT_TRANSACTION_CHANGED', (event) => {
       console.log('push::', event);
-      HumaniqProfileApiLib.getUserTransaction(this.props.id, event.hash)
+      HumaniqProfileApiLib.getUserTransaction(this.props.primaryAccount.account_id, event.hash)
           .then((resp) => {
             console.log('get transcation event::', event);
             this.getBalance();
@@ -177,14 +177,18 @@ export class Profile extends Component {
   }
 
   getUserInfo() {
-    HumaniqProfileApiLib.getAccountProfile(this.props.id)
+    HumaniqProfileApiLib.getAccountProfile(this.props.primaryAccount.account_id)
         .then((response) => {
           console.log('getUserInfo=>', response)
           if (this.activity) {
             if (response.code === 401) {
-              this.navigateTo('Tutorial');
+              this.navigateTo('Accounts');
             } else {
-              this.props.setProfile(response);
+              this.props.saveAvatar({ url: response.avatar.url });
+              this.props.saveNames({
+                first_name: response.person.first_name,
+                last_name: response.person.last_name,
+              });
             }
           }
         })
@@ -203,12 +207,12 @@ export class Profile extends Component {
 
   getBalance() {
     // get Balance
-    HumaniqProfileApiLib.getBalance(this.props.id)
+    HumaniqProfileApiLib.getBalance(this.props.primaryAccount.account_id)
         .then((addressState) => {
           console.log('getBalance=>', addressState)
           if (this.activity) {
             if (addressState.code === 401) {
-              this.navigateTo('Tutorial');
+              this.navigateTo('Accounts');
             } else {
               const { balance } = this.state;
               if (addressState) {
@@ -243,7 +247,7 @@ export class Profile extends Component {
   getTransactions(shouldRefresh, initial) {
     // get Transactions
     HumaniqProfileApiLib.getTransactions(
-        this.props.id,
+        this.props.primaryAccount.account_id,
         initial ? 0 : this.state.transactions.length,
         this.limit,
     )
@@ -312,7 +316,7 @@ export class Profile extends Component {
 
   render() {
     const { user, balance } = this.state;
-    const { profile } = this.props;
+    const { primaryAccount } = this.props;
     // break amount into two values to use them separately
     const hmqInt = balance && balance.token && balance.token.amount
         ? balance.token.amount.toString().split('.')[0] : '0';
@@ -351,7 +355,7 @@ export class Profile extends Component {
             >
               <Animated.Image
                 style={styles.avatar}
-                source={profile.avatar ? { uri: profile.avatar.url } : ic_photo_holder}
+                source={primaryAccount.avatar ? { uri: primaryAccount.avatar.url } : ic_photo_holder}
               />
               <Animated.View style={styles.infoContainer}>
                 <Text style={styles.title}>{`${hmqInt}.`}
@@ -650,10 +654,10 @@ export class Profile extends Component {
       toUserAddress = newTransaction.adress;
     }
 
-    HumaniqProfileApiLib.createTransaction(this.props.id, toUserId, toUserAddress, (newTransaction.amount * 100000000))
+    HumaniqProfileApiLib.createTransaction(this.props.primaryAccount.account_id, toUserId, toUserAddress, (newTransaction.amount * 100000000))
         .then((resp) => {
           if (resp.code === 401) {
-            this.navigateTo('Tutorial');
+            this.navigateTo('Accounts');
           } else {
             // save transaction id in array
             console.log('create transaction::', resp);
@@ -851,17 +855,16 @@ const styles = StyleSheet.create({
 export default connect(
     state => ({
       user: state.user,
-      profile: state.user.profile || {},
-      id: state.user.account.payload.payload.account_id || state.accounts.primaryAccount.accountId,
-      acc: state.accounts.primaryAccount,
+      primaryAccount: state.accounts.primaryAccount,
       newTransaction: state.newtransaction,
       contacts: state.contacts,
     }),
     dispatch => ({
-      setProfile: profile => dispatch(actions.setProfile(profile)),
       setAmount: amount => dispatch(actions.newTransaction.setTrAmount(amount)),
       setAddress: address => dispatch(actions.newTransaction.setTrAdress(address)),
       setPhone: phone => dispatch(actions.newTransaction.setTrAdress(phone)),
       setContact: contact => dispatch(actions.newTransaction.setTrAdress(contact)),
+      saveAvatar: avatar => dispatch(actions.saveAvatar(avatar)),
+      saveNames: names => dispatch(actions.saveNames(names)),
     }),
 )(Profile);

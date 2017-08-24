@@ -125,7 +125,7 @@ export class ProfileSettings extends Component {
 
   render() {
     const { user } = this.state;
-    const { profile } = this.props;
+    const { profile, primaryAccount } = this.props;
     const status = user.status === 1 ? 'online' : 'offline';
     return (
       <View style={styles.mainContainer}>
@@ -151,10 +151,10 @@ export class ProfileSettings extends Component {
             >
               <Animated.Image
                 style={styles.avatar}
-                source={profile.avatar ? { uri: profile.avatar.url } : ic_photo_holder}
+                source={primaryAccount.avatar ? { uri: primaryAccount.avatar.url } : ic_photo_holder}
               />
               <Animated.View style={styles.infoContainer}>
-                <Text style={styles.title}>{this.showPhoneIfExist(profile, false)}</Text>
+                <Text style={styles.title}>{this.showPhoneIfExist(primaryAccount, false)}</Text>
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                   <Text style={styles.statusText}>{status}</Text>
                   {this.getUserStatus(user)}
@@ -231,7 +231,7 @@ export class ProfileSettings extends Component {
 
   renderFirstSection() {
     const { user } = this.state;
-    const { profile } = this.props;
+    const { profile, primaryAccount } = this.props;
     return (
       <View style={styles.firstSection}>
         <View style={styles.firstSubSection}>
@@ -242,10 +242,10 @@ export class ProfileSettings extends Component {
           <View style={styles.phoneContainer}>
             <View style={{ flex: 1 }}>
               <Text style={styles.phoneText}>
-                {this.showPhoneIfExist(profile, true)}
+                {this.showPhoneIfExist(primaryAccount, true)}
               </Text>
               <Image
-                source={profile.phone_number && profile.phone_number.phone_number ? ic_phone : ic_lock}
+                source={primaryAccount.phone_number && primaryAccount.phone_number.phone_number ? ic_phone : ic_lock}
                 style={styles.phoneImage}
               />
             </View>
@@ -285,16 +285,14 @@ export class ProfileSettings extends Component {
       <View style={styles.secondSection}>
         <View style={[styles.divider, { height: 1 }]} />
         <View>
-          <TouchableNativeFeedback
-            delayPressIn={5}
-          >
+          <View>
             <View style={styles.personContainer}>
               <Image
                 source={ic_person_blue}
                 style={styles.profileImage}
               />
             </View>
-          </TouchableNativeFeedback>
+          </View>
           <TouchableNativeFeedback
             delayPressIn={5}
             onPress={() => this.onLogoutPress()}
@@ -375,12 +373,12 @@ export class ProfileSettings extends Component {
 
   logOutUser = () => {
     // deauthenticate user
-    HumaniqProfileApiLib.deauthenticateUser(this.props.profile.account_id)
+    HumaniqProfileApiLib.deauthenticateUser(this.props.primaryAccount.account_id)
         .then((response) => {
           // log out
           console.log(response);
           if (response.code === 200) {
-            this.navigateTo('Tutorial');
+            this.navigateTo('Accounts');
           }
         })
         .catch((err) => {
@@ -403,14 +401,14 @@ export class ProfileSettings extends Component {
         wallet={this.state.wallet}
         onClipboardClick={() => this.onClipboardClick()}
         visibility={this.state.modalVisibility}
-        profile={this.props.profile}
+        profile={this.props.primaryAccount}
       />
     );
   }
 
   getWalletAddress() {
     console.log('getting wallet address::');
-    HumaniqBlockchainApiLib.getUserAddressState(this.props.profile.account_id)
+    HumaniqBlockchainApiLib.getUserAddressState(this.props.primaryAccount.account_id)
         .then((response) => {
           console.log('wallet address::>>', response);
           this.setState({ wallet: response });
@@ -579,8 +577,8 @@ const styles = StyleSheet.create({
 export default connect(
     state => ({
       user: state.user,
-      profile: state.user.profile || {},
       password: state.user.password || '',
+      primaryAccount: state.accounts.primaryAccount,
     }),
     dispatch => ({
       setProfile: profile => dispatch(actions.setProfile(profile)),

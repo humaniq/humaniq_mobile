@@ -8,6 +8,11 @@ import persistState from 'redux-localstorage/src';
 import adapter from 'redux-localstorage/src/adapters/AsyncStorage';
 import mergePersistedState from 'redux-localstorage/src/mergePersistedState';
 
+// Logger staff
+import { createLogger } from "redux-logger";
+const loggerMiddleware = createLogger({ predicate: (getState, action) => __DEV__ });
+import promises from 'redux-promise-middleware';
+
 import rootReducer from '../reducers';
 import rootSaga from '../sagas';
 
@@ -22,7 +27,9 @@ function configureStore(initialState) {
   const enhancer = (__DEV__ ? composeWithDevTools : compose)(
     applyMiddleware(
       // logger,
+      loggerMiddleware,
       sagaMiddleware,
+      promises()
       // thunkMiddleware,
     ),
     persistState(storage),

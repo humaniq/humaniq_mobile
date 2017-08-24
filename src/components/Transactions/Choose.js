@@ -166,22 +166,38 @@ class Choose extends React.Component {
     let groupLetter = '';
 
     return (
+      <View style={{ backgroundColor: colors.white, flex: 1 }}>
+        {this.getContacts(filter, groupLetter)}
+      </View>
+    );
+  }
+
+  getContacts(filter, groupLetter) {
+    const { search, text } = this.state;
+    if (search && text && this.contacts.filter(filter).sort(sort).length === 0) {
+      return (
+        <View style={styles.emptyViewContainer}>
+          <Text style={styles.emptyText}>No results</Text>
+        </View>
+      );
+    }
+    return (
       <ScrollView style={{ backgroundColor: colors.white }} showsVerticalScrollIndicator={false}>
         <View style={{ backgroundColor: '#F2F2F2', justifyContent: 'center', height: 42 }}>
           {!search
-              ? <Image
-                style={styles.checkBlue}
-                resizeMode="contain"
-                source={ic_big_check_blue}
-              />
-              : <Text style={styles.checkText}>
-                CONTACTS
-              </Text>
-          }
+                ? <Image
+                  style={styles.checkBlue}
+                  resizeMode="contain"
+                  source={ic_big_check_blue}
+                />
+                : <Text style={styles.checkText}>
+                  CONTACTS
+                </Text>
+            }
 
         </View>
         <View style={styles.contactsHeader} />
-        {contacts.filter(filter).sort(sort).map((cnt) => {
+        {this.contacts.filter(filter).sort(sort).map((cnt) => {
           const firstLetter = getName(cnt)[0];
           let showLetter = '';
           if (groupLetter !== firstLetter) {
@@ -382,6 +398,17 @@ const styles = {
     marginTop: 8,
     marginBottom: 8,
     marginLeft: 16,
+  },
+  emptyViewContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    alignSelf: 'center',
+  },
+  emptyText: {
+    fontSize: 25,
+    color: '#9c9c9c',
+    alignSelf: 'center',
   },
 };
 

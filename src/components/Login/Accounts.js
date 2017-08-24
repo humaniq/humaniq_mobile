@@ -5,6 +5,7 @@ import {
   Image,
   Text,
   TouchableOpacity,
+  StatusBar,
 } from 'react-native';
 import Ripple from 'react-native-material-ripple';
 
@@ -39,50 +40,57 @@ export class Accounts extends Component {
     const allAccounts = [accounts.primaryAccount];
 
     return (
-      <ScrollView contentContainerStyle={styles.container}>
-        <View style={styles.header} >
-          <Image style={styles.illustration} source={authillustration} />
-        </View>
+      <View style={{ flex: 1 }}>
+        <StatusBar
+          translucent
+          backgroundColor='transparent'
+        />
+        <ScrollView contentContainerStyle={styles.container}>
+          <View style={styles.header} >
+            <Image style={styles.illustration} source={authillustration} />
+          </View>
 
-        <View style={styles.accountsContainer}>
-          {allAccounts.map((acc) => {
-            const name = acc.person
-                ? `${acc.person.first_name} ${acc.person.last_name}`
-                : '';
-            const p_code = (acc.phone_number && acc.phone_number.country_code)
-                ? `+(${acc.phone_number.country_code})` : '';
-            const p_num = (acc.phone_number && acc.phone_number.phone_number)
-                ? acc.phone_number.phone_number : '';
-            const phone = acc.phone || acc.phone_number
-                ? `${p_code} ${p_num}`
-                : '';
-            return (
-              <Ripple
-                onPress={this.validateUser}
-                key={acc.accountId}
-              >
-                <View style={styles.accountBtn}>
-                  <View style={styles.accountInfoContainer}>
-                    {acc.photo.length > 0 &&
-                    <Image style={styles.profilePhoto} source={{ uri: acc.photo }} />
-                    }
-                    {
-                      name ?
-                        <View style={{ flexDirection: 'column' }}>
-                          <Text style={styles.nameRow}>{name}</Text>
-                          <Text style={styles.phoneRow}>{phone}</Text>
-                        </View>
-                      :
-                        <Text style={styles.phone}>{phone}</Text>
-                    }
+          <View style={styles.accountsContainer}>
+            {allAccounts.map((acc) => {
+              const name = acc.person
+                    ? `${acc.person.first_name} ${acc.person.last_name}`
+                    : '';
+              const p_code = (acc.phone_number && acc.phone_number.country_code)
+                    ? `+(${acc.phone_number.country_code})` : '';
+              const p_num = (acc.phone_number && acc.phone_number.phone_number)
+                    ? acc.phone_number.phone_number : '';
+              const phone = acc.phone || acc.phone_number
+                    ? `${p_code} ${p_num}`
+                    : '';
+              return (
+                <Ripple
+                  onPress={this.validateUser}
+                  key={acc.account_id}
+                >
+                  <View style={styles.accountBtn}>
+                    <View style={styles.accountInfoContainer}>
+                      {
+                            acc.avatar && acc.avatar.url &&
+                            <Image style={styles.profilePhoto} source={{ uri: acc.avatar.url }} />
+                          }
+                      {
+                            name.trim() ?
+                              <View style={{ flexDirection: 'column' }}>
+                                <Text style={styles.nameRow}>{name}</Text>
+                                <Text style={styles.phoneRow}>{phone}</Text>
+                              </View>
+                                :
+                              <Text style={styles.phone}>{phone}</Text>
+                          }
+                    </View>
+                    <Image source={ic_chevrone_right} />
                   </View>
-                  <Image source={ic_chevrone_right} />
-                </View>
-              </Ripple>
-            );
-          }) }
-        </View>
-      </ScrollView>
+                </Ripple>
+              );
+            })}
+          </View>
+        </ScrollView>
+      </View>
     );
   }
 }
@@ -128,7 +136,7 @@ const styles = CustomStyleSheet({
     width: 41,
     marginRight: 11,
     borderRadius: 20,
-    backgroundColor: '$cBrand',
+    backgroundColor: 'transparent',
   },
   phone: {
     fontFamily: 'Roboto',

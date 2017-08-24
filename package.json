@@ -46,6 +46,7 @@
     "redux": "3.6.0",
     "redux-localstorage": "git+https://github.com/elgerlambert/redux-localstorage.git#1.0-breaking-changes",
     "redux-localstorage-filter": "0.1.1",
+    "redux-promise-middleware": "^4.3.0",
     "redux-saga": "0.15.4",
     "redux-thunk": "2.2.0",
     "remote-redux-devtools": "0.5.12",

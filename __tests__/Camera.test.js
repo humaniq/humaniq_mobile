@@ -95,10 +95,10 @@ describe('<Camera />', () => {
     expect(navigation.dispatch).toBeCalled();
   });
 
-  it('should render 4 parent views', () => {
+  it('should render 5 parent views', () => {
     const wrapper = shallow(<Cam user={user} store={mockedStore} navigation={navigation} />);
     const container = wrapper.find('View').at(0);
-    expect(container.props().children.length).toBe(4);
+    expect(container.props().children.length).toBe(5);
   });
 
   it('initial imagePath and imageB64 must be equal to empty', () => {

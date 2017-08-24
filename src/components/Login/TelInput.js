@@ -5,9 +5,11 @@ import {
   Text,
   TouchableOpacity,
   Animated,
+  StatusBar,
 } from 'react-native';
 
 import PropTypes from 'prop-types';
+import Animation from 'lottie-react-native';
 import { connect } from 'react-redux';
 import VMasker from 'vanilla-masker';
 import phoneFormat from 'phoneformat-react-native';
@@ -17,11 +19,13 @@ import CustomStyleSheet from '../../utils/customStylesheet';
 import PhoneKeyboard from '../Shared/Components/PhoneKeyboard';
 import ConfirmButton from '../Shared/Buttons/ConfirmButton';
 import HelpButton from '../Shared/Buttons/HelpButton';
+import { NavigationActions } from 'react-navigation';
 import { phoneNumberCreate, savePhone } from '../../actions';
 import { vw } from '../../utils/units';
 
 // const ic_user = require('../../assets/icons/ic_user.png');
 const arrowDownWhite = require('../../assets/icons/arrow_down_white.png');
+const spinner = require('../../assets/animations/s-spiner.json');
 
 export class TelInput extends Component {
   static propTypes = {
@@ -54,33 +58,40 @@ export class TelInput extends Component {
     countryCode: 'US',
     flag: 'united_states',
     phoneError: new Animated.Value(0),
+    progress: new Animated.Value(0),
   };
 
   componentWillReceiveProps(nextProps) {
-    if (this.props.user.phoneCreate.isFetching && !nextProps.user.phoneCreate.isFetching &&
-      nextProps.user.phoneCreate.payload) {
+    if (!this.props.user.phoneCreate.isFetching && nextProps.user.phoneCreate.isFetching) {
+      this.animateCycle(2000, 0, 1);
+    } else if (
+      this.props.user.phoneCreate.isFetching &&
+      !nextProps.user.phoneCreate.isFetching &&
+      nextProps.user.phoneCreate.payload
+    ) {
+      this.state.progress.stopAnimation();
+      this.state.progress.setValue(0);
       const code = nextProps.user.phoneCreate.payload.code;
 
       switch (code) {
-        case 6000:
-          alert(nextProps.user.phoneCreate.payload.message);
-          break;
-
         case 4005:
-            // registered user
-            // Account Phone Number Created Successfully. Validation Code Sent
-          this.props.savePhone({
-            country_code: VMasker.toNumber(this.state.code),
-            phone_number: VMasker.toNumber(this.state.phone),
+          // Account Phone Number Created Successfully. Validation Code Sent
+          this.navigateTo('CodeInput', {
+            prevScene: 'TelInput',
+            phoneNumber: {
+              country_code: VMasker.toNumber(this.state.code),
+              phone_number: VMasker.toNumber(this.state.phone),
+            }
           });
-          this.props.navigation.navigate('CodeInput');
           break;
 
         case 4011:
           // The Account Already Has A Phone Number
           alert('The Account Already Has A Phone Number');
-          // this.props.setAvatarLocalPath(this.state.path);
-          // this.props.navigation.navigate('Tutorial', { nextScene: 'Password' });
+          break;
+
+        case 6000:
+          alert(nextProps.user.phoneCreate.payload.message);
           break;
 
         default:
@@ -88,6 +99,14 @@ export class TelInput extends Component {
       }
     }
   }
+
+  navigateTo = (screen, params) => {
+    const resetAction = NavigationActions.reset({
+      index: 0,
+      actions: [NavigationActions.navigate({ routeName: screen, params })],
+    });
+    this.props.navigation.dispatch(resetAction);
+  };
 
   handleNumberPress = (number) => {
     if (this.state.phone.length < this.state.maxPhoneLength) {
@@ -110,10 +129,15 @@ export class TelInput extends Component {
 
   handlePhoneConfirm = () => {
     const phone_number = this.state.phone;
-
+    let account = null;
+    if (this.props.user.account.payload.payload.account_information) {
+      account = this.props.user.account.payload.payload.account_information;
+    } else {
+      account = this.props.user.account.payload.payload;
+    }
     if (this.phonenumber(this.state.phone, this.state.countryCode)) {
       this.props.phoneNumberCreate({
-        account_id: this.props.user.account.payload.payload.account_information.account_id,
+        account_id: account.account_id,
         phone_number: VMasker.toNumber(`${this.state.code}${phone_number}`),
       });
     } else {
@@ -123,9 +147,28 @@ export class TelInput extends Component {
   };
 
   phonenumber = (inputtxt, code) => (
-    // let phoneno = /^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/;
     phoneFormat.isValidNumber(inputtxt, code)
   );
+
+  /* Render functions */
+
+  renderInput = () => (
+    <View style={styles.telInput}>
+      <TouchableOpacity
+        style={styles.countryCodeContainer}
+        onPress={() => {
+          this.props.navigation.navigate('CountryCode',
+            { refresh: (dialCode, code, flag) => { dialCode != null ? this.setState({ code: dialCode, countryCode: code, flag }) : null; } });
+        }}>
+        <Image style={styles.flag} source={{ uri: this.state.flag }} />
+        <Text style={[styles.code, this.state.error ? styles.error : null]}>{this.state.code}</Text>
+        <Image style={[styles.arrow, this.state.error ? { tintColor: 'red' } : null]} source={arrowDownWhite} />
+      </TouchableOpacity>
+      <Text style={[styles.number, this.state.error ? styles.error : null]}>{this.state.maskedPhone}</Text>
+    </View>
+  );
+
+  /* Animations */
 
   animatePasswordError = () => {
     Animated.sequence([
@@ -152,29 +195,32 @@ export class TelInput extends Component {
     ]).start(() => { this.setState({ error: null }); });
   };
 
-  renderInput = () => (
-    <View style={styles.telInput}>
-      <TouchableOpacity
-        style={styles.countryCodeContainer}
-        onPress={() => {
-          this.props.navigation.navigate('CountryCode',
-              { refresh: (dialCode, code, flag) => { dialCode != null ? this.setState({ code: dialCode, countryCode: code, flag }) : null; } });
-        }}
-      >
-        <Image style={styles.flag} source={{ uri: this.state.flag }} />
-        <Text style={[styles.code, this.state.error ? styles.error : null]}>{this.state.code}</Text>
-        <Image style={[styles.arrow, this.state.error ? { tintColor: 'red' } : null]} source={arrowDownWhite} />
-      </TouchableOpacity>
-      <Text style={[styles.number, this.state.error ? styles.error : null]}>{this.state.maskedPhone}</Text>
-    </View>
-    );
+  animateCycle = (/* time, fr = 0, to = 1, callback */) => {
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(this.state.progress, {
+          toValue: 1,
+          duration: 2000,
+        }),
+        Animated.timing(this.state.progress, {
+          toValue: 0,
+          duration: 0,
+        }),
+      ]),
+    ).start();
+  };
 
   render() {
     return (
       <View style={styles.container}>
+        <StatusBar backgroundColor="#439fe0" />
+        <Animation
+          style={styles.animation}
+          source={spinner}
+          progress={this.state.progress} />
         <View style={styles.header}>
           <Animated.View style={[styles.passContainer, { marginLeft: this.state.phoneError }]}>
-            {this.renderInput() }
+            {this.renderInput()}
           </Animated.View>
         </View>
         <View style={styles.buttonsContainer}>
@@ -209,6 +255,13 @@ const styles = CustomStyleSheet({
     flex: 1,
     paddingTop: 120,
     paddingLeft: 16,
+  },
+  animation: {
+    position: 'absolute',
+    top: 16,
+    right: 16,
+    width: 24,
+    height: 24,
   },
   countryCodeContainer: {
     flexDirection: 'row',

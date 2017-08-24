@@ -92,12 +92,12 @@ export default class VirtualKeyboard extends Component {
   };
 
   renderBackspace = () => (
-    <TouchableOpacity
+    this.props.isBackspaceEnabled ? <TouchableOpacity
       style={styles.backspace}
       onPress={this.props.onBackspacePress}
       >
       {this.props.isBackspaceEnabled && <Image source={backSpaceWhite} />}
-    </TouchableOpacity>
+    </TouchableOpacity> : <View style={styles.backspace}/> 
   );
 
   renderHelp = () => (

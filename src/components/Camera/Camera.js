@@ -5,6 +5,8 @@ import {
   TouchableWithoutFeedback,
   Image,
   Animated,
+  StatusBar,
+  Dimensions,
 } from 'react-native';
 import PropTypes from 'prop-types';
 import Camera from 'react-native-camera';
@@ -30,6 +32,12 @@ const repeat = require('../../assets/icons/repeat.png');
 
 // Emoji assetss
 const emojiHappy = require('../../assets/icons/emojiHappy.png');
+const disgustEmoji = require('../../assets/icons/disgustEmoji.png');
+const neutralEmoji = require('../../assets/icons/neutralEmoji.png');
+const sadEmoji = require('../../assets/icons/sadEmoji.png');
+const angryEmoji = require('../../assets/icons/angryEmoji.png');
+const fearEmoji = require('../../assets/icons/fearEmoji.png');
+const surpriseEmoji = require('../../assets/icons/surpriseEmoji.png');
 
 // Button animations
 const emergeAnimation = require('../../assets/animations/emerge.json');
@@ -84,6 +92,7 @@ export class Cam extends Component {
       errorCode: null,
       progress: new Animated.Value(0),
       animation: pressAnimation,
+      emoji: emojiHappy,
       emojiAnimation: new Animated.Value(0),
       photoGoal: 'isRegistered',
       requiredEmotions: [],
@@ -96,13 +105,6 @@ export class Cam extends Component {
     // console.log('📞 nextProps', nextProps.user.validate);
     this[`${this.state.photoGoal}ReceiveProps`](nextProps);
   }
-
-  animateEmoji = (callback) => {
-    Animated.timing(this.state.emojiAnimation, {
-      toValue: 1,
-      duration: 2000,
-    }).start(callback);
-  };
 
   replayEmoji = () => {
     this.setState({ isButtonVisible: false });
@@ -129,7 +131,7 @@ export class Cam extends Component {
           this.setState({ animation: doneAnimation });
           this.animate(1000, 0, 1, () => {
             this.setState({ animation: pressAnimation });
-            this.props.navigation.navigate('Password');
+            this.navigateTo('Password');
           });
           break;
 
@@ -147,20 +149,18 @@ export class Cam extends Component {
             this.setState({ animation: doneAnimation });
             this.animate(1000, 0, 1, () => {
               this.setState({ animation: pressAnimation });
-              this.props.navigation.navigate('Tutorial', { nextScene: 'Password' });
+              this.navigateTo('Tutorial', { nextScene: 'Password' });
             });
           }
 
           break;
         default:
-          this.state.progress.stopAnimation();
-          this.state.progress.setValue(0);
           this.setState({
             error: true,
             errorCode: code,
             path: '',
-            animation: pressAnimation,
           });
+          this.rollBackAnimation();
       }
     }
   };
@@ -184,17 +184,18 @@ export class Cam extends Component {
             photoGoal: 'validateFacialRecognitionValidation',
             requiredEmotions: nextProps.user.faceEmotionCreate.payload.payload.required_emotions,
             isButtonVisible: false,
+            emoji: this.getEmoji(nextProps.user.faceEmotionCreate.payload.payload.required_emotions[0])
           });
           // After state is updated, need to animate emoji there
-          this.replayEmoji();
+          setTimeout(() => { this.replayEmoji() }, 1000)
         });
       } else {
         this.setState({
           error: true,
           errorCode: code,
           path: '',
-          animation: doneAnimation,
         });
+        this.rollBackAnimation();
       }
     }
   };
@@ -217,15 +218,15 @@ export class Cam extends Component {
         // reduce emotions there
         this.setState({ animation: doneAnimation });
         this.animate(1000, 0, 1, () => {
-          this.props.navigation.navigate('Tutorial', { nextScene: 'Password' });
+          this.navigateTo('Tutorial', { nextScene: 'Password' });
         });
       } else {
         this.setState({
-          animation: pressAnimation,
           error: true,
           errorCode: code,
           path: '',
         });
+        this.rollBackAnimation();
       }
     }
   };
@@ -235,7 +236,7 @@ export class Cam extends Component {
     if (!this.state.path && !this.state.capturing) {
       this.setState({ capturing: true });
       console.log('Camera::handleImageCapture BEGIN!!!');
-      this.camera.capture()
+      this.camera.capture({ jpegQuality: 60 })
         .then((data) => {
           console.log('Camera::handleImageCapture DONE');
           this.setState({ capturing: false, path: data.path });
@@ -275,9 +276,6 @@ export class Cam extends Component {
         }
       })
       .catch((err) => { console.log(err.message); });
-
-    // this.props.checkUserRegStatus(this.state.base64);
-    // console.log('this.props.validate', this.props);
   };
 
   convertToBase64 = (path) => {
@@ -290,19 +288,6 @@ export class Cam extends Component {
       .catch((err) => { console.log(err.message); });
   };
 
-  handleImageDelete = () => {
-    this.state.progress.setValue(0);
-    this.setState({ path: '', animation: pressAnimation });
-  };
-
-  handleCameraClose = () => {
-    this.handleImageDelete();
-    const backAction = NavigationActions.back({
-      key: null,
-    });
-    this.props.navigation.dispatch(backAction);
-  };
-
   navigateTo = (screen, params) => {
     const resetAction = NavigationActions.reset({
       index: 0,
@@ -311,7 +296,22 @@ export class Cam extends Component {
     this.props.navigation.dispatch(resetAction);
   };
 
+  handleCameraClose = () => {
+    this.state.progress.setValue(0);
+    this.setState({ path: '', animation: pressAnimation });
+    const backAction = NavigationActions.back({
+      key: null,
+    });
+    this.props.navigation.dispatch(backAction);
+  };
+
+  handleDismissModal = () => {
+    this.state.progress.stopAnimation();
+    this.setState({ error: false, errorCode: null, animation: pressAnimation });
+  };
+
   // Animation
+
   animate = (time, fr = 0, to = 1, callback) => {
     this.state.progress.setValue(fr);
     const animationref = Animated.timing(this.state.progress, {
@@ -321,9 +321,19 @@ export class Cam extends Component {
     this.setState({ animationref });
   };
 
-  handleDismissModal = () => {
+  rollBackAnimation = () => {
     this.state.progress.stopAnimation();
-    this.setState({ error: false, errorCode: null, animation: pressAnimation });
+    this.state.progress.setValue(0);
+    this.setState({
+      animation: pressAnimation,
+    });
+  };
+
+  animateEmoji = (callback) => {
+    Animated.timing(this.state.emojiAnimation, {
+      toValue: 1,
+      duration: 2000,
+    }).start(callback);
   };
 
   renderCamera() {
@@ -349,16 +359,45 @@ export class Cam extends Component {
         }}
         style={styles.camera}
         aspect={Camera.constants.Aspect.fill}
-        captureQuality={Camera.constants.CaptureQuality.low}
+        captureQuality={Camera.constants.CaptureQuality.preview}
+        captureTarget={Camera.constants.CaptureTarget.temp}
         type={camtype}
-        captureTarget={Camera.constants.CaptureTarget.disk}
         onBarCodeRead={onBarCode}
       />
     );
   }
 
 
-  renderImage = () => (<Image source={{ uri: this.state.path }} style={styles.previewImage} />);
+  renderImage = () => (<Image source={{ uri: this.state.path }} style={styles.camera} />);
+
+  getEmoji(emoji) {
+    switch (emoji) {
+      case 'happy':
+        return emojiHappy;
+        break;
+      case 'neutral':
+        return neutralEmoji;
+        break;
+      case 'surprise':
+        return surpriseEmoji;
+        break;
+      case 'fear':
+        return fearEmoji;
+        break;
+      case 'disgust':
+        return disgustEmoji;
+        break;
+      case 'angry':
+        return angryEmoji;
+        break;
+      case 'sad':
+        return sadEmoji;
+        break;
+      default:
+        return emojiHappy;
+        break;
+    }
+  }
 
   render() {
     const isFetching =
@@ -371,13 +410,14 @@ export class Cam extends Component {
     const fn = () => null;
     return (
       <View style={styles.container}>
+        <StatusBar hidden/>
         <Modal
           onPress={this.handleDismissModal}
           code={this.state.errorCode}
           visible={this.state.error}
         />
         <View style={styles.cameraImageContainer}>
-          {this.state.path ? this.renderImage() : this.renderCamera() }
+          {this.state.path ? this.renderImage() : this.renderCamera()}
         </View>
         <View style={styles.maskLayer}>
           <Image source={whiteMask} style={styles.maskImageStyle} />
@@ -386,20 +426,19 @@ export class Cam extends Component {
           <View style={styles.navbar}>
             <TouchableOpacity
               style={styles.closeBtn}
-              onPress={this.handleCameraClose}
-            >
+              onPress={this.handleCameraClose}>
               <Image source={close} />
             </TouchableOpacity>
           </View>
           {
             this.state.isButtonVisible ? <View /> :
-            <Animated.Image
-              source={emojiHappy}
-              style={[styles.emojiImage, {
-                transform: [{ scale: this.state.emojiAnimation }],
-                opacity: this.state.emojiAnimation,
-              }]}
-            />
+              <Animated.Image
+                source={this.state.emoji}
+                style={[styles.emojiImage, {
+                  transform: [{ scale: this.state.emojiAnimation }],
+                  opacity: this.state.emojiAnimation,
+                }]}
+              />
           }
           <View style={styles.captureContainer}>
             {
@@ -480,8 +519,10 @@ const styles = CustomStyleSheet({
     backgroundColor: 'white',
   },
   camera: {
-    height: 640,
-    width: 360,
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+    height: Dimensions.get('window').height,
+    width: Dimensions.get('window').width,
   },
   cameraImageContainer: {
     alignItems: 'center',

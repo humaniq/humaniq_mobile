@@ -5,6 +5,7 @@ import {
   Text,
   Animated,
   ToastAndroid,
+  StatusBar,
 } from 'react-native';
 
 import Animation from 'lottie-react-native';
@@ -34,6 +35,7 @@ export class PasswordEdit extends Component {
       firstStep: true,
       progress: new Animated.Value(0),
       passwordError: new Animated.Value(0),
+      isFetching: false,
     };
   }
 
@@ -68,9 +70,9 @@ export class PasswordEdit extends Component {
     if (this.state.password.length < this.state.maxPasswordLength) {
       this.setState({ password: this.state.password += number });
     }
-    if (this.state.password.length == this.state.maxPasswordLength) {
+    if (this.state.password.length === this.state.maxPasswordLength) {
       if (this.state.firstStep) {
-        if (this.state.old_password == this.state.password) {
+        if (this.state.old_password === this.state.password) {
           setTimeout(() => {
             this.setState({ firstStep: false, password: '' });
           }, 100);
@@ -97,7 +99,7 @@ export class PasswordEdit extends Component {
   };
 
   renderPassMask = () => {
-    const { password, maxPasswordLength, match } = this.state;
+    const { password, maxPasswordLength } = this.state;
     const digits = [];
     let style = null;
 
@@ -157,8 +159,12 @@ export class PasswordEdit extends Component {
   }
 
   render() {
+    const { primaryAccount } = this.props;
     return (
       <View style={styles.container}>
+        <StatusBar
+          backgroundColor="#3aa3e3"
+        />
         <View style={styles.header}>
           <View style={styles.animationContainer}>
             <Animation
@@ -169,8 +175,8 @@ export class PasswordEdit extends Component {
           </View>
           <Image
             style={styles.userPhoto}
-            source={this.props.profile.avatar
-                ? { uri: this.props.profile.avatar.url }
+            source={primaryAccount && primaryAccount.avatar
+                ? { uri: primaryAccount.avatar.url }
                 : ic_photo_holder}
           />
           {this.renderInputStep()}
@@ -178,10 +184,9 @@ export class PasswordEdit extends Component {
         </View>
         <View style={styles.keyboardContainer}>
           <Keyboard
-            isBackspaceEnabled={this.state.password !== ''}
+            isBackspaceEnabled={this.state.password.length > 0}
             onNumberPress={this.handleNumberPress}
             onBackspacePress={this.handleBackspacePress}
-            //onHelpPress={this.handleHelpPress}
           />
         </View>
       </View>
@@ -189,27 +194,29 @@ export class PasswordEdit extends Component {
   }
 
   changePassword(oldPassword, newPassword) {
-    console.warn(oldPassword);
-    console.warn(newPassword);
+    this.setState({ isFetching: true });
     this.animateCycle(2000, 0, 1);
     HumaniqProfileApiLib.changeProfilePassword(
-        this.props.profile.account_id,
+        this.props.primaryAccount.account_id,
         oldPassword,
         newPassword,
         )
       .then((resp) => {
+        this.setState({ isFetching: false });
         this.props.setPassword(newPassword);
+        HumaniqTokenApiLib.savePassword(newPassword)
+          .then((res) => {})
+          .catch((err) => {})
         this.state.progress.stopAnimation();
         this.state.progress.setValue(0);
-        console.warn(JSON.stringify(resp));
         ToastAndroid.show('Success', ToastAndroid.LONG);
         this.handleClose();
       })
       .catch((err) => {
+        this.setState({ isFetching: false });
         this.state.progress.stopAnimation();
         this.state.progress.setValue(0);
         this.handleClose();
-        console.warn(JSON.stringify(err.message));
       });
   }
 
@@ -224,12 +231,10 @@ export class PasswordEdit extends Component {
 export default connect(
     state => ({
       user: state.user,
-      profile: state.user.profile || {},
+      primaryAccount: state.accounts.primaryAccount,
       password: state.user.password || '',
-      id: state.accounts.primaryAccount.account_id,
     }),
     dispatch => ({
-      setProfile: profile => dispatch(actions.setProfile(profile)),
       setPassword: password => dispatch(actions.setPassword(password)),
     }),
 )(PasswordEdit);

@@ -34,17 +34,19 @@ export default function RequestSmsButton(props) {
   return (
     // using TouchH instead TouchO to disable pressing when prop active == false
     <TouchableHighlight
-      style={[styles.container, disabled && cooldownTime === 0 ? styles.disabled : null]}
+      style={[styles.container, disabled || cooldownTime != 0 ? styles.disabled : null]}
       onPress={disabled ? null : props.onPress}
       underlayColor={'transparent'}
-      activeOpacity={0.5}
-    >
-      {disabled && cooldownTime > 0 ?
-        <View style={styles.cooldownContainer}>
-          <Text style={styles.cooldownTxt}>{prettyTime(cooldownTime)}</Text>
-          <Image source={ic_clock} />
-        </View> :
-        <Image source={ic_sms} />
+      activeOpacity={0.5}>
+      {
+        !disabled && cooldownTime > 0 ?
+          <View style={styles.cooldownContainer}>
+            <Text style={styles.cooldownTxt}>
+              {prettyTime(cooldownTime)}
+            </Text>
+            <Image source={ic_clock} />
+          </View> :
+          <Image source={ic_sms} />
       }
     </TouchableHighlight>
   );
