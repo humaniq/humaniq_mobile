@@ -5,6 +5,7 @@ import {
   StatusBar,
 } from 'react-native';
 
+import MixPanel from 'react-native-mixpanel';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import CustomStyleSheet from '../../utils/customStylesheet';
@@ -25,7 +26,13 @@ class Loading extends Component {
     timeout: false,
   };
 
+  componentWillMount() {
+    // init mix panel
+    MixPanel.sharedInstanceWithToken('a890412ecd56b462f0ab93c5fed6400c');
+  }
+
   componentDidMount() {
+    MixPanel.track("Open Splash Screen");
     setTimeout(() => {
       this.setState({ timeout: true }, this.onTimeoutFinish);
     }, 2000);
@@ -34,6 +41,12 @@ class Loading extends Component {
   onTimeoutFinish = () => {
     console.log(this.props.accounts.primaryAccount);
     this.props.navigation.navigate(this.props.accounts.primaryAccount != null ? 'Accounts' : 'Tutorial');
+    MixPanel.track("Close Splash Screen");
+    if (this.props.accounts.primaryAccount != null) {
+      MixPanel.track("Open Accounts Screen");
+    } else {
+      MixPanel.track("Open Tutorial Screen");
+    }
   };
 
   render() {

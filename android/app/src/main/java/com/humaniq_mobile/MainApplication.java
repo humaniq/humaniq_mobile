@@ -4,6 +4,7 @@ import android.app.Application;
 
 import com.facebook.react.ReactApplication;
 import com.humaniq.apilib.Package;
+import com.segment.analytics.Analytics;
 import com.zmxv.RNSound.RNSoundPackage;
 import com.rnim.rn.audio.ReactNativeAudioPackage;
 import com.airbnb.android.react.lottie.LottiePackage;
@@ -22,6 +23,7 @@ import com.facebook.soloader.SoLoader;
 import android.support.multidex.MultiDexApplication;
 //import com.humaniq.libsignals.GreenDaoDatabase;
 import com.crashlytics.android.Crashlytics;
+import com.kevinejohn.RNMixpanel.*;
 
 import io.fabric.sdk.android.Fabric;
 import java.util.Arrays;
@@ -50,7 +52,8 @@ public class MainApplication extends MultiDexApplication implements ReactApplica
             new ReactVideoPackage(),
             new RNFetchBlobPackage(),
             new RCTCameraPackage(),
-            new LottiePackage()
+            new LottiePackage(),
+            new RNMixpanel()
       );
     }
   };
@@ -66,5 +69,15 @@ public class MainApplication extends MultiDexApplication implements ReactApplica
     Fabric.with(this, new Crashlytics());
     SoLoader.init(this, /* native exopackage */ false);
     //GreenDaoDatabase.createEncryptedInstance(this, "super-secret");
+    // Create an analytics client with the given context and Segment write key.
+    Analytics analytics = new Analytics.Builder(this, "nUoww8mwKM3dCgNAYtH2H6rq2OiJVnlM")
+      // Enable this to record certain application events automatically!
+      .trackApplicationLifecycleEvents()
+      // Enable this to record screen views automatically!
+      .recordScreenViews()
+      .build();
+
+    // Set the initialized instance as a globally accessible instance.
+    Analytics.setSingletonInstance(analytics);
   }
 }

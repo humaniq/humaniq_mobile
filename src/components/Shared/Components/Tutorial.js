@@ -7,6 +7,8 @@ import {
 import CustomStyleSheet from '../../../utils/customStylesheet';
 import ConfirmButton from '../Buttons/ConfirmButton';
 import HelpButton from '../Buttons/HelpButton';
+import MixPanel from 'react-native-mixpanel';
+
 // assets
 const cameraIllustration = require('../../../assets/icons/camera_illustration.png');
 const passwordIllustration = require('../../../assets/icons/password_illustration.png');
@@ -35,9 +37,11 @@ export default class Tutorial extends Component {
   }
 
   handleConfirmPress = () => {
+    MixPanel.trackWithProperties('Click Registration Button', {nextScene: this.state.nextScene});
     const navState = this.props.navigation.state;
     this.props.navigation.navigate(this.state.nextScene, { ...navState.params });
-};
+    MixPanel.track(`Open${this.state.nextScene} Screen`);
+  };
 
 handleHelpPress = () => {
   this.props.navigation.navigate('Instructions');

@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import Ripple from 'react-native-material-ripple';
 
+import MixPanel from 'react-native-mixpanel';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import CustomStyleSheet from '../../utils/customStylesheet';
@@ -31,8 +32,9 @@ export class Accounts extends Component {
     }).isRequired,
   };
 
-  validateUser = () => {
+  validateUser = (account) => {
     this.props.navigation.navigate('Camera');
+    MixPanel.trackWithProperties('Account click', account);
   };
 
   render() {
@@ -64,7 +66,7 @@ export class Accounts extends Component {
                     : '';
               return (
                 <Ripple
-                  onPress={this.validateUser}
+                  onPress={() => this.validateUser(acc)}
                   key={acc.account_id}
                 >
                   <View style={styles.accountBtn}>

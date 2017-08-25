@@ -4,6 +4,7 @@ import { api } from '../utils/index';
 import * as actions from '../actions';
 import { HumaniqProfileApiLib, HumaniqTokenApiLib } from 'react-native-android-library-humaniq-api';
 import IMEI from 'react-native-imei';
+import MixPanel from 'react-native-mixpanel';
 
 function* fetchEntity(entity, apiFn, body, errorCodes) {
   const { response } = yield call(apiFn, body);

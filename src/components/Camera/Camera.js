@@ -15,7 +15,7 @@ import { NavigationActions } from 'react-navigation';
 import RNFetchBlob from 'react-native-fetch-blob';
 import { connect } from 'react-redux';
 import { validate, setAvatarLocalPath, faceEmotionCreate, faceEmotionValidate, newTransaction } from '../../actions';
-
+import MixPanel from 'react-native-mixpanel';
 // console.log('action typesрџ”‘', ActionTypes.setAvatarLocalPath());
 
 import CustomStyleSheet from '../../utils/customStylesheet';
@@ -98,6 +98,10 @@ export class Cam extends Component {
       requiredEmotions: [],
       isButtonVisible: true,
     };
+  }
+
+  componentWillMount() {
+    MixPanel.track("Open Camera");
   }
 
   componentWillReceiveProps(nextProps) {
@@ -232,6 +236,7 @@ export class Cam extends Component {
   };
 
   handleImageCapture = () => {
+    MixPanel.track("Press Photo Button");
     console.log('Camera::handleImageCapture BEGIN');
     if (!this.state.path && !this.state.capturing) {
       this.setState({ capturing: true });
@@ -262,13 +267,17 @@ export class Cam extends Component {
   };
 
   handleImageUpload = (path) => {
+    MixPanel.timeEvent("Image Convert to base64");
     console.log('Camera::handleImageUpload', this.state.photoGoal);
     console.log('Camera::convertToBase64', path);
     RNFetchBlob.fs.readFile(path, 'base64')
       .then((base64) => {
+        MixPanel.track("Image converted");
         if (this.state.photoGoal === 'isRegistered') {
+          MixPanel.trackWithProperties("Image validation", {mode: 'isRegistered'});
           this.props.validate(base64);
         } else if (this.state.photoGoal === 'validateFacialRecognitionValidation') {
+          MixPanel.trackWithProperties("Emotion validation", {mode: 'validateFacialRecognitionValidation'});
           this.props.emotionValidate({
             facial_image_validation_id: this.props.user.faceEmotionCreate.payload.payload.facial_image_validation_id,
             facial_image: base64,

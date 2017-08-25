@@ -172,9 +172,11 @@ dependencies {
     compile "com.facebook.react:react-native:+"  // From node_modules
     compile 'com.android.support:multidex:1.0.1'
     compile 'com.google.firebase:firebase-core:11.0.2'
-        compile('com.crashlytics.sdk.android:crashlytics:2.6.5@aar') {
-            transitive = true;
-        }
+    compile 'com.segment.analytics.android:analytics:4.+'
+    compile('com.crashlytics.sdk.android:crashlytics:2.6.5@aar') {
+        transitive = true;
+    }
+    compile project(':RNMixpanel')
 }
 
 // Run this once to be able to run the application with BUCK
