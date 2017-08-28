@@ -129,6 +129,7 @@ export class TelInput extends Component {
 
   handlePhoneConfirm = () => {
     const phone_number = this.state.phone;
+    const country_code = this.state.code.substr(1);
     let account = null;
     if (this.props.user.account.payload.payload.account_information) {
       account = this.props.user.account.payload.payload.account_information;
@@ -138,7 +139,10 @@ export class TelInput extends Component {
     if (this.phonenumber(this.state.phone, this.state.countryCode)) {
       this.props.phoneNumberCreate({
         account_id: account.account_id,
-        phone_number: VMasker.toNumber(`${this.state.code}${phone_number}`),
+        phone_number: {
+          country_code: country_code,
+          phone_number: phone_number,
+        },
       });
     } else {
       this.setState({ error: true });
@@ -146,9 +150,10 @@ export class TelInput extends Component {
     }
   };
 
-  phonenumber = (inputtxt, code) => (
-    phoneFormat.isValidNumber(inputtxt, code)
-  );
+  phonenumber = (inputtxt, code) => {
+    return phoneFormat.isValidNumber(inputtxt, code);
+  };
+
 
   /* Render functions */
 

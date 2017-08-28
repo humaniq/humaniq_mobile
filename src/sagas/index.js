@@ -211,13 +211,11 @@ function* saveCredentials({ token, account_id, facial_image_id, password, device
 
 function* phoneNumberCreate({ account_id, phone_number }) {
   const errorCodes = [4011, 6000];
-  const code = phone_number.toString().slice(0, 1);
-  const number = phone_number.toString().slice(1);
   const body = {
     account_id,
     phone_number: {
-      country_code: code,
-      phone_number: number,
+      country_code: phone_number.country_code,
+      phone_number: phone_number.phone_number,
     },
   };
   console.log(body);
@@ -225,8 +223,8 @@ function* phoneNumberCreate({ account_id, phone_number }) {
   if (response.code == 4005) {
     yield put(actions.savePhone({
       phone_number: {
-        country_code: code,
-        phone_number: number,
+        country_code: phone_number.country_code,
+        phone_number: phone_number.phone_number,
       },
     }));
   }
