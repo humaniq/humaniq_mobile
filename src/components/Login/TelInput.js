@@ -53,12 +53,13 @@ export class TelInput extends Component {
   state = {
     maxPhoneLength: 10,
     phone: '',
-    maskedPhone: VMasker.toPattern(0, { pattern: '(999) 999-9999', placeholder: '0' }),
+    maskedPhone: VMasker.toPattern('', { pattern: '(999) 999-9999', placeholder: 'R' }),
     code: '+1',
     countryCode: 'US',
     flag: 'united_states',
     phoneError: new Animated.Value(0),
     progress: new Animated.Value(0),
+    p: 'R'
   };
 
   componentWillReceiveProps(nextProps) {
@@ -112,14 +113,14 @@ export class TelInput extends Component {
     if (this.state.phone.length < this.state.maxPhoneLength) {
       let inputVal = this.state.phone;
       inputVal += number;
-      const m = VMasker.toPattern(inputVal, { pattern: '(999) 999-9999', placeholder: '0' });
+      const m = VMasker.toPattern(inputVal, { pattern: '(999) 999-9999', placeholder: this.state.p });
       this.setState({ phone: inputVal, maskedPhone: m });
     }
   };
 
   handleBackspacePress = () => {
     const inputVal = this.state.phone.slice(0, -1);
-    const m = VMasker.toPattern(inputVal, { pattern: '(999) 999-9999', placeholder: '0' });
+    const m = VMasker.toPattern(inputVal, { pattern: '(999) 999-9999', placeholder: this.state.p });
     this.setState({ phone: inputVal, maskedPhone: m });
   };
 
@@ -169,7 +170,26 @@ export class TelInput extends Component {
         <Text style={[styles.code, this.state.error ? styles.error : null]}>{this.state.code}</Text>
         <Image style={[styles.arrow, this.state.error ? { tintColor: 'red' } : null]} source={arrowDownWhite} />
       </TouchableOpacity>
-      <Text style={[styles.number, this.state.error ? styles.error : null]}>{this.state.maskedPhone}</Text>
+      <Text style={[styles.number, this.state.error ? styles.error : null]}>
+        {
+          this.state.maskedPhone.split("").map((l, i) => {
+            if (l == this.state.p) {
+              return (
+                <Text key={i} style={[styles.number, { color: 'transparent' }]}>
+                  {l}
+                </Text>
+              )
+            } else {
+              return (
+                <Text key={i} style={[styles.number, this.state.error ? styles.error : null]}>
+                  {l}
+                </Text>
+              )
+            }
+
+          })
+        }
+      </Text>
     </View>
   );
 
@@ -285,6 +305,7 @@ const styles = CustomStyleSheet({
     height: 19,
   },
   code: {
+    fontFamily: 'monospace',
     fontSize: 25,
     color: 'white',
     marginLeft: 4.5,
@@ -301,6 +322,7 @@ const styles = CustomStyleSheet({
     alignItems: 'center',
   },
   number: {
+    fontFamily: 'monospace',
     textAlign: 'center',
     fontSize: 25,
     marginLeft: 10,

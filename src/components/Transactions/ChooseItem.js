@@ -33,7 +33,7 @@ class ChooseItem extends Component {
 
     const curContact = contacts.find(cnt => cnt.id === contactID);
     const contactAvatar = { uri: curContact.avatar };
-    const name = curContact.name || curContact.phone;
+    const name = curContact.name.trim().length != 0 ? curContact.name : curContact.phone;
     const offline = curContact.status === 0;
 
     return (
@@ -58,15 +58,13 @@ class ChooseItem extends Component {
                   style={[
                     styles.statusText,
                     { color: offline ? colors.greyish : colors.cerulean },
-                  ]}
-                >
+                  ]}>
                   {offline ? 'offline' : 'online'}
                 </Text>
                 <View style={[
                   styles.statusRound,
                   { backgroundColor: offline ? colors.greyish : colors.cerulean },
-                ]}
-                />
+                ]}/>
               </View>
 
             </View>
