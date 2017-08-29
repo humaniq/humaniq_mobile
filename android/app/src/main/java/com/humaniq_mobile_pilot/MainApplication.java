@@ -1,6 +1,4 @@
-package com.humaniq_mobile;
-
-import android.app.Application;
+package com.humaniq_mobile_pilot;
 
 import com.facebook.react.ReactApplication;
 import com.humaniq.apilib.Package;

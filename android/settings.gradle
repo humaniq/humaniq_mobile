@@ -1,4 +1,4 @@
-rootProject.name = 'humaniq_mobile'
+rootProject.name = 'humaniq_mobile_pilot'
 include ':react-native-android-library-humaniq-api'
 project(':react-native-android-library-humaniq-api').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-android-library-humaniq-api/android')
 include ':react-native-sound'
