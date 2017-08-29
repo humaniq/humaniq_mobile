@@ -78,8 +78,8 @@ class Choose extends React.Component {
                   id: p.account_id,
                   approved: false,
                   phone: phone_number.country_code ?
-                  `+(${phone_number.country_code}) ${phone_number.phone_number}` :
-                  `${phone_number.phone_number}`,
+                    `+(${phone_number.country_code}) ${phone_number.phone_number}` :
+                    `${phone_number.phone_number}`,
                   name: `${person.first_name} ${person.last_name}`,
                   status: 1,
                   avatar: avatar.url,
@@ -185,15 +185,15 @@ class Choose extends React.Component {
       <ScrollView style={{ backgroundColor: colors.white }} showsVerticalScrollIndicator={false}>
         <View style={{ backgroundColor: '#F2F2F2', justifyContent: 'center', height: 42 }}>
           {!search
-                ? <Image
-                  style={styles.checkBlue}
-                  resizeMode="contain"
-                  source={ic_big_check_blue}
-                />
-                : <Text style={styles.checkText}>
-                  CONTACTS
+            ? <Image
+              style={styles.checkBlue}
+              resizeMode="contain"
+              source={ic_big_check_blue}
+            />
+            : <Text style={styles.checkText}>
+              CONTACTS
                 </Text>
-            }
+          }
 
         </View>
         <View style={styles.contactsHeader} />
@@ -250,21 +250,21 @@ class Choose extends React.Component {
               <Image source={paymentBig} style={styles.paymentImage} />
             </View>
             {selectedID
-                ? <View style={{ flex: 3, alignItems: 'flex-start' }}>
-                  <Text style={styles.selectedNum}>
-                    {selName}
-                  </Text>
-                </View>
-                : null}
+              ? <View style={{ flex: 3, alignItems: 'flex-start' }}>
+                <Text style={styles.selectedNum}>
+                  {selName}
+                </Text>
+              </View>
+              : null}
             {selectedID
-                ? <TouchableOpacity
-                  onPress={() => {
-                    this.selectItem(selectedID);
-                  }}
-                >
-                  <Image source={closeWhite} style={styles.headerImage} />
-                </TouchableOpacity>
-                : null}
+              ? <TouchableOpacity
+                onPress={() => {
+                  this.selectItem(selectedID);
+                }}
+              >
+                <Image source={closeWhite} style={styles.headerImage} />
+              </TouchableOpacity>
+              : null}
             <TouchableOpacity onPress={selectedID ? () => null : this.setSearch}>
               <Image source={selectedID ? doneWhite : searchWhite} style={styles.headerImage} />
             </TouchableOpacity>
