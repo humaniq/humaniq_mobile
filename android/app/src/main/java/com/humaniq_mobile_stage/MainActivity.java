@@ -1,4 +1,4 @@
-package com.humaniq_mobile;
+package com.humaniq_mobile_stage;
 
 import com.facebook.react.ReactActivity;
 

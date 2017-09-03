@@ -93,7 +93,7 @@ android {
     buildToolsVersion "25.0.3"
 
     defaultConfig {
-        applicationId "com.humaniq_mobile"
+        applicationId "com.humaniq_mobile_stage"
         minSdkVersion 16
         targetSdkVersion 22
         versionCode 1
