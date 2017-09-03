@@ -8,6 +8,9 @@ import {
   TextInput,
   Animated,
   StatusBar,
+  FlatList,
+  SectionList,
+  ListView
 } from 'react-native';
 import PropTypes from 'prop-types';
 import { NavigationActions } from 'react-navigation';
@@ -66,6 +69,31 @@ const noFlagCountryArray = [
   'Virgin Islands, U.S.',
 ];
 
+class MyListItem extends React.PureComponent {
+  render() {
+    return (
+      <TouchableOpacity
+        style={{
+          height: vh(56),
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          flexDirection: 'row',
+        }}
+        onPress={() => this.onBackPress(this.props.o.dial_code, this.props.o.code, this.props.resname)}>
+        <View style={styles.flagAndCountryName}>
+          <Image style={styles.flag} source={{ uri: this.props.resname }} />
+          <Text style={styles.countryName}>
+            {this.props.o.name}
+          </Text>
+        </View>
+        <Text style={styles.dialCode}>
+          {this.props.o.dial_code}
+        </Text>
+      </TouchableOpacity>
+    )
+  }
+}
+
 export class CountryCode extends Component {
   static propTypes = {
 
@@ -78,6 +106,7 @@ export class CountryCode extends Component {
 
   constructor(props) {
     super(props);
+    const ds = new ListView.DataSource({ rowHasChanged: (r1, r2) => r1 !== r2 });
 
     this.state = {
       isSearchActive: false,
@@ -85,6 +114,7 @@ export class CountryCode extends Component {
       array: [],
       scrollY: new Animated.Value(0),
       loadIndex: 100,
+      dataSource: ds.cloneWithRows(countryArray)
     };
   }
 
@@ -95,11 +125,11 @@ export class CountryCode extends Component {
 
     this.state.scrollY.addListener(({ value }) => {
       if (value >= (this.state.loadIndex - this.state.loadIndex / 2) * vh(56)) {
-                // this.setState({ loadIndex: this.state.loadIndex +  this.state.loadIndex / 2 });
+        // this.setState({ loadIndex: this.state.loadIndex +  this.state.loadIndex / 2 });
       }
     });
 
-        // Array of countries grouped by letters
+    // Array of countries grouped by letters
     countryArray.map((o, i) => {
       if (o.name[0] != letter) {
         if (hashset.length != 0) {
@@ -117,64 +147,43 @@ export class CountryCode extends Component {
     this.setState({ array: res });
   }
 
-    // Render List of countries
+  // Render List of countries
   renderList = array => (
     <View style={styles.row}>
-      {this.state.isSearchActive ? () => null : this.renderLetters() }
-      <ScrollView
-        key={'countryColumn'}
-        style={[styles.scroll, this.state.isSearchActive ? { marginLeft: vw(56) } : null]}
-        scrollEventThrottle={16}
-        onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: this.state.scrollY } } }])}
-      >
-        {
-                        this.state.isSearchActive ? this.renderSearchResult() : this.renderSection(array)
-                    }
-      </ScrollView>
+      {this.state.isSearchActive ? () => null : this.renderLetters()}
+      {this.state.isSearchActive ? this.renderSearchResult() : this.renderSection(this.state.dataSource)}
     </View>
-        )
+  )
 
-  renderSection = countryArray => (
-            countryArray.map((o, i) => {
-              let resname = '';
-                // Some countries have no flag in android/src/main/res/ directory
-              if (noFlagCountryArray.filter(e => e == o.name).length > 0) {
-                resname = 'noflag';
-              } else {
-                    // Assets are lower case and contain ascii symbols
-                resname = o.name.toLowerCase()
-                        .replace(/\s/g, '_')
-                        .replace(/\(/g, '')
-                        .replace(/\)/g, '')
-                        .replace(/'/g, '')
-                        .replace(/,/g, '')
-                        .replace(/__/g, '_');
-              }
+  renderObj = (o) => {
+    let resname = '';
+    // Some countries have no flag in android/src/main/res/ directory
+    if (noFlagCountryArray.filter(e => e == o.name).length > 0) {
+      resname = 'noflag';
+    } else {
+      // Assets are lower case and contain ascii symbols
+      resname = o.name.toLowerCase()
+        .replace(/\s/g, '_')
+        .replace(/\(/g, '')
+        .replace(/\)/g, '')
+        .replace(/'/g, '')
+        .replace(/,/g, '')
+        .replace(/__/g, '_');
+    }
 
-              return (
-                <TouchableOpacity
-                  key={i}
-                  style={{
-                    height: vh(56),
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    flexDirection: 'row',
-                  }}
-                  onPress={() => this.onBackPress(o.dial_code, o.code, resname)}
-                >
-                  <View style={styles.flagAndCountryName}>
-                    <Image style={styles.flag} source={{ uri: resname }} />
-                    <Text style={styles.countryName}>
-                      {o.name}
-                    </Text>
-                  </View>
-                  <Text style={styles.dialCode}>
-                    {o.dial_code}
-                  </Text>
-                </TouchableOpacity>
-              );
-            })
-        );
+    return (
+      <MyListItem o={o} resname={resname} />
+    );
+  };
+
+  renderSection = (array) => (
+    <ListView
+      style={[styles.scroll, this.state.isSearchActive ? { marginLeft: vw(56) } : null]}
+      dataSource={array}
+      keyExtractor={item => item.name}
+      onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: this.state.scrollY } } }])}
+      renderRow={this.renderObj} />
+  );
 
   renderSearchResult = () => {
     if (this.state.searchText == '') {
@@ -186,7 +195,8 @@ export class CountryCode extends Component {
         res.push(o);
       }
     });
-    return this.renderSection(res);
+    const ds = new ListView.DataSource({ rowHasChanged: (r1, r2) => r1 !== r2 });
+    return this.renderSection(ds.cloneWithRows(res));
   }
 
   toggleSearch = () => {
@@ -208,34 +218,34 @@ export class CountryCode extends Component {
     return (
       <Animated.View key={'lettersColumn'} style={styles.letterContainer}>
         {
-                    letterArray.map((o, i) => {
-                      sectionOffset += this.state.array[i][o].length * vh(56);
-                      const h = this.state.scrollY.interpolate({
-                        inputRange: [sectionOffset - this.state.array[i][o].length * vh(56), sectionOffset - vh(56)],
-                        outputRange: [this.state.array[i][o].length * vh(56), vh(56)],
-                        extrapolate: 'clamp',
-                      });
-                      const m = this.state.scrollY.interpolate({
-                        inputRange: [sectionOffset - vh(56), sectionOffset],
-                        outputRange: [0, -vh(56)],
-                        extrapolate: 'clamp',
-                      });
-                      return (
-                        <Animated.View
-                          key={i}
-                          style={{
-                            height: h,
-                            marginTop: m,
-                            width: vw(56),
-                          }}
-                        >
-                          <Text style={styles.letter}>
-                            {o}
-                          </Text>
-                        </Animated.View >
-                      );
-                    })
-                }
+          letterArray.map((o, i) => {
+            sectionOffset += this.state.array[i][o].length * vh(56);
+            const h = this.state.scrollY.interpolate({
+              inputRange: [sectionOffset - this.state.array[i][o].length * vh(56), sectionOffset - vh(56)],
+              outputRange: [this.state.array[i][o].length * vh(56), vh(56)],
+              extrapolate: 'clamp',
+            });
+            const m = this.state.scrollY.interpolate({
+              inputRange: [sectionOffset - vh(56), sectionOffset],
+              outputRange: [0, -vh(56)],
+              extrapolate: 'clamp',
+            });
+            return (
+              <Animated.View
+                key={i}
+                style={{
+                  height: h,
+                  marginTop: m,
+                  width: vw(56),
+                }}
+              >
+                <Text style={styles.letter}>
+                  {o}
+                </Text>
+              </Animated.View >
+            );
+          })
+        }
       </Animated.View>
     );
   }
@@ -250,29 +260,29 @@ export class CountryCode extends Component {
               <Image source={backWhite} />
             </TouchableOpacity>
             {
-                            this.state.isSearchActive ? <TextInput
-                              style={styles.searchInputStyle}
-                              onChangeText={e => this.setState({ searchText: e })}
-                              underlineColorAndroid={'transparent'}
-                              autoCorrect={false}
-                              autoFocus
-                              placeholder={'Search Country'}
-                              placeholderTextColor={'#FFFFFFB2'}
-                              selectionColor={'#FFFFFF'}
-                            /> : null
-                        }
+              this.state.isSearchActive ? <TextInput
+                style={styles.searchInputStyle}
+                onChangeText={e => this.setState({ searchText: e })}
+                underlineColorAndroid={'transparent'}
+                autoCorrect={false}
+                autoFocus
+                placeholder={'Search Country'}
+                placeholderTextColor={'#FFFFFFB2'}
+                selectionColor={'#FFFFFF'}
+              /> : null
+            }
           </View>
           {
-                        this.state.isSearchActive ?
-                          <TouchableOpacity style={styles.searchButton} onPress={() => this.toggleSearch()}>
-                            <Image source={closeWhite} />
-                          </TouchableOpacity> :
-                          <TouchableOpacity style={styles.searchButton} onPress={() => this.toggleSearch()}>
-                            <Image source={searchWhite} />
-                          </TouchableOpacity>
-                    }
+            this.state.isSearchActive ?
+              <TouchableOpacity style={styles.searchButton} onPress={() => this.toggleSearch()}>
+                <Image source={closeWhite} />
+              </TouchableOpacity> :
+              <TouchableOpacity style={styles.searchButton} onPress={() => this.toggleSearch()}>
+                <Image source={searchWhite} />
+              </TouchableOpacity>
+          }
         </View>
-        {this.renderList(countryArray) }
+        {this.renderList(countryArray)}
       </View>
     );
   }
