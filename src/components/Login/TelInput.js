@@ -173,7 +173,7 @@ export class TelInput extends Component {
       <Text style={[styles.number, this.state.error ? styles.error : null]}>
         {
           this.state.maskedPhone.split("").map((l, i) => {
-            if (l == this.state.p) {
+            if (l == "R") {
               return (
                 <Text key={i} style={[styles.number, { color: 'transparent' }]}>
                   {l}
@@ -255,7 +255,7 @@ export class TelInput extends Component {
         <PhoneKeyboard
           onNumberPress={this.handleNumberPress}
           onBackspacePress={this.handleBackspacePress}
-          onHelpPress={this.handleHelpPress}
+          onHelpPress={this.handlePhoneConfirm}
         />
       </View>
     );

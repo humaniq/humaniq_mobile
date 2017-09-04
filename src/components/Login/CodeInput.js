@@ -277,8 +277,7 @@ export class CodeInput extends Component {
         <Modal
           onPress={this.handleDismissModal}
           visible={this.state.modalVisible}
-          code={this.state.errorCode}
-        />
+          code={this.state.errorCode} />
         <View style={styles.header}>
           <Animated.View style={[styles.codeInputContainer, { marginLeft: this.state.codeError }]}>
             {this.renderInput()}
@@ -288,18 +287,15 @@ export class CodeInput extends Component {
           <RequestSmsButton
             onPress={this.handleRequestSms}
             disabled={this.state.noAttempts}
-            cooldownTime={this.state.cooldownTime}
-          />
+            cooldownTime={this.state.cooldownTime} />
           <ConfirmButton
             onPress={this.handleCodeConfirm}
-            disabled={this.state.code.length < 6 || this.state.noAttempts}
-          />
+            disabled={this.state.code.length < 6 || this.state.noAttempts} />
         </View>
         <PhoneKeyboard
           onNumberPress={this.handleNumberPress}
           onBackspacePress={this.handleBackspacePress}
-          onHelpPress={this.handleHelpPress}
-        />
+          onHelpPress={this.state.code.length == 6 && !this.state.noAttempts && this.handleCodeConfirm} />
       </View>
     );
   }
