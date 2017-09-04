@@ -11,7 +11,6 @@ import CustomStyleSheet from '../../../utils/customStylesheet';
 const ic_help = require('../../../assets/icons/ic_help.png');
 const backspaceDark = require('../../../assets/icons/backspace_dark.png');
 
-
 export default class PhoneKeyboard extends Component {
     static propTypes = {
         color: PropTypes.string,
@@ -41,8 +40,7 @@ export default class PhoneKeyboard extends Component {
                 accessibilityLabel={number.toString() }
                 onPress={() => {
                     this.props.onNumberPress(number.toString());
-                } }
-                >
+                } }>
                 <Text style={[styles.number, { color: this.props.color }]}>{number}</Text>
             </TouchableOpacity>
         );
@@ -51,8 +49,7 @@ export default class PhoneKeyboard extends Component {
     renderBackspace = () => (
         <TouchableOpacity
             style={styles.backspace}
-            onPress={this.props.onBackspacePress}
-            >
+            onPress={this.props.onBackspacePress}>
             <Image source={backspaceDark}/>
         </TouchableOpacity>
     );
@@ -60,8 +57,7 @@ export default class PhoneKeyboard extends Component {
     renderNext = () => (
         <TouchableOpacity
             style={styles.cell}
-            onPress={this.props.onHelpPress}
-            >
+            onPress={this.props.onHelpPress}>
             <Text style={styles.next}>{"Next"}</Text>
         </TouchableOpacity>
     );
