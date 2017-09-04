@@ -79,7 +79,7 @@ class MyListItem extends React.PureComponent {
           alignItems: 'center',
           flexDirection: 'row',
         }}
-        onPress={() => this.onBackPress(this.props.o.dial_code, this.props.o.code, this.props.resname)}>
+        onPress={() => this.props.onBackPress(this.props.o.dial_code, this.props.o.code, this.props.resname)}>
         <View style={styles.flagAndCountryName}>
           <Image style={styles.flag} source={{ uri: this.props.resname }} />
           <Text style={styles.countryName}>
@@ -172,7 +172,7 @@ export class CountryCode extends Component {
     }
 
     return (
-      <MyListItem o={o} resname={resname} />
+      <MyListItem o={o} resname={resname} onBackPress={this.onBackPress}/>
     );
   };
 

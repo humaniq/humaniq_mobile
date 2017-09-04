@@ -1,24 +1,36 @@
-/* eslint-disable import/no-unresolved */
-import React from 'react';
-import { View, TouchableOpacity, Image, Animated, Text, TextInput, StatusBar } from 'react-native';
-import VMasker from 'vanilla-masker';
-import { connect } from 'react-redux';
-import { NavigationActions } from 'react-navigation';
+import React, { Component } from 'react';
+import {
+  View,
+  Image,
+  Text,
+  TouchableOpacity,
+  Animated,
+  StatusBar,
+} from 'react-native';
+
 import PropTypes from 'prop-types';
+import Animation from 'lottie-react-native';
+import VMasker from 'vanilla-masker';
+import phoneFormat from 'phoneformat-react-native';
+import { vw } from '../../utils/units';
 
-import { colors } from '../../utils/constants';
-import { newTransaction } from '../../actions';
-
+// Shared Components
 import PhoneKeyboard from '../Shared/Components/PhoneKeyboard';
 
+// Redux & Methods
+import { newTransaction } from '../../actions';
+import { connect } from 'react-redux';
+import { NavigationActions } from 'react-navigation';
+
+// Assets
+import { colors } from '../../utils/constants';
 const backWhite = require('./../../assets/icons/back_white.png');
 const paymentBig = require('./../../assets/icons/payment_big.png');
 const arrowDownWhite = require('../../assets/icons/arrow_down_white.png');
 const doneWhite = require('./../../assets/icons/done_white.png');
+const pattern = { pattern: '(999) 999-9999', placeholder: 'R' };
 
-const pattern = { pattern: '(999) 999-9999', placeholder: '0' };
-
-class Input extends React.Component {
+class Input extends Component {
   static propTypes = {
     newTransaction: PropTypes.shape({
       adress: PropTypes.string.isRequired,
@@ -37,12 +49,13 @@ class Input extends React.Component {
     this.state = {
       adress,
       contactID: '',
-      maxPhoneLength: 19,
+      maxPhoneLength: 10,
       phone: '',
-      maskedPhone: VMasker.toPattern(0, pattern),
+      maskedPhone: VMasker.toPattern('', pattern),
       code: '+1',
       flag: 'united_states',
       phoneError: new Animated.Value(0),
+      p: "R"
     };
   }
 
@@ -56,16 +69,28 @@ class Input extends React.Component {
   }
 
   setPhoneNumber = () => {
-    const { code, maskedPhone } = this.state;
+    const phone_number = this.state.phone;
+    const country_code = this.state.code.substr(1);
     const { setTrPhone, navigation: { navigate } } = this.props;
-    const filtered = maskedPhone.split('').filter(s => '0123456789'.indexOf(s) >= 0).join('');
-    console.warn(filtered)
-    setTrPhone(code + filtered);
-    navigate('SelectAmount');
+
+    if (this.phonenumber(this.state.phone, this.state.countryCode)) {
+      console.log(country_code + phone_number);
+      setTrPhone(this.state.code + phone_number);
+      navigate('SelectAmount');
+    } else {
+      this.setState({ error: true });
+      this.animatePasswordError();
+    }
   }
 
-  setCodeFlag = (t, flag) => {
-    if (t != null) this.setState({ code: t, flag });
+  phonenumber = (inputtxt, code) => {
+    return phoneFormat.isValidNumber(inputtxt, code);
+  };
+
+  setCodeFlag = (dialCode, code, flag) => {
+    if (dialCode != null) {
+      this.setState({ code: dialCode, countryCode: code, flag });
+    }
   }
 
   handleNumberPress = (number) => {
@@ -84,21 +109,40 @@ class Input extends React.Component {
   };
 
   renderPhone = () => (
-    <View style={{ flex: 1, flexDirection: 'column' }}>
-      <View style={styles.telInput}>
-        <TouchableOpacity
-          style={styles.countryCodeContainer}
-          onPress={() => {
-            this.props.navigation.navigate('CountryCode',
-              { refresh: this.setCodeFlag });
-          }}
-        >
-          <Image style={styles.flag} source={{ uri: this.state.flag }} />
-          <Text style={[styles.code, this.state.error ? styles.error : null]}>{this.state.code}</Text>
-          <Image style={[styles.arrow, this.state.error ? { tintColor: 'red' } : null]} source={arrowDownWhite} />
-        </TouchableOpacity>
-        <Text style={[styles.number, this.state.error ? styles.error : null]}>{this.state.maskedPhone}</Text>
-      </View>
+    <View style={styles.phoneContainer}>
+      <Animated.View style={[styles.passContainer, { marginLeft: this.state.phoneError }]}>
+        <View style={styles.telInput}>
+          <TouchableOpacity
+            style={styles.countryCodeContainer}
+            onPress={() => {
+              this.props.navigation.navigate('CountryCode', { refresh: this.setCodeFlag });
+            }}>
+            <Image style={styles.flag} source={{ uri: this.state.flag }} />
+            <Text style={[styles.code, this.state.error ? styles.error : null]}>{this.state.code}</Text>
+            <Image style={[styles.arrow, this.state.error ? { tintColor: 'red' } : { tintColor: '#d8d8d8' }]} source={arrowDownWhite} />
+          </TouchableOpacity>
+          <Text style={[styles.number, this.state.error ? styles.error : null]}>
+            {
+              this.state.maskedPhone.split("").map((l, i) => {
+                if (l == this.state.p) {
+                  return (
+                    <Text key={i} style={[styles.number, { color: 'transparent' }]}>
+                      {l}
+                    </Text>
+                  )
+                } else {
+                  return (
+                    <Text key={i} style={[styles.number, this.state.error ? styles.error : null]}>
+                      {l}
+                    </Text>
+                  )
+                }
+
+              })
+            }
+          </Text>
+        </View>
+      </Animated.View>
       <PhoneKeyboard
         onNumberPress={this.handleNumberPress}
         onBackspacePress={this.handleBackspacePress}
@@ -146,6 +190,31 @@ class Input extends React.Component {
       </View>
     );
   }
+
+  animatePasswordError = () => {
+    Animated.sequence([
+      Animated.timing(this.state.phoneError, {
+        toValue: vw(30),
+        duration: 50,
+      }),
+      Animated.timing(this.state.phoneError, {
+        toValue: vw(-30),
+        duration: 100,
+      }),
+      Animated.timing(this.state.phoneError, {
+        toValue: vw(30),
+        duration: 100,
+      }),
+      Animated.timing(this.state.phoneError, {
+        toValue: vw(-30),
+        duration: 100,
+      }),
+      Animated.timing(this.state.phoneError, {
+        toValue: vw(0),
+        duration: 50,
+      }),
+    ]).start(() => { this.setState({ error: null }); });
+  };
 
   render() {
     return (
@@ -195,8 +264,16 @@ const styles = ({
     height: 38,
   },
   // >>
-  telInput: {
+  phoneContainer: {
     flex: 1,
+  },
+  passContainer: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    paddingRight: 16,
+  },
+  telInput: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
@@ -218,12 +295,14 @@ const styles = ({
     height: 19,
   },
   code: {
+    fontFamily: 'monospace',
     fontSize: 25,
     color: colors.white_two,
     marginLeft: 4.5,
     lineHeight: 29,
   },
   number: {
+    fontFamily: 'monospace',
     textAlign: 'center',
     fontSize: 25,
     marginLeft: 10,
