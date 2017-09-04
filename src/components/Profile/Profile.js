@@ -117,7 +117,7 @@ export class Profile extends Component {
   };
 
   componentWillMount() {
-    console.warn(JSON.stringify(this.props.primaryAccount))
+    //console.warn(JSON.stringify(this.props.primaryAccount))
     DeviceEventEmitter.addListener('EVENT_TRANSACTION_ERROR', (event) => {
       console.log('ошибка');
       console.log(event);
@@ -169,7 +169,7 @@ export class Profile extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    console.warn(JSON.stringify(nextProps.newTransaction));
+    //console.warn(JSON.stringify(nextProps.newTransaction));
     if (nextProps.newTransaction && nextProps.newTransaction.amount !== 0) {
       const { newTransaction } = nextProps;
       this.setState({ newTransaction, confirmTransactionVisibility: true });

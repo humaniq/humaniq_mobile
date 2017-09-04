@@ -26,6 +26,7 @@ import { vw } from '../../utils/units';
 // const ic_user = require('../../assets/icons/ic_user.png');
 const arrowDownWhite = require('../../assets/icons/arrow_down_white.png');
 const spinner = require('../../assets/animations/s-spiner.json');
+const pattern = { pattern: '(999) 999-9999', placeholder: 'R' };
 
 export class TelInput extends Component {
   static propTypes = {
@@ -53,13 +54,12 @@ export class TelInput extends Component {
   state = {
     maxPhoneLength: 10,
     phone: '',
-    maskedPhone: VMasker.toPattern('', { pattern: '(999) 999-9999', placeholder: 'R' }),
+    maskedPhone: VMasker.toPattern('', pattern),
     code: '+1',
     countryCode: 'US',
     flag: 'united_states',
     phoneError: new Animated.Value(0),
     progress: new Animated.Value(0),
-    p: 'R'
   };
 
   componentWillReceiveProps(nextProps) {
@@ -113,14 +113,14 @@ export class TelInput extends Component {
     if (this.state.phone.length < this.state.maxPhoneLength) {
       let inputVal = this.state.phone;
       inputVal += number;
-      const m = VMasker.toPattern(inputVal, { pattern: '(999) 999-9999', placeholder: this.state.p });
+      const m = VMasker.toPattern(inputVal, pattern);
       this.setState({ phone: inputVal, maskedPhone: m });
     }
   };
 
   handleBackspacePress = () => {
     const inputVal = this.state.phone.slice(0, -1);
-    const m = VMasker.toPattern(inputVal, { pattern: '(999) 999-9999', placeholder: this.state.p });
+    const m = VMasker.toPattern(inputVal, pattern);
     this.setState({ phone: inputVal, maskedPhone: m });
   };
 
