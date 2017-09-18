@@ -16,8 +16,6 @@ import RNFetchBlob from 'react-native-fetch-blob';
 import { connect } from 'react-redux';
 import { validate, setAvatarLocalPath, faceEmotionCreate, faceEmotionValidate, newTransaction } from '../../actions';
 
-// console.log('action typesрџ”‘', ActionTypes.setAvatarLocalPath());
-
 import CustomStyleSheet from '../../utils/customStylesheet';
 import oncetrig from '../../utils/oncetrig';
 import Modal from '../Shared/Components/Modal';
@@ -44,7 +42,6 @@ const emergeAnimation = require('../../assets/animations/emerge.json');
 const pressAnimation = require('../../assets/animations/press.json');
 const scaleAnimation = require('../../assets/animations/scale.json');
 const doneAnimation = require('../../assets/animations/done.json');
-
 
 /*
   on second run check permissions http://facebook.github.io/react-native/docs/permissionsandroid.html
@@ -74,10 +71,12 @@ export class Cam extends Component {
     validate: PropTypes.func.isRequired,
     emotionCreate: PropTypes.func.isRequired,
     emotionValidate: PropTypes.func.isRequired,
+    setTrAdress: PropTypes.func.isRequired,
 
     navigation: PropTypes.shape({
       navigate: PropTypes.func.isRequired,
       dispatch: PropTypes.func.isRequired,
+      state: PropTypes.func.isRequired,
     }),
   };
 
@@ -102,9 +101,36 @@ export class Cam extends Component {
 
   componentWillReceiveProps(nextProps) {
     // TODO: MOVE TO SAGA TO PREVENT LAG
-    // console.log('📞 nextProps', nextProps.user.validate);
     this[`${this.state.photoGoal}ReceiveProps`](nextProps);
   }
+
+  getEmoji = (emoji) => {
+    switch (emoji) {
+      case 'happy':
+        return emojiHappy;
+      case 'neutral':
+        return neutralEmoji;
+      case 'surprise':
+        return surpriseEmoji;
+      case 'fear':
+        return fearEmoji;
+      case 'disgust':
+        return disgustEmoji;
+      case 'angry':
+        return angryEmoji;
+      case 'sad':
+        return sadEmoji;
+      default:
+        return emojiHappy;
+    }
+  };
+
+  animateEmoji = (callback) => {
+    Animated.timing(this.state.emojiAnimation, {
+      toValue: 1,
+      duration: 2000,
+    }).start(callback);
+  };
 
   replayEmoji = () => {
     this.setState({ isButtonVisible: false });
@@ -137,7 +163,8 @@ export class Cam extends Component {
 
         case 3003:
           // new user
-          if (nextProps.user.validate.payload.payload.facial_image_id) { // Emotions case
+          if (nextProps.user.validate.payload.payload.facial_image_id) { 
+            // Emotions case
             this.setState({ photoGoal: 'createFacialRecognitionValidation' });
             this.props.emotionCreate({
               facial_image_id: nextProps.user.validate.payload.payload.facial_image_id,
@@ -171,7 +198,6 @@ export class Cam extends Component {
       this.props.user.faceEmotionCreate.isFetching && !nextProps.user.faceEmotionCreate.isFetching
     ) {
       const code = nextProps.user.faceEmotionCreate.payload.code;
-      console.log('createFacialRecognitionValidationReceiveProps', code);
       if (code === 3006) {
         this.props.setAvatarLocalPath(this.state.path);
         this.state.progress.stopAnimation();
@@ -184,10 +210,12 @@ export class Cam extends Component {
             photoGoal: 'validateFacialRecognitionValidation',
             requiredEmotions: nextProps.user.faceEmotionCreate.payload.payload.required_emotions,
             isButtonVisible: false,
-            emoji: this.getEmoji(nextProps.user.faceEmotionCreate.payload.payload.required_emotions[0])
+            emoji: this.getEmoji(nextProps.user.faceEmotionCreate.payload.payload.required_emotions[0]),
           });
           // After state is updated, need to animate emoji there
-          setTimeout(() => { this.replayEmoji() }, 1000)
+          setTimeout(() => {
+            this.replayEmoji();
+          }, 1000);
         });
       } else {
         this.setState({
@@ -213,7 +241,6 @@ export class Cam extends Component {
       } else {
         code = nextProps.user.faceEmotionValidate.payload.code;
       }
-      console.log('validateFacialRecognitionValidationReceiveProps', code);
       if (code === 3008) {
         // reduce emotions there
         this.setState({ animation: doneAnimation });
@@ -232,13 +259,10 @@ export class Cam extends Component {
   };
 
   handleImageCapture = () => {
-    console.log('Camera::handleImageCapture BEGIN');
     if (!this.state.path && !this.state.capturing) {
       this.setState({ capturing: true });
-      console.log('Camera::handleImageCapture BEGIN!!!');
       this.camera.capture({ jpegQuality: 60 })
         .then((data) => {
-          console.log('Camera::handleImageCapture DONE');
           this.setState({ capturing: false, path: data.path });
           this.handleImageUpload(data.path);
           this.setState({ animation: scaleAnimation });
@@ -254,16 +278,13 @@ export class Cam extends Component {
             }),
           ]).start();
         })
-        .catch((err) => {
+        .catch(() => {
           this.setState({ capturing: false });
-          console.error('error during image capture', err);
         });
     }
   };
 
   handleImageUpload = (path) => {
-    console.log('Camera::handleImageUpload', this.state.photoGoal);
-    console.log('Camera::convertToBase64', path);
     RNFetchBlob.fs.readFile(path, 'base64')
       .then((base64) => {
         if (this.state.photoGoal === 'isRegistered') {
@@ -274,18 +295,14 @@ export class Cam extends Component {
             facial_image: base64,
           });
         }
-      })
-      .catch((err) => { console.log(err.message); });
+      });
   };
 
   convertToBase64 = (path) => {
-    console.log('Camera::convertToBase64', path);
     RNFetchBlob.fs.readFile(path, 'base64')
       .then((data) => {
-        console.log(data);
         return data;
-      })
-      .catch((err) => { console.log(err.message); });
+      });
   };
 
   navigateTo = (screen, params) => {
@@ -329,25 +346,16 @@ export class Cam extends Component {
     });
   };
 
-  animateEmoji = (callback) => {
-    Animated.timing(this.state.emojiAnimation, {
-      toValue: 1,
-      duration: 2000,
-    }).start(callback);
-  };
-
   renderCamera() {
-    const { params = {} } = this.props.navigation.state;
+    const { params = {} } = this.props.navigation != null && this.props.navigation.state;
     const { mode } = params;
-    const { qr } = this.state;
-    const { setTrAdress } = this.props;
     const camtype = mode === 'qr' ? 'back' : Camera.constants.Type.front;
     const { navigate } = this.props.navigation;
     oncetrig.setFunction(() => { navigate('Input', { mode: 'adress' }); });
     const onBarCode = (code) => {
       if (mode === 'qr') {
         if (code.type === 'QR_CODE' && code.data) {
-          setTrAdress(code.data);
+          this.props.setTrAdress(code.data);
           oncetrig.callFunction();
         }
       }
@@ -367,50 +375,16 @@ export class Cam extends Component {
     );
   }
 
-
   renderImage = () => (<Image source={{ uri: this.state.path }} style={styles.camera} />);
 
-  getEmoji(emoji) {
-    switch (emoji) {
-      case 'happy':
-        return emojiHappy;
-        break;
-      case 'neutral':
-        return neutralEmoji;
-        break;
-      case 'surprise':
-        return surpriseEmoji;
-        break;
-      case 'fear':
-        return fearEmoji;
-        break;
-      case 'disgust':
-        return disgustEmoji;
-        break;
-      case 'angry':
-        return angryEmoji;
-        break;
-      case 'sad':
-        return sadEmoji;
-        break;
-      default:
-        return emojiHappy;
-        break;
-    }
-  }
-
   render() {
-    const isFetching =
-      this.props.user.validate.isFetching ||
-      this.props.user.faceEmotionCreate.isFetching ||
-      this.props.user.faceEmotionValidate.isFetching;
     const { params = {} } = this.props.navigation.state;
     const { mode } = params;
     const isQR = mode === 'qr';
     const fn = () => null;
     return (
       <View style={styles.container}>
-        <StatusBar hidden/>
+        <StatusBar hidden />
         <Modal
           onPress={this.handleDismissModal}
           code={this.state.errorCode}
@@ -426,12 +400,13 @@ export class Cam extends Component {
           <View style={styles.navbar}>
             <TouchableOpacity
               style={styles.closeBtn}
-              onPress={this.handleCameraClose}>
+              onPress={this.handleCameraClose}
+            >
               <Image source={close} />
             </TouchableOpacity>
           </View>
           {
-            this.state.isButtonVisible ? <View /> :
+            this.state.isButtonVisible ? <View /> : (
               <Animated.Image
                 source={this.state.emoji}
                 style={[styles.emojiImage, {
@@ -439,6 +414,7 @@ export class Cam extends Component {
                   opacity: this.state.emojiAnimation,
                 }]}
               />
+            )
           }
           <View style={styles.captureContainer}>
             {

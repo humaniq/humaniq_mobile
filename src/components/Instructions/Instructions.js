@@ -8,7 +8,6 @@ import {
   ActivityIndicator,
   Dimensions,
   Animated,
-  Easing,
   DeviceEventEmitter,
   StatusBar,
 } from 'react-native';
@@ -30,11 +29,7 @@ export class Instructions extends Component {
       navigate: PropTypes.func.isRequired,
       dispatch: PropTypes.func.isRequired,
     }),
-    url: PropTypes.string.isRequired,
   };
-  video: Video;
-  activity = true;
-  animationValue = new Animated.Value(0);
 
   constructor(props) {
     super(props);
@@ -53,26 +48,12 @@ export class Instructions extends Component {
     };
   }
 
-  componentWillMount() {
-  }
-
-  animateIndicator = (reset = true) => {
-    if (reset) this.animationValue.setValue(0);
-    requestAnimationFrame(() => {
-      Animated.timing(this.animationValue, {
-        toValue: 1,
-        easing: Easing.linear,
-        duration: (this.state.duration * 1000) * (1 - this.animationValue._value),
-      }).start();
-    });
-  }
-
   async componentDidMount() {
     HumaniqDownloadFileLib.downloadVideoFile(this.state.videoUrl).then((uri) => {
       if (this.activity) {
         this.setState({ source: uri.uri, loading: false });
       }
-    }).catch((error) => {
+    }).catch(() => {
       if (this.activity) {
         this.setState({ loading: false });
       }
@@ -136,13 +117,54 @@ export class Instructions extends Component {
     this.setState({ width });
   };
 
+  animateIndicator = (reset = true) => {
+    if (reset) this.animationValue.setValue(0);
+  }
+  activity = true;
+  video: Video;
+  animationValue = new Animated.Value(0);
+
+  showVideoPlayer(height, width) {
+    return (
+      <TouchableWithoutFeedback
+        delayPressIn={0}
+        delayPressOut={0}
+        onPressOut={() => this.onPressEnd()}
+        onPressIn={() => this.onPressStart()}
+      >
+        <Video
+          ref={(ref) => {
+            this.video = ref;
+          }}
+          source={{ uri: this.state.source }}
+          style={[styles.fullScreen, { height, width }]}
+          paused={this.state.paused}
+          volume={this.state.volume}
+          muted={this.state.muted}
+          onProgress={this.onProgress}
+          onLoad={this.onLoad}
+          resizeMode="cover"
+          onEnd={this.onEnd}
+        />
+      </TouchableWithoutFeedback>
+    );
+  }
+
+  showProgress() {
+    return (
+      <View style={styles.progressTextContainer}>
+        <Text style={{ fontSize: 26 }}>{this.state.progressText}%</Text>
+      </View>
+    );
+  }
+
   renderLoadingComponent = () => (
     <ActivityIndicator
       color="#fff"
       size={24}
       style={styles.indicator}
     />
-    );
+  );
 
   renderCloseButton = () => (
     <TouchableOpacity onPress={() => this.onClosePress()}>
@@ -152,7 +174,7 @@ export class Instructions extends Component {
         source={closeIcon}
       />
     </TouchableOpacity>
-    );
+  );
 
   render() {
     const { height, width } = Dimensions.get('window');
@@ -195,40 +217,6 @@ export class Instructions extends Component {
             </View>
           </View>
         </LinearGradient>
-      </View>
-    );
-  }
-
-  showVideoPlayer(height, width, source) {
-    return (
-      <TouchableWithoutFeedback
-        delayPressIn={0}
-        delayPressOut={0}
-        onPressOut={() => this.onPressEnd()}
-        onPressIn={() => this.onPressStart()}
-      >
-        <Video
-          ref={(ref) => {
-            this.video = ref;
-          }}
-          source={{ uri: this.state.source }}
-          style={[styles.fullScreen, { height, width }]}
-          paused={this.state.paused}
-          volume={this.state.volume}
-          muted={this.state.muted}
-          onProgress={this.onProgress}
-          onLoad={this.onLoad}
-          resizeMode="cover"
-          onEnd={this.onEnd}
-        />
-      </TouchableWithoutFeedback>
-    );
-  }
-
-  showProgress() {
-    return (
-      <View style={styles.progressTextContainer}>
-        <Text style={{ fontSize: 26 }}>{this.state.progressText}%</Text>
       </View>
     );
   }
@@ -302,8 +290,7 @@ const styles = CustomStyleSheet({
 });
 
 export default connect(
-    state => ({
-      user: state.user,
-    }),
-    dispatch => ({}),
+  state => ({
+    user: state.user,
+  }),
 )(Instructions);

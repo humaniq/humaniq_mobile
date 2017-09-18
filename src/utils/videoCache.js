@@ -10,7 +10,6 @@ export const downloadVideo = (url, name) => {
       .fetch('GET', url)
       .then(res => res.path())
       .catch((err) => {
-        console.warn(`error ${JSON.stringify(err)}`);
         return deleteFile(path);
       });
   });
@@ -18,7 +17,7 @@ export const downloadVideo = (url, name) => {
 
 export const deleteFile = path => RNFetchBlob.fs.stat(path)
   .then(res => res && res.type === 'file')
-  .then(exists => exists && RNFetchBlob.fs.unlink(path)) // if file exist
+  .then(exists => exists && RNFetchBlob.fs.unlink(path))
   .catch((err) => {
-    console.log('delete file error', err);
+    //console.log('delete file error', err);
   });

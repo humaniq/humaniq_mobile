@@ -33,7 +33,7 @@ const nameSort = (a, b) => {
 };
 const sort = (a, b) => nameSort(getName(a), getName(b));
 
-export class ChatContacts extends Component {
+class ChatContacts extends Component {
   constructor(props) {
     super(props);
     this.state = {

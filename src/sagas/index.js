@@ -8,23 +8,19 @@ import IMEI from 'react-native-imei';
 function* fetchEntity(entity, apiFn, body, errorCodes) {
   const { response } = yield call(apiFn, body);
   let result = null;
-  console.log(response);
   if (response && response.code) {
     const responseCode = parseInt(response.code, 10);
     const errorCode = errorCodes.find(errCode => errCode === responseCode);
 
     if (!errorCode) {
-      console.log('response ok', response);
       result = response;
       yield put(entity.success(result));
     } else {
       result = { ...response };
-      console.log('response fail', result);
       yield put(entity.failure(result));
     }
   } else {
     result = { ...response };
-    console.log('unknown response fail', result);
     yield put(entity.failure(result));
   }
   return result;
@@ -84,7 +80,6 @@ export const fetchSmsCodeRepeat = fetchEntity.bind(
 
 function* validate({ facial_image }) {
   const errorCodes = [3000, 3001, 6000];
-  // do we need cache? place it here and wrap with conditional statement below call
   return yield call(fetchValidate, { facial_image }, errorCodes);
 }
 
@@ -107,7 +102,6 @@ function* faceEmotionValidate({ facial_image_validation_id, facial_image }) {
 function* login({ facial_image, password, device_imei }) {
   // Call to get new facial_image_id (every time password was typed incorrectly we need new fid)
   let response = yield call(validate, { facial_image });
-
   // If new fid recieved go on
   if (response && response.payload.facial_image_id) {
     const errorCodesLogin = [2002, 3003, 6000];
@@ -135,7 +129,6 @@ function* login({ facial_image, password, device_imei }) {
         }
       });
       const photo = yield select(state => { return state.user.photo });
-
       /* Save creds to the store */
       yield HumaniqTokenApiLib.saveCredentials(credentials);
       // Native Call to get user profile data
@@ -168,7 +161,6 @@ function* signup({ facial_image_id, password, device_imei }) {
   if (response && response.code == 1001) {
     const account_information = response.payload.account_information;
     /* Save creds to the store */
-    console.log(response.payload.token);
     const credentials = {
       token: response.payload.token,
       account_id: account_information.account_id,
@@ -202,9 +194,7 @@ function* saveCredentials({ token, account_id, facial_image_id, password, device
     password: password,
     device_imei: device_imei,
   };
-  HumaniqTokenApiLib.saveCredentials(credentials)
-    .then(res => console.log(res))
-    .catch(err => console.log(err));
+  HumaniqTokenApiLib.saveCredentials(credentials);
 }
 
 /* Initiate phone number validation process */
@@ -218,7 +208,6 @@ function* phoneNumberCreate({ account_id, phone_number }) {
       phone_number: phone_number.phone_number,
     },
   };
-  console.log(body);
   let response = yield call(fetchPhoneNumberCreate, body, errorCodes);
   if (response.code == 4005) {
     yield put(actions.savePhone({
@@ -234,18 +223,11 @@ function* phoneNumberCreate({ account_id, phone_number }) {
 
 function* phoneNumberValidate({ phone_number, validation_code, account_id }) {
   const errorCodes = [6000, 4010, 4004, 4003, 4001, 4009];
-  // let code = phone_number.toString().slice(0, 1);
-  // let number = phone_number.toString().slice(1);
   const body = {
     validation_code: validation_code.toString(),
     account_id: account_id.toString(),
     phone_number,
-    // phone_number: {
-    // country_code: code,
-    // phone_number: number,
-    // },
   };
-  console.log('validate sms body', body);
   yield call(fetchPhoneNumberValidate, body, errorCodes);
 }
 
@@ -253,14 +235,11 @@ function* phoneNumberValidate({ phone_number, validation_code, account_id }) {
 
 function* smsCodeRepeat({ account_id, phone_number, imei }) {
   const errorCodes = [6000, 4010, 4004, 4003, 4001, 4009];
-  // let code = phone_number.toString().slice(0, 1);
-  // let number = phone_number.toString().slice(1);
   const body = {
     account_id,
     phone_number,
     imei,
   };
-  console.log('sms code repeat', body);
   yield call(fetchSmsCodeRepeat, body, errorCodes);
 }
 

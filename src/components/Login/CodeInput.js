@@ -45,6 +45,7 @@ export class CodeInput extends Component {
     navigation: PropTypes.shape({
       navigate: PropTypes.func.isRequired,
       dispatch: PropTypes.func.isRequired,
+      state: PropTypes.func.isRequired,
     }),
   };
 
@@ -60,7 +61,7 @@ export class CodeInput extends Component {
 
   componentDidMount() {
     const params = this.props.navigation.state.params;
-    if (params.prevScene != 'TelInput') {
+    if (params.prevScene !== 'TelInput') {
       this.handleRequestSms();
     }
     let interval;
@@ -82,7 +83,6 @@ export class CodeInput extends Component {
         const smsCode = body.replace(/\D/g, '');
 
         let account = null;
-        const params = this.props.navigation.state.params;
         if (this.props.user.account.payload.payload.account_information) {
           account = this.props.user.account.payload.payload.account_information;
         } else {
@@ -248,12 +248,12 @@ export class CodeInput extends Component {
     VMasker.toPattern(this.state.code, { pattern: '999999', placeholder: '0' }).split('').map((o, i) => {
       if (i === 2) {
         return [
-          <View key={i} style={[styles.numberContainer, this.state.error ? styles.errorContainer : null]}>
+          <View key={o} style={[styles.numberContainer, this.state.error ? styles.errorContainer : null]}>
             <Text style={[styles.codeInput, this.state.error ? styles.errorText : null]}>
               {o}
             </Text>
           </View>,
-          <View key={i + 'dash'} style={[styles.numberContainer, this.state.error ? styles.errorContainer : null]}>
+          <View key={`dash${o}!`} style={[styles.numberContainer, this.state.error ? styles.errorContainer : null]}>
             <Text style={[styles.codeInput, this.state.error ? styles.errorText : null]}>
               {'-'}
             </Text>
@@ -261,7 +261,7 @@ export class CodeInput extends Component {
         ];
       }
       return (
-        <View key={i} style={[styles.numberContainer, this.state.error ? styles.errorContainer : null]}>
+        <View key={o} style={[styles.numberContainer, this.state.error ? styles.errorContainer : null]}>
           <Text style={[styles.codeInput, this.state.error ? styles.errorText : null]}>
             {o}
           </Text>
@@ -277,7 +277,8 @@ export class CodeInput extends Component {
         <Modal
           onPress={this.handleDismissModal}
           visible={this.state.modalVisible}
-          code={this.state.errorCode} />
+          code={this.state.errorCode}
+        />
         <View style={styles.header}>
           <Animated.View style={[styles.codeInputContainer, { marginLeft: this.state.codeError }]}>
             {this.renderInput()}
@@ -287,15 +288,18 @@ export class CodeInput extends Component {
           <RequestSmsButton
             onPress={this.handleRequestSms}
             disabled={this.state.noAttempts}
-            cooldownTime={this.state.cooldownTime} />
+            cooldownTime={this.state.cooldownTime}
+          />
           <ConfirmButton
             onPress={this.handleCodeConfirm}
-            disabled={this.state.code.length < 6 || this.state.noAttempts} />
+            disabled={this.state.code.length < 6 || this.state.noAttempts}
+          />
         </View>
         <PhoneKeyboard
           onNumberPress={this.handleNumberPress}
           onBackspacePress={this.handleBackspacePress}
-          onHelpPress={this.state.code.length == 6 && !this.state.noAttempts && this.handleCodeConfirm} />
+          onHelpPress={this.state.code.length === 6 && !this.state.noAttempts && this.handleCodeConfirm}
+        />
       </View>
     );
   }

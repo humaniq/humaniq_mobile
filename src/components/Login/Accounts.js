@@ -4,7 +4,6 @@ import {
   View,
   Image,
   Text,
-  TouchableOpacity,
   StatusBar,
 } from 'react-native';
 import Ripple from 'react-native-material-ripple';
@@ -16,7 +15,6 @@ import CustomStyleSheet from '../../utils/customStylesheet';
 // assets
 const authillustration = require('../../assets/icons/auth_illustration.png');
 const ic_chevrone_right = require('../../assets/icons/ic_chevrone_right.png');
-const ic_add_user = require('../../assets/icons/ic_add_user.png');
 
 export class Accounts extends Component {
   static propTypes = {
@@ -43,7 +41,7 @@ export class Accounts extends Component {
       <View style={{ flex: 1 }}>
         <StatusBar
           translucent
-          backgroundColor='transparent'
+          backgroundColor={'transparent'}
         />
         <ScrollView contentContainerStyle={styles.container}>
           <View style={styles.header} >

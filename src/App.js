@@ -3,7 +3,6 @@ import { AppRegistry } from 'react-native';
 import {
   NavigationActions,
   StackNavigator,
-  // TabNavigator,
 } from 'react-navigation';
 import { Provider } from 'react-redux';
 import store from './utils/store';
@@ -22,32 +21,15 @@ import {
 import Dashboard from './components/Dashboard';
 import Tutorial from './components/Shared/Components/Tutorial';
 import Chat from './components/Chat';
-import MainChat from './components/Chat/MainChatView';
 import Chats from './components/Chats';
 import { Instructions } from './components/Instructions/Instructions';
 import Choose from './components/Transactions/Choose';
-import Temp from './components/Transactions/Temp';
 import Input from './components/Transactions/Input';
 import SelectAmount from './components/Transactions/SelectAmount';
 import { Profile, ProfileSettings, ProfileEdit, ProfileEditPassword } from './components/Profile/index';
 import CameraEdit from './components/Profile/CameraEdit';
 import PasswordEdit from './components/Profile/PasswordEdit';
 import ChatContacts from './components/Chats/ChatContacts';
-
-/*
-const Dashboard = TabNavigator(
-  {
-    Chat: { screen: Chat },
-    Contacts: { screen: Contacts },
-    Dapp: { screen: Dapp },
-    Profile: { screen: Profile },
-  },
-  {
-    tabBarPosition: 'bottom',
-    backBehavior: 'none',
-  },
-);
-*/
 
 const stack = {
   // Temp: { screen: Temp },
@@ -90,17 +72,17 @@ function kickRoutes(prevRouteName, nextRouteName) {
       return 1;
     case 'Password':
       return nextRouteName === 'Password' ? 1 : 2;
+    default: 
+      break;
   }
   return 0;
 }
 
 LoginStack.router.getStateForAction = (action, state) => {
-  // console.log('getStateForAction >>', action, state);
   let newState = state;
   let newAction = action;
   if (action.type === 'Navigation/NAVIGATE' && state.index >= 0) {
     const prevRouteName = state.routes[state.index].routeName;
-    // reset routing stack
     if (prevRouteName === 'Loading' || action.routeName === 'Profile') {
       newAction = NavigationActions.reset({
         actions: [action],
@@ -108,7 +90,6 @@ LoginStack.router.getStateForAction = (action, state) => {
       });
     } else {
       const kickCount = kickRoutes(prevRouteName, action.routeName);
-      // kick intermediate screens
       if (kickCount > 0) {
         const newIndex = state.index - kickCount;
         newState = {
@@ -117,12 +98,8 @@ LoginStack.router.getStateForAction = (action, state) => {
           index: Math.max(newIndex, 0),
         };
       }
-      // console.log('newState', newState);
     }
   }
-  // const res = defaultGetStateForAction(newAction, newState);
-  // console.log('defaultGetStateForAction >>', res);
-  // return res;
   return defaultGetStateForAction(newAction, newState);
 };
 

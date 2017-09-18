@@ -41,7 +41,7 @@ const pressAnimation = require('../../assets/animations/press.json');
 const scaleAnimation = require('../../assets/animations/scale.json');
 const doneAnimation = require('../../assets/animations/done.json');
 
-export class CameraEdit extends Component {
+class CameraEdit extends Component {
   constructor(props) {
     super(props);
 
