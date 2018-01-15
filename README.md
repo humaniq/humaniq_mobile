@@ -1,3 +1,5 @@
+### This version of the app has been deprecated since September 2017. It doesn't have any features we have implemented since that time. New version of the app hasn't been released to open source, yet.
+
 # HUMANIQ MOBILE [LITE]
 
 [![Vexor status](https://ci.vexor.io/projects/9c78b9c5-e2d8-4209-8acf-b67152d7024f/status.svg)](https://ci.vexor.io/ui/projects/9c78b9c5-e2d8-4209-8acf-b67152d7024f/builds)
